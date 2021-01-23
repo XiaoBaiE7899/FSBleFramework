@@ -4,6 +4,7 @@
 
 #import "FSEnum.h"
 #import "FSDelegate.h"
+#import "FSBleDevice.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,6 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 排序
 - (void)sortRssiForDevice;
+
+// 查找信号最前的设备 FIXME: 这个方法不能公开
+- (void)findNearestDevice;
 
 @end
 

@@ -1,8 +1,10 @@
 
-
-
 #import "FSCentralManager.h"
+#import "FSLibHelp.h"
+
 static NSMutableDictionary  *manager = nil;
+
+
 
 @interface FSCentralManager ()
 
@@ -81,10 +83,13 @@ static NSMutableDictionary  *manager = nil;
 }
 
 - (void)disconnectAllDevicesInManager {
-    // FIXME: 这个不能注释
-//    for (BleDevice *device in self.devices) {
-//        [device disconnect];
-//    }
+    for (FSBleDevice *device in self.devices) {
+        [device disconnect];
+    }
+}
+
+- (void)findNearestDevice {
+
 }
 
 #pragma mark 蓝牙中心代理方法
@@ -111,9 +116,72 @@ static NSMutableDictionary  *manager = nil;
     [self.centralDelegate manager:self didUpdateState:self.mgrState];
 }
 
+/* !!!: 蓝牙广播包数据构成
+广播包的数据12字节
+前面4个字节：设备id  一个字节8位，一共32位，高4位是设备类型，接下来12位是品牌代码，剩余16位是机型代码
+中间4个字节：系列号  这是一个长整形数字
+后面4个字节没有用
+*/
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *, id> *)advertisementData RSSI:(NSNumber *)RSSI {
+    /*
+     扫描得到的设备 的判断逻辑
+     1 扫描得到的外设名字为空， 直接返回
+     */
+    if (kIsEmptyStr(peripheral.name)) return;
+
+    /*
+     基本错误已过滤 先通过 peripheral 初始化一个蓝牙模块对象
+     重写 设置广播包的的数据 和 更新信号量
+     */
+
+    FSBleModule *module = [[FSBleModule alloc] initWithPeripheral:peripheral];
+    [module setAdvertisementData:advertisementData];
+    [module setRssi:RSSI.intValue];
+
+    // 在管理器的数组中查找 设备， 判断设备是不是已经被扫描到了
+    FSBleDevice *device = [self objectForPeripheral:peripheral];
+
+    if (!device) { // 设备还没找到
+        return;
+    }
+    // 设备已经找了 更新设备信息，主要是主要是更新设备的信号量，因为最近的设备是通过信号量计算得到的
+    [device.module setAdvertisementData:advertisementData];
+    [device.module setRssi:RSSI.intValue];
+    // 子类需要重写这个方法，因为不同子类的信号量偏差可能存在不同
+    [self findNearestDevice];
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
+    // 先找到设备，在去找服务
+    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    if (device) {
+        [peripheral discoverServices:nil];
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+
+    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    if (device) { // 连接失败就重连
+        FSLog(@"断开重连^^^重连");
+        [device willDisconnect];
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+    // 先找到设备，在去找服务
+    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    if (device) { // 连接失败就重连
+        FSLog(@"连接失败^^^重连");
+        [device willDisconnect];
+    }
+}
+
 #pragma mark 子类需要重写的方法
 - (void)initialize {
 }
+
+
 
 #pragma mark settet && geter
 - (BOOL)hasAuthorized {
@@ -129,6 +197,15 @@ static NSMutableDictionary  *manager = nil;
         _devices = NSMutableArray.array;
     }
     return _devices;
+}
+
+#pragma mark 内部方法
+- (FSBleDevice *)objectForPeripheral:(CBPeripheral *)peripheral {
+    for (FSBleDevice *obj in self.devices) {
+        if ([obj.module.peripheral isEqual:peripheral])
+            return obj;
+    }
+    return nil;
 }
 
 @end

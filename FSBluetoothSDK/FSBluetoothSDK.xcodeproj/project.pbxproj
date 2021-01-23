@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7B5C22EF25BC4F52004942F8 /* FSBleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */; };
 		7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210025BC049500FCDA13 /* AppDelegate.m */; };
 		7BEE210725BC049500FCDA13 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210625BC049500FCDA13 /* ViewController.m */; };
 		7BEE210A25BC049500FCDA13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BEE210825BC049500FCDA13 /* Main.storyboard */; };
@@ -35,6 +36,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7B5C22ED25BC4F52004942F8 /* FSBleDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBleDevice.h; sourceTree = "<group>"; };
+		7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBleDevice.m; sourceTree = "<group>"; };
+		7B5C22F325BC571E004942F8 /* FSLibHelp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLibHelp.h; sourceTree = "<group>"; };
 		7BEE20FC25BC049500FCDA13 /* FSBluetoothSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSBluetoothSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEE20FF25BC049500FCDA13 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7BEE210025BC049500FCDA13 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -140,8 +144,11 @@
 			children = (
 				7BEE214125BC05FD00FCDA13 /* FSCentralManager.h */,
 				7BEE214225BC05FD00FCDA13 /* FSCentralManager.m */,
+				7B5C22ED25BC4F52004942F8 /* FSBleDevice.h */,
+				7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */,
 				7BEE214725BC065400FCDA13 /* FSDelegate.h */,
 				7BEE214B25BC092000FCDA13 /* FSEnum.h */,
+				7B5C22F325BC571E004942F8 /* FSLibHelp.h */,
 			);
 			path = FSLib;
 			sourceTree = "<group>";
@@ -278,6 +285,7 @@
 				7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */,
 				7BEE214325BC05FD00FCDA13 /* FSCentralManager.m in Sources */,
 				7BEE211225BC049600FCDA13 /* main.m in Sources */,
+				7B5C22EF25BC4F52004942F8 /* FSBleDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
