@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FSCentralManager : NSObject <CBCentralManagerDelegate>
 
-/// iOS 13以后，调用系统蓝牙库需要系统授权
+/// iOS 13以后，调用系统蓝牙库需要系统授权 重写getter方法
 @property (nonatomic, assign) BOOL hasAuthorized;
 
 /// 蓝牙管理的的状态
@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 自定义代理
 @property (nonatomic, assign) id <FSCentralDelegate> centralDelegate;
 
-// 蓝牙中心 FIXME: 这个属性不需要开放出去
+// 蓝牙中心 FIXME: 这个属性不需要开放出去 如果开放出去，这个属性应该是只读
 @property (nonatomic, strong) CBCentralManager    *centralManager;
 
 /// 扫描指定的 服务 当前类初始化的同时初始化
@@ -42,12 +42,34 @@ NS_ASSUME_NONNULL_BEGIN
 /// 停止扫描
 - (void)stopScan;
 
+/// 清楚管理器
+- (void)cleanManager;
 
+/// 断连子类管理器中所有连接的设备
+- (void)disconnectAllDevicesInManager;
 
-
-
-
+/// 排序
+- (void)sortRssiForDevice;
 
 @end
+
+// 运动秀的管理器 主要扫描 大件运动设备
+@interface FSLargeManager : FSCentralManager
+
+@end
+
+// 心率设备管理 主要扫描 心率设备
+@interface FSHeartRateManager : FSCentralManager
+
+@end
+
+// 跳绳 管理器 主要扫描对象为跳绳
+@interface FSRopeManager : FSLargeManager
+
+@end
+
+
+
+
 
 NS_ASSUME_NONNULL_END

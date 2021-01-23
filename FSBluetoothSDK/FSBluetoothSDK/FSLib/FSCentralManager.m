@@ -10,6 +10,7 @@ static NSMutableDictionary  *manager = nil;
 
 @property (nonatomic) BOOL isScaning;
 
+
 @end
 
 @implementation FSCentralManager
@@ -34,7 +35,6 @@ static NSMutableDictionary  *manager = nil;
         ble = [[[self class] alloc] initWithDelegate:delegate];
         manager[NSStringFromClass([self class])] = ble;
     }
-    // MARK: 蓝牙状态关闭  初始化中心
     else if (ble.mgrState == FSManagerStatePoweredOff) {
         ble.centralDelegate = delegate;
         ble.centralManager  = [[CBCentralManager alloc] initWithDelegate:ble queue:nil];
@@ -52,19 +52,39 @@ static NSMutableDictionary  *manager = nil;
 - (BOOL)startScan {
     /*
      可以扫描的逻辑
+     1 如果没有授权，不能扫描
+     2 如果系统蓝牙不知道正常可以扫描的状态  不能扫描
+     3 如果蓝牙正在扫描  不能扫描
+     MARK: 这里看看是否需要增加过滤调教，如果需要增加过滤条件，增加过滤条件
      */
-    // 如果系统蓝牙不可以用，直接返回no
-    if (self.mgrState != FSManagerStatePoweredOn ||
-           self.isScaning) {
-        [self setValue:@(0) forKey:@"isScaning"];
-        return NO;
-    }
-    return NO;
+    if (!self.hasAuthorized) return NO;
+    if (self.mgrState != FSManagerStatePoweredOn) return NO;
+    if (self.isScaning) return NO;
+
+    // 如果有指定扫描服务，扫描指定服务，如果没有，扫描全部设备
+    [self.centralManager scanForPeripheralsWithServices:self.services.count ? self.services : nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
+    return YES;
 }
 
 - (void)stopScan {
     self.isScaning = NO;
     [self.centralManager stopScan];
+}
+
+- (void)cleanManager {
+    [manager removeObjectForKey:NSStringFromClass([self class])];
+    _centralDelegate = nil;
+}
+
+- (void)sortRssiForDevice {
+
+}
+
+- (void)disconnectAllDevicesInManager {
+    // FIXME: 这个不能注释
+//    for (BleDevice *device in self.devices) {
+//        [device disconnect];
+//    }
 }
 
 #pragma mark 蓝牙中心代理方法
@@ -110,5 +130,20 @@ static NSMutableDictionary  *manager = nil;
     }
     return _devices;
 }
+
+@end
+
+
+// MARK: 大件中心管理器，
+@implementation FSLargeManager
+
+@end
+
+// MARK: 心率设备管理器
+@implementation FSHeartRateManager
+@end
+
+// MARK: 跳绳管理器
+@implementation FSRopeManager
 
 @end
