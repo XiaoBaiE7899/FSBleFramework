@@ -48,6 +48,33 @@ typedef NS_ENUM(NSInteger, BleProtocolType) {
     BleProtocolTypeCarTable       = 1,
 };
 
+// MARK: 设备断连类型
+typedef NS_ENUM(NSInteger, DisconnectType) {
+    /* 初始状态  设备还没开始连接 */
+    DisconnectTypeNone,
+    /* 用户主动断连 */
+    DisconnectTypeUser,
+    /* 连接超时断连 */
+    DisconnectTypeTimeout,
+    /* 开关关闭断连 */
+    DisconnectTypePoweredOff,
+    /* 没有找到服务断连 */
+    DisconnectTypeService,
+    /* 无响应断连 */
+    DisconnectTypeResponse,
+    /* 连接异常 */
+    DisconnectTypeAbnormal,
+};
+
+// MARK: 设备连接状态
+typedef NS_ENUM(NSInteger, ConnectState) {
+    ConnectStateDisconnected,
+    ConnectStateConnecting,
+    ConnectStateReconnecting,
+    ConnectStateConnected,
+    ConnectStateWorking,
+};
+
 
 
 

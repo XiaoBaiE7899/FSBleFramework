@@ -67,10 +67,36 @@
     return BleProtocolTypeUnknow;
 }
 
+
+
+@end
+
+@implementation FSCommand
+
+
 @end
 
 @implementation FSBleDevice
 
+#pragma mark 开放方法
+- (instancetype _Nonnull )initWithModule:(FSBleModule *_Nonnull)module {
+    if (self = [super init]) {
+        _module = module;
+        // 设置外设代理
+        _module.peripheral.delegate = self;
+        // 重连次数
+        _reconnect = 0;
+        // 断连类型
+        _disconnectType = DisconnectTypeNone;
+        // 设置连接状态为断连
+        _connectState = ConnectStateDisconnected;
+        // 指令集初始化
+        _commands = NSMutableArray.array;
+        // 收到的执行初始化
+        _receiveCmd = [FSCommand new];
+    }
+    return self;
+}
 
 - (void)disconnect {
     
@@ -78,6 +104,18 @@
 
 - (void)willDisconnect {
     
+}
+
+
+#pragma mark  蓝牙外设代理方法
+
+#pragma mark settre && geter
+- (BOOL)isConnected {
+    if (self.connectState == ConnectStateConnected ||
+        self.connectState == ConnectStateWorking) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

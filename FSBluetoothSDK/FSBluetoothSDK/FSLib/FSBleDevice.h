@@ -3,6 +3,8 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "FSEnum.h"
 
+@class FSCentralManager;
+
 NS_ASSUME_NONNULL_BEGIN
 
 // 蓝牙模块
@@ -80,9 +82,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface FSBleDevice : NSObject
+@interface FSCommand : NSObject
 
-@property (nonatomic, strong) FSBleModule *module;
+@end
+
+@interface FSBleDevice : NSObject <CBPeripheralDelegate>
+
+/* 蓝牙模块 */
+@property (nonatomic, strong) FSBleModule * _Nonnull module;
+
+/* 蓝牙中心管理器 */
+@property (nonatomic, readonly, weak)   FSCentralManager * _Nullable centralMgr;
+
+/* 连接次数 */
+@property (nonatomic, assign) int reconnect;
+
+/* 断连类型 */
+@property (nonatomic, assign) DisconnectType disconnectType;
+
+/* 设备连接状态 */
+@property (nonatomic, assign) ConnectState connectState;
+
+/* 判断是否已连接  重写getter方法 */
+@property (nonatomic, assign) BOOL isConnected;
+
+/* 指令集 */ 
+@property (nonatomic, strong) NSMutableArray<FSCommand *> * _Nullable commands;
+
+/* 收到的指令 */
+@property (nonatomic, readonly) FSCommand *receiveCmd;
+
+
+
+/// 初始化蓝牙设备的
+/// @param module 蓝牙模块
+- (instancetype _Nonnull )initWithModule:(FSBleModule *_Nonnull)module;
 
 - (void)disconnect;
 

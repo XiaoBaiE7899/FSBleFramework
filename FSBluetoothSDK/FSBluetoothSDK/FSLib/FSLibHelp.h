@@ -27,5 +27,14 @@
 #define PLog(string, ...)
 #endif
 
+/// 扫描外设UUID
+static NSString * _Nonnull const SERVICES_UUID        = @"FFF0";
+
+/// 通知通道
+static NSString * _Nonnull const CHAR_NOTIFY_UUID     = @"FFF1";
+
+/// 可以写通道
+static NSString * _Nonnull const CHAR_WRITE_UUID      = @"FFF2";
+
 
 #endif /* FSLibHelp_h */

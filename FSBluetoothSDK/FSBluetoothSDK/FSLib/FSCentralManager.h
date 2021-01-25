@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 管理器的设备 lazy loading
 @property (nonatomic, strong) NSMutableArray       *devices;
 
+/* 最近的设备 目前只有运动秀的设备才会有值 */ 
+@property (nonatomic, strong) FSBleDevice  *_Nullable nearest;
+
 /// 初始化方法
 + (FSCentralManager *)managerWithDelegate:(id <FSCentralDelegate>)delegate;
 
@@ -49,11 +52,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// 断连子类管理器中所有连接的设备
 - (void)disconnectAllDevicesInManager;
 
-/// 排序
+// 排序 FIXME: 这个方法不能公开
 - (void)sortRssiForDevice;
 
 // 查找信号最前的设备 FIXME: 这个方法不能公开
 - (void)findNearestDevice;
+
+@end
+
+// 扫描运动秀的中心管理器
+@interface FitshowManager : FSCentralManager
 
 @end
 

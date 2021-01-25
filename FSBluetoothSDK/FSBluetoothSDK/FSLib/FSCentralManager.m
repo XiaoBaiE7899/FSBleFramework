@@ -22,7 +22,7 @@ static NSMutableDictionary  *manager = nil;
         if (delegate) {
             self.centralDelegate = delegate;
             _centralManager  = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
-            _services = [NSMutableArray new];
+            _services = NSMutableArray.array;
 //            [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
             [self initialize];
         }
@@ -78,18 +78,10 @@ static NSMutableDictionary  *manager = nil;
     _centralDelegate = nil;
 }
 
-- (void)sortRssiForDevice {
-
-}
-
 - (void)disconnectAllDevicesInManager {
     for (FSBleDevice *device in self.devices) {
         [device disconnect];
     }
-}
-
-- (void)findNearestDevice {
-
 }
 
 #pragma mark 蓝牙中心代理方法
@@ -142,6 +134,28 @@ static NSMutableDictionary  *manager = nil;
     FSBleDevice *device = [self objectForPeripheral:peripheral];
 
     if (!device) { // 设备还没找到
+        device = [self discoverModule:module];
+        if (!device) return;  // 没设备直接返回
+        // 有设备 设置设备的管理器
+        [device setValue:self forKey:@"centralMgr"];
+        // 是否添加设备，默认是添加设备的，带可以通过实现willDiscoverDevice 不然设备添加到管理器中
+        BOOL add = YES;
+        if (self.centralDelegate &&
+            [self.centralDelegate respondsToSelector:@selector(manager:willDiscoverDevice:)]) {
+            add = [self.centralDelegate manager:self willDiscoverDevice:device];
+        }
+
+        // 代理没有拒绝，或者没有实现代理方法，加入设备
+        if (add) {
+            // 添加设备
+            [self.devices addObject:device];
+            if (self.centralDelegate &&
+                [self.centralDelegate respondsToSelector:@selector(manager:didDiscoverDevice:)]) {
+                [self.centralDelegate manager:self didDiscoverDevice:device];
+                return;
+            }
+        }
+
         return;
     }
     // 设备已经找了 更新设备信息，主要是主要是更新设备的信号量，因为最近的设备是通过信号量计算得到的
@@ -178,7 +192,20 @@ static NSMutableDictionary  *manager = nil;
 }
 
 #pragma mark 子类需要重写的方法
-- (void)initialize {
+- (void)initialize {}
+
+- (void)findNearestDevice {}
+
+- (void)sortRssiForDevice {}
+
+- (FSBleDevice *)newDevice:(FSBleModule * _Nonnull)module {
+    return [[FSBleDevice alloc] initWithModule:module];
+}
+
+- (FSBleDevice *)discoverModule:(FSBleModule *)module {
+    if ([_centralDelegate respondsToSelector:@selector(manager:didUnknownModule:)])
+        return [_centralDelegate manager:self didUnknownModule:module];
+    return nil;
 }
 
 
@@ -208,8 +235,53 @@ static NSMutableDictionary  *manager = nil;
     return nil;
 }
 
+
+
 @end
 
+
+@implementation FitshowManager
+
+/// 初始化的时候指定扫描指定服务
+- (void)initialize {
+    // !!!: 1826  的服务是运动器材特有的uuid
+    [self.services addObject:UUID(SERVICES_UUID)];
+}
+
+- (void)findNearestDevice {
+    // 确保蓝牙可以使用才有用
+    if (self.mgrState != FSManagerStatePoweredOn) return;
+
+    FSBleDevice *dev = nil;
+    if (self.devices.count == 1) {
+
+        if ([self.centralDelegate respondsToSelector:@selector(manager:didNearestDevice:)])
+            [self.centralDelegate manager:self didNearestDevice:[self.devices firstObject]];
+        return;
+    }
+    for (FSBleDevice *obj in self.devices) {
+        if (obj.isConnected) [obj.module.peripheral readRSSI];
+        if (!dev || dev.module.rssi < obj.module.rssi) dev = obj;
+    }
+
+    int rssi = dev ? dev.module.rssi : -100;
+    int last = self.nearest ? self.nearest.module.rssi : -100;
+    if (last < -95)  {
+        self.nearest = nil;
+    }
+
+    if ((dev != self.nearest) && (rssi - last > 7 && rssi > -80)) {
+        self.nearest = dev;
+//            PLog(@"设备名字%@ 设备信号：%d", dev.module.name, dev.module.rssi);
+        if ([self.centralDelegate respondsToSelector:@selector(manager:didNearestDevice:)])
+            [self.centralDelegate manager:self didNearestDevice:dev];
+    } else { // MARK: 如果没有改变，回调上次信号最前的那台设备
+        if ([self.centralDelegate respondsToSelector:@selector(manager:didNearestDevice:)])
+            [self.centralDelegate manager:self didNearestDevice:self.nearest];
+    }
+}
+
+@end
 
 // MARK: 大件中心管理器，
 @implementation FSLargeManager
