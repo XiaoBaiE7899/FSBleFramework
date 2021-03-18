@@ -79,7 +79,7 @@ static NSMutableDictionary  *manager = nil;
 }
 
 - (void)disconnectAllDevicesInManager {
-    for (FSBleDevice *device in self.devices) {
+    for (BleDevice *device in self.devices) {
         [device disconnect];
     }
 }
@@ -126,12 +126,12 @@ static NSMutableDictionary  *manager = nil;
      重写 设置广播包的的数据 和 更新信号量
      */
 
-    FSBleModule *module = [[FSBleModule alloc] initWithPeripheral:peripheral];
+    BleModule *module = [[BleModule alloc] initWithPeripheral:peripheral];
     [module setAdvertisementData:advertisementData];
     [module setRssi:RSSI.intValue];
 
     // 在管理器的数组中查找 设备， 判断设备是不是已经被扫描到了
-    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    BleDevice *device = [self objectForPeripheral:peripheral];
 
     if (!device) { // 设备还没找到
         device = [self discoverModule:module];
@@ -167,7 +167,7 @@ static NSMutableDictionary  *manager = nil;
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
     // 先找到设备，在去找服务
-    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) {
         [peripheral discoverServices:nil];
     }
@@ -175,7 +175,7 @@ static NSMutableDictionary  *manager = nil;
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
 
-    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) { // 连接失败就重连
         FSLog(@"断开重连^^^重连");
         [device willDisconnect];
@@ -184,7 +184,7 @@ static NSMutableDictionary  *manager = nil;
 
 - (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
     // 先找到设备，在去找服务
-    FSBleDevice *device = [self objectForPeripheral:peripheral];
+    BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) { // 连接失败就重连
         FSLog(@"连接失败^^^重连");
         [device willDisconnect];
@@ -198,11 +198,11 @@ static NSMutableDictionary  *manager = nil;
 
 - (void)sortRssiForDevice {}
 
-- (FSBleDevice *)newDevice:(FSBleModule * _Nonnull)module {
-    return [[FSBleDevice alloc] initWithModule:module];
+- (BleDevice *)newDevice:(BleModule * _Nonnull)module {
+    return [[BleDevice alloc] initWithModule:module];
 }
 
-- (FSBleDevice *)discoverModule:(FSBleModule *)module {
+- (BleDevice *)discoverModule:(BleModule *)module {
     if ([_centralDelegate respondsToSelector:@selector(manager:didUnknownModule:)])
         return [_centralDelegate manager:self didUnknownModule:module];
     return nil;
@@ -212,7 +212,7 @@ static NSMutableDictionary  *manager = nil;
 
 #pragma mark settet && geter
 - (BOOL)hasAuthorized {
-    if (@available(iOS 13.0, *)) {
+    if (@available(iOS 13.1, *)) {
         return CBManager.authorization == CBManagerAuthorizationDenied ? NO : YES;
     } else {
         return YES;
@@ -227,8 +227,8 @@ static NSMutableDictionary  *manager = nil;
 }
 
 #pragma mark 内部方法
-- (FSBleDevice *)objectForPeripheral:(CBPeripheral *)peripheral {
-    for (FSBleDevice *obj in self.devices) {
+- (BleDevice *)objectForPeripheral:(CBPeripheral *)peripheral {
+    for (BleDevice *obj in self.devices) {
         if ([obj.module.peripheral isEqual:peripheral])
             return obj;
     }
@@ -248,18 +248,28 @@ static NSMutableDictionary  *manager = nil;
     [self.services addObject:UUID(SERVICES_UUID)];
 }
 
+- (BleDevice *)discoverModule:(BleModule *)module {
+    FSLog(@"子类发现模块  %@", module.name);
+
+//    if ([self.centralDelegate respondsToSelector:@selector(manager:didUnknownModule:)])
+//        return [self.centralDelegate manager:self didUnknownModule:module];
+    return nil;
+}
+
+
+
 - (void)findNearestDevice {
     // 确保蓝牙可以使用才有用
     if (self.mgrState != FSManagerStatePoweredOn) return;
 
-    FSBleDevice *dev = nil;
+    BleDevice *dev = nil;
     if (self.devices.count == 1) {
 
         if ([self.centralDelegate respondsToSelector:@selector(manager:didNearestDevice:)])
             [self.centralDelegate manager:self didNearestDevice:[self.devices firstObject]];
         return;
     }
-    for (FSBleDevice *obj in self.devices) {
+    for (BleDevice *obj in self.devices) {
         if (obj.isConnected) [obj.module.peripheral readRSSI];
         if (!dev || dev.module.rssi < obj.module.rssi) dev = obj;
     }
@@ -283,16 +293,6 @@ static NSMutableDictionary  *manager = nil;
 
 @end
 
-// MARK: 大件中心管理器，
-@implementation FSLargeManager
 
-@end
 
-// MARK: 心率设备管理器
-@implementation FSHeartRateManager
-@end
 
-// MARK: 跳绳管理器
-@implementation FSRopeManager
-
-@end

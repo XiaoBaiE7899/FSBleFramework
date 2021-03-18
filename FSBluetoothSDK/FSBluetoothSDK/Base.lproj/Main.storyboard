@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -25,11 +26,24 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MfI-0K-beb">
+                                <rect key="frame" x="20" y="124" width="60" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="Avc-MM-2q9"/>
+                                    <constraint firstAttribute="width" constant="60" id="YlU-KO-0S1"/>
+                                </constraints>
+                                <state key="normal" title="扫描"/>
+                                <connections>
+                                    <action selector="blescanDevice:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WMO-5Y-KIy"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="MfI-0K-beb" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="0ei-Kd-IKk"/>
                             <constraint firstItem="sH3-jg-zQg" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="HOW-tC-4h1"/>
                             <constraint firstItem="sH3-jg-zQg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="LnT-9O-Br7"/>
+                            <constraint firstItem="MfI-0K-beb" firstAttribute="top" secondItem="XfC-UT-zlB" secondAttribute="bottom" constant="80" id="oaJ-R8-DSu"/>
                         </constraints>
                     </view>
                 </viewController>

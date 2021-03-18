@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7B5C22EF25BC4F52004942F8 /* FSBleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */; };
+		7B16D1A125EB2F7F0065C163 /* BleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B16D1A025EB2F7F0065C163 /* BleDevice.m */; };
+		7B16D1B025EB32390065C163 /* FSBleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B16D1AF25EB32390065C163 /* FSBleDevice.m */; };
 		7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210025BC049500FCDA13 /* AppDelegate.m */; };
 		7BEE210725BC049500FCDA13 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210625BC049500FCDA13 /* ViewController.m */; };
 		7BEE210A25BC049500FCDA13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BEE210825BC049500FCDA13 /* Main.storyboard */; };
@@ -36,8 +37,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		7B5C22ED25BC4F52004942F8 /* FSBleDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBleDevice.h; sourceTree = "<group>"; };
-		7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBleDevice.m; sourceTree = "<group>"; };
+		7B16D19F25EB2F7F0065C163 /* BleDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleDevice.h; sourceTree = "<group>"; };
+		7B16D1A025EB2F7F0065C163 /* BleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BleDevice.m; sourceTree = "<group>"; };
+		7B16D1AE25EB32390065C163 /* FSBleDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBleDevice.h; sourceTree = "<group>"; };
+		7B16D1AF25EB32390065C163 /* FSBleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBleDevice.m; sourceTree = "<group>"; };
 		7B5C22F325BC571E004942F8 /* FSLibHelp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLibHelp.h; sourceTree = "<group>"; };
 		7BEE20FC25BC049500FCDA13 /* FSBluetoothSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSBluetoothSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEE20FF25BC049500FCDA13 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -142,13 +145,15 @@
 		7BEE213D25BC056700FCDA13 /* FSLib */ = {
 			isa = PBXGroup;
 			children = (
-				7BEE214125BC05FD00FCDA13 /* FSCentralManager.h */,
-				7BEE214225BC05FD00FCDA13 /* FSCentralManager.m */,
-				7B5C22ED25BC4F52004942F8 /* FSBleDevice.h */,
-				7B5C22EE25BC4F52004942F8 /* FSBleDevice.m */,
 				7BEE214725BC065400FCDA13 /* FSDelegate.h */,
 				7BEE214B25BC092000FCDA13 /* FSEnum.h */,
 				7B5C22F325BC571E004942F8 /* FSLibHelp.h */,
+				7BEE214125BC05FD00FCDA13 /* FSCentralManager.h */,
+				7BEE214225BC05FD00FCDA13 /* FSCentralManager.m */,
+				7B16D19F25EB2F7F0065C163 /* BleDevice.h */,
+				7B16D1A025EB2F7F0065C163 /* BleDevice.m */,
+				7B16D1AE25EB32390065C163 /* FSBleDevice.h */,
+				7B16D1AF25EB32390065C163 /* FSBleDevice.m */,
 			);
 			path = FSLib;
 			sourceTree = "<group>";
@@ -282,10 +287,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BEE210725BC049500FCDA13 /* ViewController.m in Sources */,
+				7B16D1A125EB2F7F0065C163 /* BleDevice.m in Sources */,
 				7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */,
 				7BEE214325BC05FD00FCDA13 /* FSCentralManager.m in Sources */,
+				7B16D1B025EB32390065C163 /* FSBleDevice.m in Sources */,
 				7BEE211225BC049600FCDA13 /* main.m in Sources */,
-				7B5C22EF25BC4F52004942F8 /* FSBleDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,12 +464,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2D4QW5S8N;
 				INFOPLIST_FILE = FSBluetoothSDK/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.dakaimen.dwn.FSBluetoothSDK;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitshow.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -475,12 +483,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = J2D4QW5S8N;
 				INFOPLIST_FILE = FSBluetoothSDK/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.dakaimen.dwn.FSBluetoothSDK;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitshow.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

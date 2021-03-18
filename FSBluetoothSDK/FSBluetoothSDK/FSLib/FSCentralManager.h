@@ -4,7 +4,7 @@
 
 #import "FSEnum.h"
 #import "FSDelegate.h"
-#import "FSBleDevice.h"
+#import "BleDevice.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableArray       *devices;
 
 /* 最近的设备 目前只有运动秀的设备才会有值 */ 
-@property (nonatomic, strong) FSBleDevice  *_Nullable nearest;
+@property (nonatomic, strong) BleDevice  *_Nullable nearest;
 
 /// 初始化方法
 + (FSCentralManager *)managerWithDelegate:(id <FSCentralDelegate>)delegate;
@@ -65,20 +65,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-// 运动秀的管理器 主要扫描 大件运动设备
-@interface FSLargeManager : FSCentralManager
 
-@end
 
-// 心率设备管理 主要扫描 心率设备
-@interface FSHeartRateManager : FSCentralManager
 
-@end
-
-// 跳绳 管理器 主要扫描对象为跳绳
-@interface FSRopeManager : FSLargeManager
-
-@end
 
 
 

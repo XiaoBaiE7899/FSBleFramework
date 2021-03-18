@@ -24,7 +24,7 @@
 #if (DEBUG == 1)
 #define FSLog(string, ...) NSLog(@"🔨 %@ <%d>🔥🔥 %@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(string), ##__VA_ARGS__])
 #else
-#define PLog(string, ...)
+#define FSLog(string, ...)
 #endif
 
 /// 扫描外设UUID
