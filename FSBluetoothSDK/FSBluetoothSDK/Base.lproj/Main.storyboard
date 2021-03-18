@@ -27,23 +27,34 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MfI-0K-beb">
-                                <rect key="frame" x="20" y="124" width="60" height="40"/>
+                                <rect key="frame" x="20" y="124" width="80" height="40"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="40" id="Avc-MM-2q9"/>
-                                    <constraint firstAttribute="width" constant="60" id="YlU-KO-0S1"/>
+                                    <constraint firstAttribute="width" constant="80" id="YlU-KO-0S1"/>
                                 </constraints>
                                 <state key="normal" title="扫描"/>
                                 <connections>
                                     <action selector="blescanDevice:" destination="BYZ-38-t0r" eventType="touchUpInside" id="WMO-5Y-KIy"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="AAv-CK-ED7">
+                                <rect key="frame" x="110" y="124" width="80" height="40"/>
+                                <state key="normal" title="停止扫描"/>
+                                <connections>
+                                    <action selector="stopScan:" destination="BYZ-38-t0r" eventType="touchUpInside" id="k44-1Q-YnQ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="MfI-0K-beb" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="0ei-Kd-IKk"/>
+                            <constraint firstItem="AAv-CK-ED7" firstAttribute="width" secondItem="MfI-0K-beb" secondAttribute="width" id="Bbn-mj-yP7"/>
                             <constraint firstItem="sH3-jg-zQg" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="HOW-tC-4h1"/>
                             <constraint firstItem="sH3-jg-zQg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="LnT-9O-Br7"/>
+                            <constraint firstItem="AAv-CK-ED7" firstAttribute="leading" secondItem="MfI-0K-beb" secondAttribute="trailing" constant="10" id="cwC-en-e2W"/>
+                            <constraint firstItem="AAv-CK-ED7" firstAttribute="centerY" secondItem="MfI-0K-beb" secondAttribute="centerY" id="gvE-6z-gGo"/>
                             <constraint firstItem="MfI-0K-beb" firstAttribute="top" secondItem="XfC-UT-zlB" secondAttribute="bottom" constant="80" id="oaJ-R8-DSu"/>
+                            <constraint firstItem="AAv-CK-ED7" firstAttribute="height" secondItem="MfI-0K-beb" secondAttribute="height" id="p02-Ts-osI"/>
                         </constraints>
                     </view>
                 </viewController>

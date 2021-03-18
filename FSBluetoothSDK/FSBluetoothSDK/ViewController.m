@@ -35,11 +35,17 @@
 #pragma mark  按钮点击事件
 
 - (IBAction)blescanDevice:(UIButton *)sender {
-    FSLog(@"扫描设备");if ([self.fitshowManager startScan]) {
+    FSLog(@"扫描设备");
+    if ([self.fitshowManager startScan]) {
         FSLog(@"可以扫描");
     } else {
         FSLog(@"不可以扫描");
     }
+}
+
+- (IBAction)stopScan:(UIButton *)sender {
+    FSLog(@"停止扫描");
+    [self.fitshowManager stopScan];
 }
 
 #pragma mark 蓝牙中心代理
@@ -78,14 +84,6 @@
 - (void)manager:(FSCentralManager *)manager didNearestDevice:(BleDevice *)device {
     FSLog(@"更新附近的设备");
 }
-
-#pragma mark setter & getter
-//- (FSCentralManager *)fitshowManager {
-//    if (!_fitshowManager) {
-//        _fitshowManager = [FitshowManager managerWithDelegate:self];
-//    }
-//    return _fitshowManager;
-//}
 
 
 @end

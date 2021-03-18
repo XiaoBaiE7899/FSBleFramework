@@ -2,6 +2,7 @@
 #import "FSCentralManager.h"
 #import "FSLibHelp.h"
 
+
 static NSMutableDictionary  *manager = nil;
 
 
@@ -248,12 +249,29 @@ static NSMutableDictionary  *manager = nil;
     [self.services addObject:UUID(SERVICES_UUID)];
 }
 
+- (BleDevice *)newDevice:(BleModule * _Nonnull)module {
+    return [[FSBleDevice alloc] initWithModule:module];
+}
+
 - (BleDevice *)discoverModule:(BleModule *)module {
+    BleDevice *device = nil;
+    NSData *data = module.manufacturerData;
+    /* !!!: 蓝牙广播包数据构成
+    广播包的数据12字节
+    前面4个字节：设备id  一个字节8位，一共32位，高4位是设备类型，接下来12位是品牌代码，剩余16位是机型代码
+    中间4个字节：系列号  这是一个长整形数字
+    后面4个字节没有用
+    */
+    // 因此如果小于8位， 应该直接返回nil
+    if (data.length >= 8) {
+        device = [self newDevice:module];
+    } else {   //外部处理兼容旧设备
+        device = [super discoverModule:module];
+    }
+    return device;
+
     FSLog(@"子类发现模块  %@", module.name);
 
-//    if ([self.centralDelegate respondsToSelector:@selector(manager:didUnknownModule:)])
-//        return [self.centralDelegate manager:self didUnknownModule:module];
-    return nil;
 }
 
 

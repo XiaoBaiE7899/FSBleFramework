@@ -5,6 +5,7 @@
 #import "FSEnum.h"
 #import "FSDelegate.h"
 #import "BleDevice.h"
+#import "FSBleDevice.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
