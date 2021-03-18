@@ -19,6 +19,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // 初始化  中心管理器
     self.fitshowManager = [FitshowManager managerWithDelegate:self];
 }
 
