@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7B16D1A125EB2F7F0065C163 /* BleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B16D1A025EB2F7F0065C163 /* BleDevice.m */; };
 		7B16D1B025EB32390065C163 /* FSBleDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B16D1AF25EB32390065C163 /* FSBleDevice.m */; };
+		7B3CC30E2609CBC9006ACC23 /* FSDeiveceDefImg.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B3CC30D2609CBC9006ACC23 /* FSDeiveceDefImg.bundle */; };
 		7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210025BC049500FCDA13 /* AppDelegate.m */; };
 		7BEE210725BC049500FCDA13 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210625BC049500FCDA13 /* ViewController.m */; };
 		7BEE210A25BC049500FCDA13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BEE210825BC049500FCDA13 /* Main.storyboard */; };
@@ -41,6 +42,7 @@
 		7B16D1A025EB2F7F0065C163 /* BleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BleDevice.m; sourceTree = "<group>"; };
 		7B16D1AE25EB32390065C163 /* FSBleDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBleDevice.h; sourceTree = "<group>"; };
 		7B16D1AF25EB32390065C163 /* FSBleDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBleDevice.m; sourceTree = "<group>"; };
+		7B3CC30D2609CBC9006ACC23 /* FSDeiveceDefImg.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = FSDeiveceDefImg.bundle; sourceTree = "<group>"; };
 		7B5C22F325BC571E004942F8 /* FSLibHelp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLibHelp.h; sourceTree = "<group>"; };
 		7BEE20FC25BC049500FCDA13 /* FSBluetoothSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSBluetoothSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEE20FF25BC049500FCDA13 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 		7BEE20FE25BC049500FCDA13 /* FSBluetoothSDK */ = {
 			isa = PBXGroup;
 			children = (
+				7B3CC30D2609CBC9006ACC23 /* FSDeiveceDefImg.bundle */,
 				7BEE213D25BC056700FCDA13 /* FSLib */,
 				7BEE20FF25BC049500FCDA13 /* AppDelegate.h */,
 				7BEE210025BC049500FCDA13 /* AppDelegate.m */,
@@ -261,6 +264,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BEE210F25BC049600FCDA13 /* LaunchScreen.storyboard in Resources */,
+				7B3CC30E2609CBC9006ACC23 /* FSDeiveceDefImg.bundle in Resources */,
 				7BEE210A25BC049500FCDA13 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

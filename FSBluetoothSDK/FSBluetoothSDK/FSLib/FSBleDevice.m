@@ -6,6 +6,7 @@
 //
 
 #import "FSBleDevice.h"
+#import "FSLibHelp.h"
 
 @interface FSBleDevice ()
 
@@ -56,6 +57,24 @@
 // 恢复设备
 - (void)resume {
 
+}
+
+#pragma mark setter && getter
+- (UIImage *)fsDefaultImage {
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"FSDeiveceDefImg" ofType:@"bundle"];
+    if (!bundlePath) {
+        FSLog(@"bundle 文件为空，直接返回空");
+        return nil;
+    }
+
+    NSString *str = FSSF(@"device_deficon_%ld.png", (long)self.module.type);
+    UIImage *iconImage = [UIImage imageWithContentsOfFile:[bundlePath stringByAppendingPathComponent:str]];
+    if (!iconImage) {
+        FSLog(@"bundle 文件找不到图片，直接返回空");
+        return nil;
+    }
+    
+    return iconImage;
 }
 
 @end

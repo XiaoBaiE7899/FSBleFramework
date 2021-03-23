@@ -6,11 +6,15 @@
 //  运动秀的蓝牙设备
 
 #import "BleDevice.h"
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 
 @interface FSBleDevice : BleDevice
+
+/* 设备的默认图片，在boudle文件里面，重写getter方法 */
+@property (nonatomic, strong) UIImage *fsDefaultImage;
 
 /* 模块厂商 */
 @property (nonatomic, readonly) NSString   * _Nullable manufacturer;
