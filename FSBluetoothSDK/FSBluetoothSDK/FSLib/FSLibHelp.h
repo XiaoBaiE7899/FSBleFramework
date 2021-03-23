@@ -21,6 +21,9 @@
 #define    DWORDBYTE(d)        LOBYTE(LOWORD(d)), HIBYTE(LOWORD(d)), LOBYTE(HIWORD(d)), HIBYTE(HIWORD(d))
 
 #define FSSF(format, ...) ([NSString stringWithFormat:(format), ##__VA_ARGS__])
+
+#define weakObj(value) __weak typeof(value) weak##value = value;
+#define SPBLOCK_EXEC(block, ...) if (block) { block(__VA_ARGS__); }
 #if (DEBUG == 1)
 #define FSLog(string, ...) NSLog(@"🔨 %@ <%d>🔥🔥 %@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(string), ##__VA_ARGS__])
 #else

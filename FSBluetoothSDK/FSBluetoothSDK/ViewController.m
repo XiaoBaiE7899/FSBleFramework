@@ -8,6 +8,7 @@
 #import "ViewController.h"
 #import "FSCentralManager.h"
 #import "FSLibHelp.h"
+#import "ScanedDevicesCtrl.h"
 
 @interface ViewController () <FSCentralDelegate>
 
@@ -20,21 +21,20 @@
 // 模块名称
 @property (weak, nonatomic) IBOutlet UILabel *moduleName;
 
+@property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"FSDeiveceDefImg" ofType:@"bundle"];
-    UIImage *iconImage = [UIImage imageWithContentsOfFile:[bundlePath stringByAppendingPathComponent:@"device_deficon_0.png"]];
     // 初始化  中心管理器
     self.fitshowManager = [FitshowManager managerWithDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-//    
 }
 
 #pragma mark  按钮点击事件
@@ -51,6 +51,23 @@
 - (IBAction)stopScan:(UIButton *)sender {
     FSLog(@"停止扫描");
     [self.fitshowManager stopScan];
+}
+- (IBAction)deviceHasScanned:(UIButton *)sender {
+    if (!self.fitshowManager) {
+        FSLog(@"中心管理器没有初始化");
+        return;
+    }
+
+    if (!self.fitshowManager.devices.count) {
+        FSLog(@"没有扫描到设备设备");
+        return;
+    }
+    FSLog(@"已经扫描到的设备 有%lu个", (unsigned long)self.fitshowManager.devices.count);
+    // MARK: 页面切换  停止扫描
+    [self.fitshowManager stopScan];
+    [self presentViewController:self.scanedCtl animated:YES completion:^{
+
+    }];
 }
 
 #pragma mark 蓝牙中心代理
@@ -92,12 +109,35 @@
     self.device = device;
 }
 
-
 #pragma mark setter && getter
 - (void)setDevice:(FSBleDevice *)device {
     _device = device;
     self.deviceImg.image = _device.fsDefaultImage;
     self.moduleName.text = _device.module.name;
+}
+
+- (ScanedDevicesCtrl *)scanedCtl {
+    if (!_scanedCtl) {
+        _scanedCtl = (ScanedDevicesCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([ScanedDevicesCtrl class])];
+        weakObj(self);
+        weakObj(_scanedCtl);
+        weak_scanedCtl.selectDevice = ^(FSBleDevice * _Nonnull device) {
+            weakself.device = device;
+        };
+    }
+    return _scanedCtl;
+}
+
+#pragma mark  Private methods
+- (UIViewController *)storyboardWithName:(NSString *)name storyboardID:(NSString *)sid {
+    if (sid) {
+        return [[UIStoryboard storyboardWithName:name bundle:nil] instantiateViewControllerWithIdentifier:sid];
+    }
+    else if (name) {
+        return [[UIStoryboard storyboardWithName:name bundle:nil] instantiateInitialViewController];
+    }
+
+    return nil;
 }
 
 @end
