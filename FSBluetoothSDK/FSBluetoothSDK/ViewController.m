@@ -9,6 +9,7 @@
 #import "FSCentralManager.h"
 #import "FSLibHelp.h"
 #import "ScanedDevicesCtrl.h"
+#import "DisplayDataCtrl.h"
 
 @interface ViewController () <FSCentralDelegate>
 
@@ -20,8 +21,10 @@
 @property (weak, nonatomic) IBOutlet UIImageView *deviceImg;
 // 模块名称
 @property (weak, nonatomic) IBOutlet UILabel *moduleName;
-
+// 已扫描到的设备
 @property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
+// 展示数据的控制器
+@property (nonatomic, strong) DisplayDataCtrl   *datasCtrl;
 
 @end
 
@@ -70,6 +73,45 @@
     }];
 }
 
+- (IBAction)displaySportDatas:(UIButton *)sender {
+    FSLog(@"展示运动数据");
+    /* 判断是否有设备 */
+    if (!self.device) {
+        FSLog(@"设备都没有，哪来的数据");
+        return;
+    }
+    /* 判断设备是否在运行中，如果不是在运行中，不能展示 */
+    [self presentViewController:self.datasCtrl animated:YES completion:^{
+
+    }];
+}
+
+- (IBAction)contentDevice:(UIButton *)sender {
+    FSLog(@"连接设备");
+}
+
+- (IBAction)startDevice:(UIButton *)sender {
+    FSLog(@"启动设备");
+}
+
+- (IBAction)stopDevice:(UIButton *)sender {
+    FSLog(@"停止设备");
+}
+
+- (IBAction)controlSpeed:(UIButton *)sender {
+    FSLog(@"控制速度");
+}
+
+- (IBAction)controlIncline:(UIButton *)sender {
+    FSLog(@"控制坡度");
+}
+
+- (IBAction)controlLevel:(UIButton *)sender {
+    FSLog(@"控制阻力");
+}
+
+
+
 #pragma mark 蓝牙中心代理
 - (void)manager:(FSCentralManager *)manager didUpdateState:(FSManagerState)state {
     switch (state) {
@@ -99,6 +141,8 @@
     FSLog(@"已经发现设备");
 }
 
+
+
 - (void)manager:(FSCentralManager *)manager didNearestDevice:(FSBleDevice *)device {
     if (self.device &&
         self.device.module.peripheral == device.module.peripheral) {
@@ -126,6 +170,15 @@
         };
     }
     return _scanedCtl;
+}
+
+
+- (DisplayDataCtrl *)datasCtrl {
+    if (!_datasCtrl) {
+        _datasCtrl = (DisplayDataCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([DisplayDataCtrl class])];
+
+    }
+    return _datasCtrl;
 }
 
 #pragma mark  Private methods
