@@ -167,9 +167,11 @@ static NSMutableDictionary  *manager = nil;
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
+    /*成功连接*/
     // 先找到设备，在去找服务
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) {
+        FSLog(@"外设与中心建立连接，开始查找外设的服务，运动秀的设备到这里不能算是连接成功，要找到FFF1,FFF2 后才算连接成功");
         [peripheral discoverServices:nil];
     }
 }

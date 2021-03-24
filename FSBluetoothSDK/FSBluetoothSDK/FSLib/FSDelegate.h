@@ -38,6 +38,21 @@
 /// @param device 最新的设备
 - (void)manager:(FSCentralManager *_Nonnull)manager didNearestDevice:(BleDevice *_Nonnull)device;
 
+@end
+
+@protocol FSDeviceDelegate <NSObject>
+
+@optional
+/// 蓝牙设备 连接成功
+/// @param device 成功的设备
+/// @param state 状态
+- (void)device:(BleDevice *_Nonnull)device didConnectedWithState:(ConnectState)state;
+
+
+/// 蓝牙设备断开连接
+/// @param device 断连的设备
+/// @param mode 断连类型
+- (void)device:(BleDevice *_Nonnull)device didDisconnectedWithMode:(DisconnectType)mode;
 
 
 @end

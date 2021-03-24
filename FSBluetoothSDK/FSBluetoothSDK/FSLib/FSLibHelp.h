@@ -39,5 +39,17 @@ static NSString * _Nonnull const CHAR_NOTIFY_UUID     = @"FFF1";
 /// 可以写通道
 static NSString * _Nonnull const CHAR_WRITE_UUID      = @"FFF2";
 
+/// 厂家
+static NSString * _Nonnull const CHAR_READ_MFRS       = @"2A29";
+
+/// 型号
+static NSString * _Nonnull const CHAR_READ_PN         = @"2A24";
+
+/// 硬件版本
+static NSString * _Nonnull const CHAR_READ_HV         = @"2A27";
+
+/// 软件版本
+static NSString * _Nonnull const CHAR_READ_SV         = @"2A28";
+
 
 #endif /* FSLibHelp_h */

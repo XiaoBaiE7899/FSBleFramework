@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "FSEnum.h"
+#import "FSDelegate.h"
 @class FSCentralManager;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -96,8 +97,20 @@ NS_ASSUME_NONNULL_BEGIN
 /* 蓝牙模块 */
 @property (nonatomic, strong) BleModule * _Nonnull module;
 
+// 蓝牙订阅特征
+@property (nonatomic, readonly) CBCharacteristic        * _Nonnull bleNotifyChar;
+
+// 蓝牙写入特征
+@property (nonatomic, readonly) CBCharacteristic        * _Nonnull bleWriteChar;
+
 /* 蓝牙中心管理器 */
 @property (nonatomic, readonly, weak)   FSCentralManager * _Nullable centralMgr;
+
+/* 外设代理对象 */
+@property (nonatomic, weak) id <FSDeviceDelegate> fsDeviceDeltgate;
+
+/* 已经获取模块信息  FIXME: 这个名字需要修改 */
+@property (nonatomic, assign) BOOL hasGetModuleInfo;
 
 /* 连接次数 */
 @property (nonatomic, assign) int reconnect;
@@ -122,6 +135,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype _Nonnull )initWithModule:(BleModule *_Nonnull)module;
 
 - (void)disconnect;
+
+// 发起连接
+- (void)connent:(id<FSDeviceDelegate>_Nonnull)delegate;
+
+/// 断连的类型
+- (void)disconnect:(DisconnectType)mode;
 
 /// 将要断连
 - (void)willDisconnect;

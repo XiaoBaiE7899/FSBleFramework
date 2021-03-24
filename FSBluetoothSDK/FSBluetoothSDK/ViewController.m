@@ -11,7 +11,7 @@
 #import "ScanedDevicesCtrl.h"
 #import "DisplayDataCtrl.h"
 
-@interface ViewController () <FSCentralDelegate>
+@interface ViewController () <FSCentralDelegate, FSDeviceDelegate>
 
 @property (nonatomic, strong) FSCentralManager *fitshowManager;
 
@@ -87,7 +87,12 @@
 }
 
 - (IBAction)contentDevice:(UIButton *)sender {
-    FSLog(@"连接设备");
+    if (!self.device) {
+        FSLog(@"没有设备，不能连接");
+        return;
+    }
+    [self.fitshowManager stopScan];
+    [self.device connent:self];
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
@@ -141,8 +146,6 @@
     FSLog(@"已经发现设备");
 }
 
-
-
 - (void)manager:(FSCentralManager *)manager didNearestDevice:(FSBleDevice *)device {
     if (self.device &&
         self.device.module.peripheral == device.module.peripheral) {
@@ -153,9 +156,59 @@
     self.device = device;
 }
 
+#pragma mark 蓝牙外设代理
+// 设备断连的方法
+- (void)device:(BleDevice *)device didDisconnectedWithMode:(DisconnectType)mode {
+    switch (mode) {
+        case DisconnectTypeNone:{}
+            break;
+        case DisconnectTypeService:{
+            FSLog(@"代理回调___断连，因为找不到对应的服务");
+        }
+            break;
+        case DisconnectTypeUser: {}
+            break;
+        case DisconnectTypeTimeout: {
+            FSLog(@"代理回调___断连，连接超时");
+        }
+            break;
+        case DisconnectTypeResponse: {}
+            break;;
+        case DisconnectTypePoweredOff: {}
+            break;
+        case DisconnectTypeAbnormal: {}
+            break;
+        default:
+            break;
+    }
+
+}
+
+// 设备已连接的方法
+- (void)device:(BleDevice *)device didConnectedWithState:(ConnectState)state {
+    switch (state) {
+        case ConnectStateWorking:{
+            FSLog(@"代理回调___开始工作");
+        }
+            break;
+        case ConnectStateConnected:{
+            FSLog(@"代理回调___连接成功");
+        }
+            break;
+        case ConnectStateConnecting:{
+            FSLog(@"代理回调___连接中");
+        }
+            break;
+        default:
+            break;
+    }
+
+}
+
 #pragma mark setter && getter
 - (void)setDevice:(FSBleDevice *)device {
     _device = device;
+//    _device.fsDeviceDeltgate = self;
     self.deviceImg.image = _device.fsDefaultImage;
     self.moduleName.text = _device.module.name;
 }
