@@ -24,7 +24,7 @@ typedef NS_ENUM(NSInteger, BleProtocolType) {
     /* 跑步机 */
     BleProtocolTypeTreadmill      = 0,
     /* 椭圆机 */
-    BleProtocolTypeCarTable       = 1,
+    BleProtocolTypeSection       = 1,
 };
 
 
@@ -81,12 +81,30 @@ typedef NS_ENUM(NSInteger, FSDeviceType) {
     FSDeviceTypeUnknow
 };
 
+
+
 // 蓝牙命令 开始 && 结束
 typedef NS_ENUM(NSInteger, BLE_CMD) {
     /* 指令帧头 */
     BLE_CMD_START   = 0x02,
     /* 指令帧尾 */
     BLE_CMD_END     = 0x03,
+};
+
+// 整理过后的状态
+typedef NS_ENUM(NSInteger, FSDeviceState) {
+    FSDeviceStateNormal,            /* 待机 */
+    FSDeviceStateStarting,          /* 启动中 */
+    FSDeviceStateRunning,           /* 运行中 */
+    FSDeviceStatePaused,            /* 已暂停 */
+    FSDeviceStateError,             /* 故障 */
+    FSDeviceStateTreadmillEnd,      /* 跑步机 已停机状态(还未返回到待机) */
+    FSDeviceStateTreadmillStopping, /* 跑步机 减速停止中(完全停止后变为 PAUSED 或 END 或 NORMAL) */
+    FSDeviceStateTreadmillDisable,  /* 跑步机 禁用（安全开关或睡眠等）（1.1 修改） */
+    FSDeviceStateTreadmillDisRun,   /* 跑步机  禁止启动状态(设备处于不允许运行状态) */
+    FSDeviceStateTreadmillReady,    /* 设备就绪（1.1）CONTROL_READY 指令后应为此状态 */
+    FSDeviceStateSectionSleep,      /* 车表  睡眠*/
+    FSDeviceStateNone,              /* MARK: 一个未知状态 */
 };
 
 #pragma mark 跑步机
@@ -184,7 +202,7 @@ typedef NS_ENUM(NSInteger, TREADMILL_START_MODE) {
     /* 倒计卡路里模式 */
     TreadmillStartModeCalorises = 3,
     /* 程式模式(会发送速度及坡度数据) */
-    readmillStartModePogram     = 5,
+    TreadmillStartModePogram     = 5,
 };
 
 #pragma mark 车表协议
@@ -212,7 +230,7 @@ typedef NS_ENUM(NSInteger, Section_Param) {
 };
 
 // 车表设备参数信息
-typedef NS_ENUM(NSInteger, CARTABLE_STATUS) { // normal  0x02 0x42 0x42 0x03
+typedef NS_ENUM(NSInteger, Section_STATUS) { // normal  0x02 0x42 0x42 0x03
     /* 待机 */
     SectionParamStatusNormal     = 0,    //
     /* 启动中 */
@@ -230,7 +248,7 @@ typedef NS_ENUM(NSInteger, CARTABLE_STATUS) { // normal  0x02 0x42 0x42 0x03
 };
 
 // 车表数据
-typedef NS_ENUM(NSInteger, CARTABLE_DATA) {
+typedef NS_ENUM(NSInteger, Section_DATA) {
     /* 获取0x02 0x43 0x01 0x43 0x03 ：  时间W 距离W 热量W 计数W */
     SectionDataSportData      = 0x01,
     /* 获取0x02 0x43 0x02 0x41 0x03：  用户L 运动L 模式B 段数B 目标W */
@@ -240,7 +258,7 @@ typedef NS_ENUM(NSInteger, CARTABLE_DATA) {
 };
 
 // 车表控制
-typedef NS_ENUM(NSInteger, CARTABLE_CONTROL) {
+typedef NS_ENUM(NSInteger, Section_CONTROL) {
     /*app在即将开始运行设备时，最先发送此指令给设备，通知设备即将开始，设备接收到此指令后，进行运动数据重置，同事恢复相关设置值   备注：倒计值 若设备需要倒计时提示用户，返回数据为倒计秒值，若不需要返回0*/
     /* 0x02 0x44 0x01 0x45 0x03 准备就绪 */
     SectionControlReady             = 0x01,
@@ -265,7 +283,7 @@ typedef NS_ENUM(NSInteger, CARTABLE_CONTROL) {
 };
 
 // 车表数据  有控制模式时候，必须有倒计模式
-typedef NS_ENUM(NSInteger, CARTABLE_START_MODE) {
+typedef NS_ENUM(NSInteger, Section_START_MODE) {
     /* 自由 */
     SectionStartModeFree          = 0x00,
     /* 时间 */

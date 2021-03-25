@@ -54,6 +54,17 @@
 /// @param mode 断连类型
 - (void)device:(BleDevice *_Nonnull)device didDisconnectedWithMode:(DisconnectType)mode;
 
+/// 设备故障
+- (void)deviceError:(BleDevice *_Nonnull)device;
+
+
+
+/// 设备状态改变
+/// @param device 连接的设备
+/// @param newState 当前状态
+/// @param oldState 就状态
+- (void)device:(BleDevice *_Nonnull)device currentState:(FSDeviceState)newState oldState:(FSDeviceState)oldState;
+
 
 @end
 

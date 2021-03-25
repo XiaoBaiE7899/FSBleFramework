@@ -70,7 +70,7 @@
 - (BleProtocolType)protocolType {
     if (self.type == FSDeviceTypeTreadmill ) return BleProtocolTypeTreadmill;
     if (self.type > FSDeviceTypeTreadmill &&
-        self.type < FSDeviceTypeUnknow) return BleProtocolTypeCarTable;
+        self.type < FSDeviceTypeUnknow) return BleProtocolTypeSection;
     return BleProtocolTypeUnknow;
 }
 

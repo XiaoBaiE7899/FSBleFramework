@@ -68,10 +68,10 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark 设备的实时数据
 
 /* 设备的旧状态 初始化状态：-1 */
-@property (nonatomic, readonly) NSString      *oldStatus;
+@property (nonatomic, readonly) FSDeviceState      oldStatus;
 
 /* 设备的新状态 初始化状态：-1 */
-@property (nonatomic, readonly) NSString      *currentStatus;
+@property (nonatomic, readonly) FSDeviceState      currentStatus;
 
 /* 速度 区分英制单位&公制单位 */
 @property (nonatomic, readonly) NSString *speed;
@@ -131,7 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *frequency;
 
 /* 启动倒计时秒数 */
-@property (nonatomic, readonly) NSString *second;
+@property (nonatomic, readonly) NSString *countDwonSecond;
 
 /* 功率 */
 @property (nonatomic, readonly) NSString *watt;
@@ -140,10 +140,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL isPausing;
 
 /* 判断设备是不是正在运行 重写了getter方法， 运动设备不同，内部判断也不同 */
-@property (nonatomic, assign) BOOL isRunning;
+//@property (nonatomic, assign) BOOL isRunning; // 状态重新封装以后，这个不需要了
 
 /* 设备是否已经停止  重写setter方法 */
 @property (nonatomic, assign) BOOL hasStoped;
+
+/* 已获取速度参数 */
+@property (nonatomic, readonly) BOOL hasGetSpeedParam;
+
+/* 已获取坡度参数 */
+@property (nonatomic, readonly) BOOL hasGetInclineParma;
+
+/* 已获取阻力参数*/
+@property (nonatomic, readonly) BOOL hasGetLevelParam;
 
 
 /// 改变速度

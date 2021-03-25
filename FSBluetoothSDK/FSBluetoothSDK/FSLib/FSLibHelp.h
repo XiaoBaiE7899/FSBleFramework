@@ -51,5 +51,9 @@ static NSString * _Nonnull const CHAR_READ_HV         = @"2A27";
 /// 软件版本
 static NSString * _Nonnull const CHAR_READ_SV         = @"2A28";
 
+#pragma mark 以下是通知的名称
+/// 运动秀设备完全停止了
+static NSString * _Nonnull const kFitshowHasStoped = @"kFitshowHasStoped";
+
 
 #endif /* FSLibHelp_h */
