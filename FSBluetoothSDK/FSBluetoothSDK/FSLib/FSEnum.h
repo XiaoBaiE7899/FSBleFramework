@@ -188,100 +188,100 @@ typedef NS_ENUM(NSInteger, TREADMILL_START_MODE) {
 };
 
 #pragma mark 车表协议
-typedef NS_ENUM(NSInteger, CARTABLE) {
+typedef NS_ENUM(NSInteger, Section) {
     /* 配置设备型号：0x02 0x50 0x00 0x50 0x03  可以获取设备品牌、机型 */
-    CarTableModel   = 0x50,
+    SectionModel   = 0x50,
     /* 设备参数 */
-    CarTableParam   = 0x41,
+    SectionParam   = 0x41,
     /* 设备状态 */
-    CarTableStatus  = 0x42,
+    SectionStatus  = 0x42,
     /* 设备数据 */
-    CarTableData    = 0x43,
+    SectionData    = 0x43,
     /* 设备控制 */
-    CarTableControl = 0x44,
+    SectionControl = 0x44,
 };
 
 // 车表设备参数信息
-typedef NS_ENUM(NSInteger, CARTABLE_PARAM) {
+typedef NS_ENUM(NSInteger, Section_Param) {
     /*  获取0x02 0x41 0x02 0x40 0x03：  阻力B  坡度B  配置B  段数B */
-    CarTableParamInfo    = 0x02,
+    SectionParamInfo    = 0x02,
     /*  获取0x02 0x41 0x03 0x42 0x03：  累计值 */
-    CarTableParamTotal   = 0x03,
+    SectionParamTotal   = 0x03,
     /*  同步时间：传入数据  年月日周时分秒 年传入后2位 */
-    CarTableParamDate    = 0x04,
+    SectionParamDate    = 0x04,
 };
 
 // 车表设备参数信息
 typedef NS_ENUM(NSInteger, CARTABLE_STATUS) { // normal  0x02 0x42 0x42 0x03
     /* 待机 */
-    CarTableParamStatusNormal     = 0,    //
+    SectionParamStatusNormal     = 0,    //
     /* 启动中 */
-    CarTableParamStatusStarting   = 1,    //
+    SectionParamStatusStarting   = 1,    //
     /* 运行   数据：速度W 阻力B 频率W 心率B 瓦特W 坡度B 段索引B */
-    CarTableParamStatusRunning    = 2,
+    SectionParamStatusRunning    = 2,
     /* 暂停   数据：速度W 阻力B 频率W 心率B 瓦特W 坡度B 段索引B */
-    CarTableParamStatusPause      = 3,
+    SectionParamStatusPause      = 3,
     /* 睡眠 !!!:  预防表商10进制， 防呆不防傻 */
-    CarTableParamStatusSleep      = 20,
+    SectionParamStatusSleep      = 20,
     /* 睡眠 */
-    CarTableParamStatusSleeps     = 32,
+    SectionParamStatusSleeps     = 32,
     /* 故障 */
-    CarTableParamStatusError      = 21
+    SectionParamStatusError      = 21
 };
 
 // 车表数据
 typedef NS_ENUM(NSInteger, CARTABLE_DATA) {
     /* 获取0x02 0x43 0x01 0x43 0x03 ：  时间W 距离W 热量W 计数W */
-    CarTableDataSportData      = 0x01,
+    SectionDataSportData      = 0x01,
     /* 获取0x02 0x43 0x02 0x41 0x03：  用户L 运动L 模式B 段数B 目标W */
-    CarTableDataSportInfo      = 0x02,
+    SectionDataSportInfo      = 0x02,
     /*  获取：  索引B 数据N  这个可能不会用到 */
-    CarTableDataProgramData    = 0x03,   //
+    SectionDataProgramData    = 0x03,   //
 };
 
 // 车表控制
 typedef NS_ENUM(NSInteger, CARTABLE_CONTROL) {
     /*app在即将开始运行设备时，最先发送此指令给设备，通知设备即将开始，设备接收到此指令后，进行运动数据重置，同事恢复相关设置值   备注：倒计值 若设备需要倒计时提示用户，返回数据为倒计秒值，若不需要返回0*/
     /* 0x02 0x44 0x01 0x45 0x03 准备就绪 */
-    CarTableControlReady             = 0x01,
+    SectionControlReady             = 0x01,
     /* 0x02 0x44 0x02 0x46 0x03 开始继续 */
-    CarTableControlStart             = 0x02,
+    SectionControlStart             = 0x02,
     /* 0x02 0x44 0x03 0x47 0x03 暂停 */
-    CarTableControlPause             = 0x03,
+    SectionControlPause             = 0x03,
     /* 0x02 0x44 0x04 0x40 0x03 停止 */
-    CarTableControlStop              = 0x04,
+    SectionControlStop              = 0x04,
     /* 设置参数  设置阻力  坡度 */
-    CarTableControlParam             = 0x05,
+    SectionControlParam             = 0x05,
     /* 设置步进  设置阻力  坡度 */
-    CarTableControlStep              = 0x06,
+    SectionControlStep              = 0x06,
     /* 写入用户数据 ID（L） 体重B  身高B 年龄B 性别B（0:男  1:女） */
-    CarTableControlUser              = 0x0A,
+    SectionControlUser              = 0x0A,
     /* 运动模式  运动ID（L） 模式B   段数B  目标W */
-    CarTableControlSportMode         = 0x0B,
+    SectionControlSportMode         = 0x0B,
     /* 功能关开 */
-    CarTableControlFunctionSwitch    = 0x0C,
+    SectionControlFunctionSwitch    = 0x0C,
     /* 设置程式模式 */
-    CarTableControlProgram           = 0x0D,
+    SectionControlProgram           = 0x0D,
 };
 
 // 车表数据  有控制模式时候，必须有倒计模式
 typedef NS_ENUM(NSInteger, CARTABLE_START_MODE) {
     /* 自由 */
-    CarTableStartModeFree          = 0x00,
+    SectionStartModeFree          = 0x00,
     /* 时间 */
-    CarTableStartModeTime          = 0x01,
+    SectionStartModeTime          = 0x01,
     /* 距离 */
-    CarTableStartModeDistance      = 0x02,
+    SectionStartModeDistance      = 0x02,
     /* 卡路里 */
-    CarTableStartModeCalory        = 0x03,
+    SectionStartModeCalory        = 0x03,
     /* 计数 */
-    CarTableStartModeCount         = 0x04,
+    SectionStartModeCount         = 0x04,
     /* 阻力控制模式 */
-    CarTableStartModeResistance    = 0x10,
+    SectionStartModeResistance    = 0x10,
     /* 心率控制模式 */
-    CarTableStartModeHeartRate     = 0x20,
+    SectionStartModeHeartRate     = 0x20,
     /* 功率控制模式 */
-    CarTableStartModeWatt          = 0x03,
+    SectionStartModeWatt          = 0x03,
 };
 
 #endif /* FSEnum_h */

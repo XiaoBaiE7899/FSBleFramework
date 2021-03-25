@@ -26,6 +26,9 @@
 /* 软件版本 */
 @property (nonatomic) NSString   * _Nullable software;
 
+/* 心跳包定时器 */
+@property (nonatomic, strong) NSTimer *heartbeatTimer;
+
 @end
 
 @implementation FSBleDevice
@@ -127,8 +130,10 @@
         FSLog(@"bundle 文件找不到图片，直接返回空");
         return nil;
     }
-    
     return iconImage;
 }
+
+// 指令
+// 数据解析
 
 @end
