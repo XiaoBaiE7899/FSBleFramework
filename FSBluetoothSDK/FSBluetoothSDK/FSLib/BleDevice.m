@@ -80,14 +80,34 @@
 
 @implementation FSCommand
 
++ (instancetype)make:(CBCharacteristic *)object data:(NSData *)data {
+    FSCommand *cmd = [FSCommand new];
+    cmd.chrt = object;
+    cmd.data = data;
+    cmd.sendCnt = 3;
+    return cmd;
+}
+
 
 @end
 
 @interface BleDevice ()
 
-// 指令错误一次，连续发3条失败  算一次错误
+/* 模块厂商 */
+@property (nonatomic) NSString   * _Nullable m_manufacturer;
+
+/* 模块机型 */
+@property (nonatomic) NSString   * _Nullable m_model;
+
+/* 硬件版本 */
+@property (nonatomic) NSString   * _Nullable m_hardware;
+
+/* 软件版本 */
+@property (nonatomic) NSString   * _Nullable m_software;
+
+// 指令错误次数，连错误3条 算一次失败
 @property (nonatomic, assign) int cmdErrorCnt;
-// 指令失败次数， 失败3次算一次错误
+// 指令失败次数，联系失败3次， 断连
 @property (nonatomic, assign) int cmdFailCnt;
 
 @end
@@ -209,7 +229,29 @@
         [self onConnected];
 
     }
+}
 
+- (void)clearSend {
+    [self.commands removeAllObjects];
+    if (self.resending) {
+        self.resending = NO;
+    }
+}
+
+
+
+/// 发送指令
+- (void)sendCommand:(FSCommand *_Nullable)command {
+    if (command) { // 有指令，才会发送
+        [self.commands addObject:command];
+//        [self.commands insertObject:command atIndex:0];
+        if (!self.resending) {
+            [self onSendData];
+//            [self.commands insertObject:command atIndex:1];
+        } else {
+//            [self.commands insertObject:command atIndex:0];
+        }
+    }
 }
 
 #pragma mark 内部方法
@@ -253,7 +295,75 @@
 }
 
 - (void)onConnected {
-    
+}
+
+- (void)onFailedSend:(FSCommand *_Nullable)cmd {
+    //
+}
+
+- (NSString *)dataToString:(NSData *)data{
+    NSString *s = @"";
+    Byte *buf = (Byte *)data.bytes;
+    for (uint i = 0; i < data.length; i++) {
+        s = [s stringByAppendingFormat:@"%02X ", buf[i]];
+    }
+    return s;
+}
+
+/// 这个方法之类不需要重写
+- (void)onSendData {
+    if (!_centralMgr) {       //已释放
+        [self willDisconnect];
+        return;
+    }
+
+    FSCommand *cmd = _commands.firstObject;
+    if (_commands.count && ++self.cmdErrorCnt <= cmd.sendCnt) { // 发送指令  错误次数没超过
+        if (!self.resending) self.resending = YES;
+        FSLog(self.cmdErrorCnt > 1 ? @"重发(%@): %@" : @"发送(%@): %@", _module.name, [self dataToString:cmd.data]);
+
+        if (cmd.data == nil) {
+            [_module.peripheral readValueForCharacteristic:cmd.chrt];
+        } else if (cmd.chrt.properties & CBCharacteristicPropertyWriteWithoutResponse) {
+            [_module.peripheral writeValue:cmd.data forCharacteristic:cmd.chrt type:CBCharacteristicWriteWithoutResponse];
+        } else {
+            [_module.peripheral writeValue:cmd.data forCharacteristic:cmd.chrt type:CBCharacteristicWriteWithResponse];
+
+        }
+//        [_sendCmdTimer invalidate];
+//        _sendCmdTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
+//        [[NSRunLoop currentRunLoop] addTimer:_sendCmdTimer forMode:NSRunLoopCommonModes];
+        // FIXME: 这个定时器没有重复，不应该写成定时器，用延迟执行可能更好
+        [_cmdQueueTimer invalidate];
+        _cmdQueueTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
+        [[NSRunLoop currentRunLoop] addTimer:_cmdQueueTimer forMode:NSRunLoopCommonModes];
+    } else if (_commands.count) {
+        FSLog(@"指令失败次数%d", self.cmdFailCnt);
+
+        // MARK: 特殊指令，一直发送
+        [self onFailedSend:cmd];
+
+        if (++self.cmdFailCnt == 3) {
+            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
+            [self.fsDeviceDeltgate device:self didDisconnectedWithMode:DisconnectTypeTimeout];
+            self.disconnectType = DisconnectTypeResponse;
+            [self.centralMgr.centralManager cancelPeripheralConnection:_module.peripheral];
+        } else {
+            // 重新搜索
+            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
+            [self commit];
+        }
+    }
+}
+
+- (void)commit {
+    self.cmdErrorCnt = 0;
+    if (_commands.count) [(NSMutableArray *)_commands removeObjectAtIndex:0];
+    if (_commands.count) {
+        [self onSendData];
+    }  else {
+        self.resending = NO;
+    }
 }
 
 - (void)onDisconnected {
@@ -316,6 +426,54 @@
         [self willConnect];
     }
 }
+
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
+    FSLog(@"收到数据");
+    if (self.module.isFitshow) { // 如果是运动秀的模块 获取指定数据
+        if ([self moduleInfoAgterConnented:characteristic]) {
+            return;
+        }
+    }
+}
+
+- (BOOL)moduleInfoAgterConnented:(CBCharacteristic *)chat {
+    NSArray *arr = @[CHAR_READ_MFRS, CHAR_READ_PN, CHAR_READ_HV, CHAR_READ_SV];
+    NSData    *data = chat.value;
+    NSUInteger  len =  data.length;
+    Byte *databytes = (Byte *)[data bytes];
+    NSString *string = @"";
+    for (int i = 0; i < len; i++) {
+        uint16_t temp = databytes[i];
+        NSString *str = FSSF(@"%c", temp);
+        string = [string stringByAppendingString:str];
+    }
+//    PLog(@"%@", string);
+    if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_MFRS]) {  // 厂家
+        // 46495453484f57  fitshow
+//        [self.module setValue:string forKey:manufacturer];
+        self.m_manufacturer = string;
+        FSLog(@"获取模块厂商");
+        // FIXME: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
+        /* 连接以后判断厂商名字 */
+        FSLog(@"厂商名字%@", self.module.manufacturer);
+        NSString *temp = string.uppercaseString;
+        if ([temp isEqualToString:@"FITHOME"] ||
+            [temp isEqualToString:@"JIANJIA"]) {
+//            [EasyTextView showText:@"非运动秀蓝牙模块，无法使用Fitshow APP"];
+        }
+    } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_PN]) { // 型号
+//        [self.module setValue:string forKey:model];
+        self.m_model = string;
+    } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_HV]) { // 硬件版本
+//        [self.module setValue:string forKey:hardware];
+        self.m_hardware = string;
+    } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_SV]) { // 软件版本
+//        [self.module setValue:string forKey:software];
+        self.m_software = string;
+    }
+    return [arr containsObject:chat.UUID.UUIDString];
+}
+
 
 #pragma mark settre && geter
 - (BOOL)isConnected {

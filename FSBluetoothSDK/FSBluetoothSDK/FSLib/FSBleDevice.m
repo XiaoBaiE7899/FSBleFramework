@@ -192,12 +192,26 @@
 
 - (void)onConnected {
     FSLog(@"执行子类onConnected");
-    // 已连上的方法
+    /*
+     数据重置---清除指令---获取状态---更新设备参数--- 写入用户数据--- 启动心跳包
+     */
+    [self reset];
+    [self clearSend];
+    [self updateState:nil];
+    [self updateDeviceParams];
+    // 定时发送心跳包
+    [_heartbeatTimer invalidate];
+    _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:.5 target:self selector:@selector(updateState:) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:_heartbeatTimer forMode:NSRunLoopCommonModes];
 }
 
 - (void)onDisconnected {
     FSLog(@"执行子类onDisconnected");
 }
+
+//- (void)onSendData {
+//    FSLog(@"执行子类 onSendData");
+//}
 
 #pragma mark 对外开放方法
 // 发送速度指令
@@ -247,7 +261,107 @@
     return iconImage;
 }
 
+
+
+- (BOOL)hasStoped {
+    FSLog(@"设备是否完全停止");
+    // 车表是否完全停止
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        if (self.oldStatus == FSDeviceStateRunning &&
+            self.currentStatus == FSDeviceStateNormal) {
+            return YES;
+        }
+        if (self.oldStatus == FSDeviceStatePaused &&
+            self.currentStatus == FSDeviceStateNormal) {
+            return YES;
+        }
+        return NO;
+    }
+    /*
+     2021.02.19 MARK: 判断设备是否完成停止，只要判断设备不是初始化状态，旧状态不为0，新状态为0就是完全停止
+    */
+    //
+    if (self.oldStatus == FSDeviceStateTreadmillStopping &&
+        self.currentStatus == FSDeviceStateNormal) {
+        FSLog(@"0322 不支持暂停 的设备");
+        return YES;
+    }
+    // MARK: 9.14 脉动工厂参加体博会设备 不会进入4状态，状态3&&速度0即为暂停，再发停止，就停止
+    if (self.oldStatus == FSDeviceStateRunning &&
+        self.currentStatus == FSDeviceStateNormal) {
+        FSLog(@"0322 脉动工厂参加体博会设备");
+        return YES;
+    }
+    // MARK: 2021.02.19 康乐佳 发送停止指令以后  3-1-0
+    if (self.oldStatus == FSDeviceStateTreadmillEnd &&
+        self.currentStatus == FSDeviceStateNormal) {
+        FSLog(@"0322 脉动工厂参加体博会设备");
+        return YES;
+    }
+    // 暂停到待机
+    if (self.oldStatus == FSDeviceStatePaused ||
+        self.currentStatus == FSDeviceStateNormal) {
+        FSLog(@"0322 脉动工厂参加体博会设备");
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)isPausing {
+    // 车表是否暂停
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        return self.currentStatus == FSDeviceStatePaused ? YES : NO;
+    }
+    /*
+     正常的暂停 状态为 TreadmillStausPauseds || TreadmillStausPaused
+     20.09.14 迈动工厂测试 暂停的时候设备还在运行中，但是速度为0
+     */
+    /*  9.29 迈动展厅测试，通过指令让设备从设备暂停状态恢复运行的结果
+     1. TA860K 可以恢复，这种情况不需要处理，直接恢复就好
+     2. 体博会参展的设备，设备状态一直都是3，点击app上的恢复，也是3，速度为0.
+     3. 跑客（白色跑步机），从app恢复的状态一直为10.
+     */
+
+    // 判断跑步机是否整处于暂停状态
+    if (self.currentStatus == FSDeviceStatePaused || (self.currentStatus == FSDeviceStateRunning && self.speed.intValue == 0)) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 #pragma mark 蓝牙指令公用方法
+// 重置数据
+- (void)reset {
+    self.oldStatus = FSDeviceStateNone;
+    self.currentStatus = FSDeviceStateNone;
+    self.speed = @"0";
+    self.incline = @"0";
+    self.eElapsedTime = @"0";
+    self.distance = @"0";
+    self.steps = @"0";
+    self.counts = @"0";
+    self.heartRate = @"0";
+    self.paragraph = @"0";
+    self.errorCode = @"";
+    self.uid = @"0";
+    self.weight = @"0";
+    self.height = @"0";
+    self.age = @"0";
+    self.gender = @"";
+    self.adjustSlope = @"";
+    self.adjustSpeed = @"";
+    self.level = @"0";
+    self.frequency = @"0";
+    self.countDwonSecond = @"0";
+    self.watt = @"0";
+    self.isPausing = NO;
+    self.hasStoped = NO;
+    self.hasGetLevelParam = NO;
+    self.hasGetSpeedParam = NO;
+    self.hasGetInclineParma = NO;
+}
+
 - (NSDateComponents *)systemtime:(NSDate *)date {
     NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *comps = [[NSDateComponents alloc] init];
@@ -325,7 +439,94 @@
     return [self prepareSendData:cmd length:sizeof(cmd)];
 }
 
-- (void)fsDeviceState {
+// 发送数据
+- (void)sendData:(NSData *)data {
+    // 如果发送数据 4秒没返回数据，就是超时了
+    [self performSelector:@selector(readyTimeOut) withObject:nil afterDelay:4];
+    FSCommand *cmd = [FSCommand make:self.bleWriteChar data:data];
+    [self sendCommand:cmd];
+}
+
+
+
+- (void)readyTimeOut {
+    
+}
+
+// 更新设备参数
+- (void)updateDeviceParams {
+    // 获取跑步机的设备参数
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        [self sendData:[self cmdTreadmillSpeedParam]];
+        // MARK: 延迟1秒获取设备坡度信息，
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self sendData:[self cmdTreadmillInclineParam]];
+        });
+    }
+
+    // 获取车表的设备参数
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        [self sendData:[self cmdSectionParamInfo]];
+    }
+}
+
+- (BOOL)getParamSuccess {
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        if (self.hasGetSpeedParam && self.hasGetInclineParma) {
+            return YES;
+        }
+    }
+
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        if (self.hasGetLevelParam && self.hasGetInclineParma) {
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+// 更新状态
+- (void)updateState:(NSTimer *)sender {
+    // 这里要判断设备类型
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        // 如果指令集合小于2条就加入一条状态指令
+        if (self.commands.count < 2) {
+            // 如果有定时器，但是控制参数没有获取，先去获取控制参数
+            if (sender && ![self getParamSuccess]) {
+                [self updateDeviceParams];
+            }
+            // 再获取  设备状态
+            [self sendData:[self cmdSectionStatue]];
+        }
+        return;
+    }
+
+    if (self.commands.count < 3) {
+        // 如果指令集合小于3条就加入一条状态指令
+        if (sender && ![self getParamSuccess]) {
+            [self updateDeviceParams];
+        }
+        [self sendData:[self cmdSectionStatue]];
+        [self sendData:[self cmdSectionSportDada]];
+    }
+}
+
+// 写入用户数据 !!!: 中阳系统运动ID只能传0  特别注意
+- (void)sendUserInfo {
+    // 这里要判断设备类型
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        // FIXME: 跑步机写入用户数据  指令没发送
+    }
+
+    if (self.module.protocolType ==  BleProtocolTypeSection) {
+        [self sendData:[self cmdSectionWriteUserData:0 weight:70 height:170 age:25 sexy: 0]];
+    }
+}
+
+
+/// 重置设备的状态
+- (void)fsResetDeviceState {
     /* 跑步机、车表都有的状态  待机、启动中、运行、暂停、故障
      TreadmillStausEnd      = 1,   已停机状态(还未返回到待机)
      TreadmillStausStopping = 4,  减速停止中(完全停止后变为 PAUSED 或 END 或 NORMAL)
@@ -567,7 +768,7 @@
 }
 
 /// 当前运动量信息
-- (NSData *)cmdSectionDada {
+- (NSData *)cmdSectionSportDada {
     // 指令 0x02 0x43 0x01 0x42 0x03
     // 数据 0x02 0x43 0x01 时间(W) 距离(W) 热量(W) 计数(W) xx 0x03
     uint8_t cmd[] = {BLE_CMD_START, SectionData, SectionDataSportData, 0x42, BLE_CMD_END};
@@ -782,9 +983,22 @@
             self.oldStatus = self.currentStatus;
             // 设置跑步机的当前状态
             self.currentStatus = subcmd;
+            // 状态统一处理
+            [self fsResetDeviceState];
+            // MARK: 新旧状态都不是初始化状态 并且新旧状态不一致  通过代理回调状态改变
+            if (self.currentStatus != FSDeviceStateNone &&
+                self.oldStatus != FSDeviceStateNone &&
+                self.currentStatus != self.oldStatus) {
+                if (self.fsDeviceDeltgate &&
+                    [self.fsDeviceDeltgate respondsToSelector:@selector(device:currentState:oldState:)]) {
+                    [self.fsDeviceDeltgate device:self currentState:self.currentStatus oldState:self.oldStatus];
+                }
+            }
+
             // 输入出
-            FSLog(@"原始——当前状态%ld", (long)self.currentStatus);
+            FSLog(@"原始——当前状态%hu", subcmd);
             // FIXME:  状态改变 通过代理回调 在这里增加代码
+
             // MARK: 2021年，康乐佳  发送停止指令以后  状态的变化是3-1-0 这里要做兼容
             // 添加停止中
             if (self.oldStatus == FSDeviceStateRunning &&
@@ -998,7 +1212,17 @@
             self.oldStatus = self.currentStatus;
             // 设置新状态
             self.currentStatus = subcmd;
-            FSLog(@"原始  当前状态%ld", (long)self.currentStatus);
+            [self fsResetDeviceState];
+            FSLog(@"原始  当前状态%ld", (long)subcmd);
+            // MARK: 新旧状态都不是初始化状态 并且新旧状态不一致  通过代理回调状态改变
+            if (self.currentStatus != FSDeviceStateNone &&
+                self.oldStatus != FSDeviceStateNone &&
+                self.currentStatus != self.oldStatus) {
+                if (self.fsDeviceDeltgate &&
+                    [self.fsDeviceDeltgate respondsToSelector:@selector(device:currentState:oldState:)]) {
+                    [self.fsDeviceDeltgate device:self currentState:self.currentStatus oldState:self.oldStatus];
+                }
+            }
 
             if (self.hasStoped) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];

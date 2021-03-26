@@ -90,6 +90,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FSCommand : NSObject
 
+// 特征
+@property (nonatomic, strong) CBCharacteristic * _Nonnull chrt;
+
+// 要发送的数据
+@property (nonatomic, strong) NSData           * _Nullable data;
+
+// 发送次数
+@property (nonatomic, assign) int sendCnt;
+
++ (instancetype)make:(CBCharacteristic *)object data:(NSData *)data;
+
 @end
 
 @interface BleDevice : NSObject <CBPeripheralDelegate>
@@ -127,8 +138,26 @@ NS_ASSUME_NONNULL_BEGIN
 /* 指令集 */
 @property (nonatomic, strong) NSMutableArray<FSCommand *> * _Nullable commands;
 
+/* 指令队列定时器 */
+@property (nonatomic, strong) NSTimer * _Nullable cmdQueueTimer;
+
+// 是否正在重发失败的指令
+@property (nonatomic, assign) BOOL resending;
+
 /* 收到的指令 */
 @property (nonatomic, readonly) FSCommand *receiveCmd;
+
+/* 模块厂商 */
+@property (nonatomic, readonly) NSString   * _Nullable m_manufacturer;
+
+/* 模块机型 */
+@property (nonatomic, readonly) NSString   * _Nullable m_model;
+
+/* 硬件版本 */
+@property (nonatomic, readonly) NSString   * _Nullable m_hardware;
+
+/* 软件版本 */
+@property (nonatomic, readonly) NSString   * _Nullable m_software;
 
 /// 初始化蓝牙设备的
 /// @param module 蓝牙模块
@@ -144,6 +173,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 将要断连
 - (void)willDisconnect;
+
+/// 清除指令
+- (void)clearSend;
+
+/// 发送指令
+- (void)sendCommand:(FSCommand *_Nullable)command;
+
 
 @end
 

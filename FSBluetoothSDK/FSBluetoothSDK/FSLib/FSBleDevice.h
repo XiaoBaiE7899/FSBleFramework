@@ -11,17 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 /* 设备的默认图片，在boudle文件里面，重写getter方法 */
 @property (nonatomic, strong) UIImage *fsDefaultImage;
 
-/* 模块厂商 */
-@property (nonatomic, readonly) NSString   * _Nullable manufacturer;
 
-/* 模块机型 */
-@property (nonatomic, readonly) NSString   * _Nullable model;
-
-/* 硬件版本 */
-@property (nonatomic, readonly) NSString   * _Nullable hardware;
-
-/* 软件版本 */
-@property (nonatomic, readonly) NSString   * _Nullable software;
 
 /*是否为英制单位 0:公里  1: 英里  1英里(mi) = 1.60934千米(公里) */
 @property (nonatomic, readonly) BOOL imperial;

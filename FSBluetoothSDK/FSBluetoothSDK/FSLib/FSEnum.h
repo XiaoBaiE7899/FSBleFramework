@@ -93,6 +93,7 @@ typedef NS_ENUM(NSInteger, BLE_CMD) {
 
 // 整理过后的状态
 typedef NS_ENUM(NSInteger, FSDeviceState) {
+    FSDeviceStateNone = -1,              /* MARK: 一个未知状态 开始连接的时候，初始化就是这个状态 */
     FSDeviceStateNormal,            /* 待机 */
     FSDeviceStateStarting,          /* 启动中 */
     FSDeviceStateRunning,           /* 运行中 */
@@ -104,7 +105,7 @@ typedef NS_ENUM(NSInteger, FSDeviceState) {
     FSDeviceStateTreadmillDisRun,   /* 跑步机  禁止启动状态(设备处于不允许运行状态) */
     FSDeviceStateTreadmillReady,    /* 设备就绪（1.1）CONTROL_READY 指令后应为此状态 */
     FSDeviceStateSectionSleep,      /* 车表  睡眠*/
-    FSDeviceStateNone,              /* MARK: 一个未知状态 */
+
 };
 
 #pragma mark 跑步机
