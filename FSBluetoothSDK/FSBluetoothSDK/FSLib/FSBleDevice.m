@@ -205,6 +205,42 @@
     [[NSRunLoop currentRunLoop] addTimer:_heartbeatTimer forMode:NSRunLoopCommonModes];
 }
 
+- (BOOL)onUpdateData:(FSCommand *_Nullable)cmd {
+    FSLog(@"xb1007%@", self.module.name);
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readyTimeOut) object:nil];
+
+    // !!!: 判断数据是否合法
+//    if (!FSBleDataProcess.isValidDataForBleBack(cmd.data)) {
+//        // FIXME: 数据不合法，直接断连  这个判断还没写  对蓝牙返回的数据做CRC校验
+//        return NO;
+//    }
+
+    // 解析蓝牙返回的数据
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        [self parsingTreadmillData:cmd.data];
+    } else {
+//        CarTableCmd.parsingCarTableData(cmd.data, self);
+        [self parsingCarTableData:cmd.data];
+    }
+
+    // MARK: 判断是不是程式模式
+
+    if (self.connectState != ConnectStateWorking) {
+        if (self.fsDeviceDeltgate &&
+            [self.fsDeviceDeltgate respondsToSelector:@selector(device:didConnectedWithState:)]) {
+            [self.fsDeviceDeltgate device:self didConnectedWithState:ConnectStateWorking];
+        }
+    }
+    [self setValue:@(ConnectStateWorking) forKeyPath:@"connectState"];
+
+    // 程式模式已完成，就不更新数据
+//    if (self.programFinished) return YES;
+    // 数据通过通知发送出去
+//    [[NSNotificationCenter defaultCenter] postNotificationName:kUpdateFitshoData object:self];
+    // MARK: 12.30 self  与 fs_sport.fsDevice 其实就是同一个对象
+    return YES;
+}
+
 - (void)onDisconnected {
     FSLog(@"执行子类onDisconnected");
 }
@@ -373,7 +409,8 @@
 }
 // 发送数据准备
 - (NSData *)prepareSendData:(UInt8 *)data length:(int)len {
-    UInt8 crc = [self checkCrcCode:data length:len];
+    //FSBleDataProcess.calculateCheckNum(data + 1, len - 3);
+    UInt8 crc = [self checkCrcCode:data + 1 length:len - 3];
     data[len - 2] = crc;
     NSData *rst = [NSData dataWithBytes:data length:len];
     return rst;
@@ -497,7 +534,7 @@
                 [self updateDeviceParams];
             }
             // 再获取  设备状态
-            [self sendData:[self cmdSectionStatue]];
+            [self sendData:[self cmdTreadmillStatus]];
         }
         return;
     }
@@ -996,7 +1033,7 @@
             }
 
             // 输入出
-            FSLog(@"原始——当前状态%hu", subcmd);
+            FSLog(@"原始  当前状态%hu", subcmd);
             // FIXME:  状态改变 通过代理回调 在这里增加代码
 
             // MARK: 2021年，康乐佳  发送停止指令以后  状态的变化是3-1-0 这里要做兼容

@@ -301,6 +301,10 @@
     //
 }
 
+- (BOOL)onUpdateData:(FSCommand *_Nullable)cmd {
+    return YES;
+}
+
 - (NSString *)dataToString:(NSData *)data{
     NSString *s = @"";
     Byte *buf = (Byte *)data.bytes;
@@ -323,10 +327,13 @@
         FSLog(self.cmdErrorCnt > 1 ? @"重发(%@): %@" : @"发送(%@): %@", _module.name, [self dataToString:cmd.data]);
 
         if (cmd.data == nil) {
+//            FSLog(@"0326 --nil 发送");
             [_module.peripheral readValueForCharacteristic:cmd.chrt];
         } else if (cmd.chrt.properties & CBCharacteristicPropertyWriteWithoutResponse) {
+//            FSLog(@"0326  WithoutResponse发送");
             [_module.peripheral writeValue:cmd.data forCharacteristic:cmd.chrt type:CBCharacteristicWriteWithoutResponse];
         } else {
+//            FSLog(@"0326  nil  发送");
             [_module.peripheral writeValue:cmd.data forCharacteristic:cmd.chrt type:CBCharacteristicWriteWithResponse];
 
         }
@@ -427,12 +434,43 @@
     }
 }
 
+// 发送数据
+- (void)writeToPeripheral:(CBPeripheral *)peripheral Character:(CBCharacteristic *)characteristic data:(UInt8 *)bytes length:(int)length {
+    FSLog(@"发送数据");
+    NSData * data = [NSData dataWithBytes:bytes length: length];
+    if (peripheral) {
+        [peripheral writeValue:data forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
+    }
+}
+
+// 写的回调
+- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error {
+    FSLog(@"写入特征值");
+//    PLog(@"❤❤❤❤❤❤❤❤❤❤❤❤❤❤%@", NSStringFromSelector(_cmd));
+}
+
+// 打开通道回调
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error {
+//    PLog(@"打开通道回调");
+//    PLog(@"订阅状态发生改变%@", NSStringFromSelector(_cmd));
+}
+
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
     FSLog(@"收到数据");
     if (self.module.isFitshow) { // 如果是运动秀的模块 获取指定数据
         if ([self moduleInfoAgterConnented:characteristic]) {
             return;
         }
+    }
+//    FSLog(@"接收(%@): %@", peripheral.name, characteristic.value.toString());
+    FSLog(@"接收(%@): %@", peripheral.name, [self dataToString:characteristic.value]);
+//    _receiveCmd.chrt = characteristic;
+//    _receiveCmd.data = characteristic.value;
+    self.receiveCmd.chrt = characteristic;
+    self.receiveCmd.data = characteristic.value;
+    if ([self onUpdateData:_receiveCmd]) {
+        self.cmdFailCnt = 0;
+        [self commit];
     }
 }
 
@@ -447,28 +485,19 @@
         NSString *str = FSSF(@"%c", temp);
         string = [string stringByAppendingString:str];
     }
-//    PLog(@"%@", string);
     if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_MFRS]) {  // 厂家
-        // 46495453484f57  fitshow
-//        [self.module setValue:string forKey:manufacturer];
         self.m_manufacturer = string;
-        FSLog(@"获取模块厂商");
         // FIXME: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
         /* 连接以后判断厂商名字 */
-        FSLog(@"厂商名字%@", self.module.manufacturer);
         NSString *temp = string.uppercaseString;
         if ([temp isEqualToString:@"FITHOME"] ||
             [temp isEqualToString:@"JIANJIA"]) {
-//            [EasyTextView showText:@"非运动秀蓝牙模块，无法使用Fitshow APP"];
         }
     } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_PN]) { // 型号
-//        [self.module setValue:string forKey:model];
         self.m_model = string;
     } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_HV]) { // 硬件版本
-//        [self.module setValue:string forKey:hardware];
         self.m_hardware = string;
     } else if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_SV]) { // 软件版本
-//        [self.module setValue:string forKey:software];
         self.m_software = string;
     }
     return [arr containsObject:chat.UUID.UUIDString];
