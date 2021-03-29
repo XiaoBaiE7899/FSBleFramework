@@ -236,7 +236,7 @@
     // 程式模式已完成，就不更新数据
 //    if (self.programFinished) return YES;
     // 数据通过通知发送出去
-//    [[NSNotificationCenter defaultCenter] postNotificationName:kUpdateFitshoData object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kUpdateFitshoData object:self];
     // MARK: 12.30 self  与 fs_sport.fsDevice 其实就是同一个对象
     return YES;
 }
@@ -284,32 +284,259 @@
 
 // 发送速度指令
 - (void)sendTargetSpeed:(int)speed {
+    /*
+     控制速度
+     1 只有跑步机才能控制速度，不是跑步机直接返回  MARK: 走步机应该也可以控制速度，这个需要测试
+     2 如果当前速度等于目标速度，不用发送指令，直接返回
+     3 判断速度上下限
+     4 获取当前坡度，
+     5 发送指令
+     */
+    if (self.module.protocolType != BleProtocolTypeTreadmill) {
+        FSLog(@"不是跑步机，速度不支持控制");
+        return;
+    }
+    if (self.speed.intValue == speed) {
+        FSLog(@"当前速度与目标速度相同，不需要发送指令");
+        return;
+    }
+    // 目标速度
+    int targetSpeed = speed;
+    // 当前坡度
+    int currentIncline = self.incline.intValue;
+    if (speed <= self.minSpeed.intValue) {
+        targetSpeed = self.minSpeed.intValue;
+    }
 
+    if (speed >= self.maxSpeed.intValue) {
+        targetSpeed = self.maxSpeed.intValue;
+    }
+    // 发送指令
+    [self sendData:[self cmdTreadmillControlSpeed:targetSpeed incline:currentIncline]];
 }
 
 // 发送坡度指令
 - (void)sendTargetIncline:(int)incline {
+    /*
+       控制坡度
+     1 如果设备不支持坡度控制，或者当前设备的坡度等于要控制的坡度，直接返回
+     2 过滤坡度值的上下限
+     3 获取当前设备的速度和阻力
+     4 根据设备类型不同，发送不停指令
+     */
+    if (!self.supportIncline) {
+        FSLog(@"设备不支持坡度控制");
+        return;
+    }
+    if (self.incline.intValue == incline) {
+        FSLog(@"目标坡度等于当前坡度，不需要发送指令");
+        return;
+    }
+    // 目标坡度
+    int targetIncline = incline;
+    // 当前速度
+    int currentSpeed = self.speed.intValue;
+    // 当前阻力
+    int currentLevel = self.level.intValue;
+    if (targetIncline <= self.minIncline.intValue) {
+        targetIncline = self.minIncline.intValue;
+    }
+    if (targetIncline >= self.maxIncline.intValue) {
+        targetIncline = self.maxIncline.intValue;
+    }
+    // 根据设备类型不同，发送不同指令
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        // 发送跑步机指令
+        [self sendData:[self cmdTreadmillControlSpeed:currentSpeed incline:targetIncline]];
+    }
 
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        // 发送车表指令
+        [self sendData:[self cmdSectionControlLevel:currentLevel incline:targetIncline]];
+    }
+}
+
+// 同时控制设备的速度&坡度
+- (void)sendTargetSpeed:(int)speed targetIncline:(int)incline {
+    /*
+     同时控制速度、坡度
+     1 如果不是跑步机 因为速度不能控制，速度、坡度等于目标速度、目标坡度 直接返回
+     2 过滤速度、坡度的上下限
+     3 跑步机的速度可以控制，坡度不一定可以控制
+       3.1 如果跑步的坡度不可控制，速度等于目标速度，直接返回， 否则发送执行后返回
+     4 速度、坡度都是可以控制，发送指令
+     */
+    if (self.module.protocolType != BleProtocolTypeTreadmill) {
+        FSLog(@"只有跑步机才支持速度控制");
+        return;
+    }
+    if (self.speed.intValue == speed &&
+        self.incline.intValue == incline) {
+        FSLog(@"速度&坡度  等于目标速度&坡度");
+        return;
+    }
+    int targetSpeed = speed;
+    int targetIncline = incline;
+    if (targetSpeed <= self.minSpeed.intValue) {
+        targetSpeed = self.minSpeed.intValue;
+    }
+    if (targetSpeed >= self.maxSpeed.intValue) {
+        targetSpeed = self.maxSpeed.intValue;
+    }
+    // 设备不支持坡度控制,目标速度等于当前速度，不需要发送指令
+    if (!self.supportIncline) {
+        // 设备不支持坡度控制
+        if (targetSpeed == self.speed.intValue) {
+            FSLog(@"坡度不能控制，目标速度等于当前速度，不需要发送指令");
+            return;
+        }
+        [self sendData:[self cmdTreadmillControlSpeed:targetSpeed incline:0]];
+    } else {
+        // 设备支持坡度控制
+        if (targetSpeed == self.speed.intValue &&
+            targetIncline == self.incline.intValue) {
+            FSLog(@"坡度可以控制，目标速度&坡度等于当前的速度&坡度，不需要发送指令");
+            return;
+        }
+        [self sendData:[self cmdTreadmillControlSpeed:targetSpeed incline:targetIncline]];
+    }
 }
 
 // 发送阻力指令
 - (void)sendTargetLevel:(int)level {
+    /*
+     控制阻力
+     1 设备类型不对(跑步机不支持阻力控制)，阻力不可以控制，直接返回
+     2 当前阻力等于目标阻力，直接返回
+     3 获取当前坡度，
+     4 过滤非法数据
+     5 发送指令
+     */
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        FSLog(@"跑步机不支持阻力控制");
+        return;
+    }
+    if (!self.supportLevel) {
+        FSLog(@"设备不支持阻力控制");
+        return;
+    }
+    if (level == self.level.intValue) {
+        FSLog(@"当前阻力等于目标阻力，不需要发送指令");
+        return;
+    }
+    // 目标阻力
+    int targetLevel = level;
+    // 当前坡度
+    int currentIncline = self.incline.intValue;
+    if (targetLevel <= self.minLevel.intValue) {
+        targetLevel = self.minLevel.intValue;
+    }
+    if (targetLevel >= self.maxLevel.intValue) {
+        targetLevel = self.maxLevel.intValue;
+    }
+    // 发送控制指令
+    [self sendData:[self cmdSectionControlLevel:targetLevel incline:currentIncline]];
+}
 
+// 同时控制 设备的阻力&坡度
+- (void)sendTargetLevel:(int)level targetIncline:(int)incline {
+    /*
+     1 设备阻力&坡度都不可以，直接返回
+     2 设备阻力不可以控制，坡度可以控制，只要发送坡度指令
+     3 设备坡度不可以控制，阻力可以控制，只要发送阻力指令
+     4 设备的阻力&坡度都可以控制，判断目标阻力&目标坡度是否相等
+     */
+    if (!self.supportLevel && !self.supportIncline) {
+        FSLog(@"阻力速度，都不可以控制，不用发指令");
+        return;
+    }
+    if (!self.supportLevel && self.supportIncline) {
+        [self sendTargetIncline:incline];
+        return;
+    }
+    if (!self.supportIncline && self.supportLevel) {
+        [self sendTargetLevel:level];
+        return;
+    }
+    int targetLevel = level;
+    int targetIncline = incline;
+    if (targetLevel <= self.minLevel.intValue) {
+        targetLevel = self.minLevel.intValue;
+    }
+    if (targetLevel >= self.maxLevel.intValue) {
+        targetLevel = self.maxLevel.intValue;
+    }
+    if (targetIncline <= self.minIncline.intValue) {
+        targetIncline = self.minIncline.intValue;
+    }
+    if (targetIncline >= self.maxIncline.intValue) {
+        targetIncline = self.maxIncline.intValue;
+    }
+
+    if (targetLevel == self.level.intValue &&
+        targetIncline == self.incline.intValue) {
+        FSLog(@"设备阻力&坡度，都可以控制，但是目标阻力&坡度  等于  设备当前的阻力&坡度");
+        return;
+    }
+    // 发送控制阻力和坡度的指令
+    [self sendData:[self cmdSectionControlLevel:targetLevel incline:targetIncline]];
+//    [self sendData:CarTableCmd.carTableControlParam(targetLevel, currentIncline)];
 }
 
 // 暂停设备
 - (void)pause {
+    /*
+     如果设备不支持暂停  直接返回
+     根据不同设备类型不同，发送不同指令
+     */
+    if (!self.supportPause) {
+        FSLog(@"设备不支持暂停");
+        return;
+    }
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        FSLog(@"跑步机发送暂停指令");
+        return;
+    }
 
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        FSLog(@"车表发送暂停指令");
+        return;
+    }
 }
 
 // 停止设备
 - (void)stop {
+    /*
+     设备不同，发送的指令不同
+     */
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        // 发送跑步机停止指令
+        [self sendData:[self cmdTreadmillStop]];
+    }
 
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        [self sendData:[self cmdSectionStop]];
+    }
 }
 
 // 恢复设备
 - (void)resume {
+    /*
+     1 如果不是跑步机，直接返回
+     2 如果设备不是在暂停中，直接返回
+     3 发送跑步机  恢复指令
+     */
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        FSLog(@"不是跑步机，直接返回");
+        return;
+    }
 
+    if (!self.isPausing) {
+        FSLog(@"设备不是正在暂停中，直接返回");
+        return;
+    }
+    // 发送恢复指令 以后3秒判断设备是否有回复
+    [self sendData:[self cmdTreadmillResume]];
 }
 
 #pragma mark setter && getter
@@ -332,7 +559,10 @@
 
 
 - (BOOL)hasStoped {
-    FSLog(@"设备是否完全停止");
+    if (self.oldStatus == FSDeviceStateNone || self.currentStatus == FSDeviceStateNone) {
+        return NO;
+    }
+//    FSLog(@"设备是否完全停止");
     // 车表是否完全停止
     if (self.module.protocolType == BleProtocolTypeSection) {
         if (self.oldStatus == FSDeviceStateRunning &&
@@ -367,7 +597,7 @@
         return YES;
     }
     // 暂停到待机
-    if (self.oldStatus == FSDeviceStatePaused ||
+    if (self.oldStatus == FSDeviceStatePaused &&
         self.currentStatus == FSDeviceStateNormal) {
         FSLog(@"0322 脉动工厂参加体博会设备");
         return YES;
@@ -781,7 +1011,7 @@
 }
 
 /// 控制速度和坡度
-- (NSData *)cmdControlDeviceSpeed:(int)v incline:(int)p {
+- (NSData *)cmdTreadmillControlSpeed:(int)v incline:(int)p {
     uint8_t cmd[] = {BLE_CMD_START, TreadmillControl, TreadmillControlTarget, v, p,0, BLE_CMD_END};
     return [self prepareSendData:cmd length:sizeof(cmd)];
 }
@@ -1106,6 +1336,8 @@
             // 12.7 保存连接
             if (self.hasStoped) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
+                FSLog(@"设备已经完全停止了");
+                [self disconnect];
             }
             
             if (subcmd == TreadmillStausNormal) { // 待机状态 完全停止 返回这个状态
@@ -1133,6 +1365,7 @@
                 unsigned int _paragraph = databytes[14];
                 self.incline = FSSF(@"%d", _incline);
                 self.eElapsedTime = FSSF(@"%d", _time);
+                FSLog(@"0329上报的距离%d  上报的速度%d", _distance, _speed);
                 // 设备上报的距离
                 NSString *device_dist = FSSF(@"%d", _distance);
                 // 设备上报的速度

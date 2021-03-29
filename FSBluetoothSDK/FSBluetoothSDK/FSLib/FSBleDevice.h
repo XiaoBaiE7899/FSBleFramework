@@ -158,9 +158,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendTargetIncline:(int)incline;
 
 
+/// 同时控制速度&坡度
+/// @param speed 目标速度
+/// @param incline 目标坡度
+- (void)sendTargetSpeed:(int)speed targetIncline:(int)incline;
+
+
 /// 改变阻力
 /// @param level 目标阻力
 - (void)sendTargetLevel:(int)level;
+
+
+/// 同时控制阻力&批斗
+/// @param level 目标阻力
+/// @param incline 目标坡度
+- (void)sendTargetLevel:(int)level targetIncline:(int)incline;
 
 /// 暂停设备
 - (void)pause;

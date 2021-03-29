@@ -886,6 +886,37 @@
                             <constraint firstItem="Qi3-Ls-Hkk" firstAttribute="top" secondItem="2fX-q2-Y3L" secondAttribute="bottom" id="yi2-Ae-yUK"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="calory" destination="9x0-gO-s0v" id="cW4-fs-jaf"/>
+                        <outlet property="counts" destination="OhH-8L-jCG" id="07b-Co-zY9"/>
+                        <outlet property="currentState" destination="pBF-RY-XKy" id="21R-oJ-RZz"/>
+                        <outlet property="distance" destination="9mM-MS-ocR" id="yZS-93-sG9"/>
+                        <outlet property="errorcode" destination="mTX-YU-Uz8" id="0T7-6e-Rfy"/>
+                        <outlet property="freq" destination="zig-5k-3eh" id="wNm-Jw-JJp"/>
+                        <outlet property="hearRate" destination="tYp-sU-vQO" id="KEM-Vb-S3a"/>
+                        <outlet property="imperial" destination="8Ar-yc-zk3" id="4gi-sZ-ezr"/>
+                        <outlet property="incline" destination="OpQ-xN-az7" id="R9r-q1-Yan"/>
+                        <outlet property="isPaused" destination="bsS-Vx-hCg" id="M8q-E3-e9I"/>
+                        <outlet property="isRunning" destination="maI-kQ-L07" id="obh-as-wO4"/>
+                        <outlet property="isStoped" destination="Az3-ZR-he7" id="mNO-FX-Nci"/>
+                        <outlet property="level" destination="hVS-5D-ou8" id="Pol-Oc-hQr"/>
+                        <outlet property="maxIncline" destination="1JP-Ng-ENx" id="zUx-ug-7mf"/>
+                        <outlet property="maxLevel" destination="GR7-WP-o2O" id="i8p-yd-SDH"/>
+                        <outlet property="maxSpeed" destination="trR-Ek-2rb" id="gQr-gh-voO"/>
+                        <outlet property="minIncline" destination="1Ad-R9-iLH" id="etF-qU-eqW"/>
+                        <outlet property="minLevel" destination="G5p-wP-L9y" id="j1f-GY-qiL"/>
+                        <outlet property="minSpeed" destination="yMC-Hf-JdE" id="7eP-yG-6V0"/>
+                        <outlet property="oldState" destination="qNI-Wd-YH3" id="hxt-go-zct"/>
+                        <outlet property="power" destination="FUi-uS-TKu" id="FF7-di-TTw"/>
+                        <outlet property="speed" destination="RPM-hV-H6V" id="XWd-IO-zVQ"/>
+                        <outlet property="steps" destination="acU-BW-A08" id="AOJ-5B-v6L"/>
+                        <outlet property="supporLevel" destination="Z4U-eN-TVc" id="vcG-JJ-hZ3"/>
+                        <outlet property="supportControl" destination="JYw-hf-0EW" id="lAG-GZ-J1Y"/>
+                        <outlet property="supportIncline" destination="X97-Jh-DiH" id="pYo-9E-ci8"/>
+                        <outlet property="supportPause" destination="71y-GR-Xx4" id="oFM-7d-sjW"/>
+                        <outlet property="supportSpeed" destination="QsO-4j-mnS" id="4ib-Dt-Y70"/>
+                        <outlet property="time" destination="v6x-cv-bpz" id="Ijl-Hs-PZ0"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RPk-VW-Ufp" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>

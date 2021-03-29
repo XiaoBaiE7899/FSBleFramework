@@ -98,23 +98,32 @@
 - (IBAction)startDevice:(UIButton *)sender {
     FSLog(@"启动设备");
     // MARK: 这里需要判断  设备是否可以启动
+    if ([self.device startDevice]) {
+
+    } else {
+        FSLog(@"设备不能启动");
+    }
     
 }
 
 - (IBAction)stopDevice:(UIButton *)sender {
     FSLog(@"停止设备");
+    [self.device stop];
 }
 
 - (IBAction)controlSpeed:(UIButton *)sender {
     FSLog(@"控制速度");
+    [self.device sendTargetSpeed:50];
 }
 
 - (IBAction)controlIncline:(UIButton *)sender {
     FSLog(@"控制坡度");
+    [self.device sendTargetIncline:5];
 }
 
 - (IBAction)controlLevel:(UIButton *)sender {
     FSLog(@"控制阻力");
+    [self.device sendTargetLevel:3];
 }
 
 

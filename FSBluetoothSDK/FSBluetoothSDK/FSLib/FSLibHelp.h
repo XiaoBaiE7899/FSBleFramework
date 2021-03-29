@@ -52,6 +52,9 @@ static NSString * _Nonnull const CHAR_READ_HV         = @"2A27";
 static NSString * _Nonnull const CHAR_READ_SV         = @"2A28";
 
 #pragma mark 以下是通知的名称
+/// 运动秀设备收到数据的通知
+static NSString * _Nonnull const kUpdateFitshoData = @"kUpdateFitshoData";
+
 /// 运动秀设备完全停止了
 static NSString * _Nonnull const kFitshowHasStoped = @"kFitshowHasStoped";
 
