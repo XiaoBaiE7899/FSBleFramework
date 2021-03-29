@@ -10,6 +10,7 @@
 #import "FSLibHelp.h"
 #import "ScanedDevicesCtrl.h"
 #import "DisplayDataCtrl.h"
+#import "BezierCtrl.h"
 
 @interface ViewController () <FSCentralDelegate, FSDeviceDelegate>
 
@@ -25,6 +26,9 @@
 @property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
 // 展示数据的控制器
 @property (nonatomic, strong) DisplayDataCtrl   *datasCtrl;
+
+// 贝塞尔曲线测试控制器
+@property (nonatomic, strong) BezierCtrl *bezierCtrl;
 
 @end
 
@@ -123,7 +127,12 @@
 
 - (IBAction)controlLevel:(UIButton *)sender {
     FSLog(@"控制阻力");
-    [self.device sendTargetLevel:3];
+//    [self.device sendTargetLevel:3];
+    // 测试贝塞尔曲线
+    [self presentViewController:self.bezierCtrl animated:YES completion:^{
+
+    }];
+
 }
 
 
@@ -243,6 +252,15 @@
 
     }
     return _datasCtrl;
+}
+
+- (BezierCtrl *)bezierCtrl {
+    if (!_bezierCtrl) {
+        _bezierCtrl = (BezierCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([BezierCtrl class])];
+
+    }
+    return _bezierCtrl;
+
 }
 
 #pragma mark  Private methods

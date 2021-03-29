@@ -922,6 +922,24 @@
             </objects>
             <point key="canvasLocation" x="1748" y="62"/>
         </scene>
+        <!--Bezier Ctrl-->
+        <scene sceneID="UUl-gQ-I2H">
+            <objects>
+                <viewController storyboardIdentifier="BezierCtrl" id="x5U-Pp-jek" customClass="BezierCtrl" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="eFp-tb-rIK"/>
+                        <viewControllerLayoutGuide type="bottom" id="CJH-uo-fDu"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Je3-8z-g32">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SBS-Oh-8Ex" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2567" y="62"/>
+        </scene>
     </scenes>
     <resources>
         <systemColor name="systemBackgroundColor">

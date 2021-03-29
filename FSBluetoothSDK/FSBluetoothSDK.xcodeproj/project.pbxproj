@@ -12,6 +12,7 @@
 		7B3CC30E2609CBC9006ACC23 /* FSDeiveceDefImg.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7B3CC30D2609CBC9006ACC23 /* FSDeiveceDefImg.bundle */; };
 		7B3CC3142609D46B006ACC23 /* ScanedDevicesCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3CC3132609D46B006ACC23 /* ScanedDevicesCtrl.m */; };
 		7B3CC3202609E42F006ACC23 /* DisplayDataCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B3CC31F2609E42F006ACC23 /* DisplayDataCtrl.m */; };
+		7BC4CAAA2611BFC2002173B8 /* BezierCtrl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BC4CAA92611BFC2002173B8 /* BezierCtrl.m */; };
 		7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210025BC049500FCDA13 /* AppDelegate.m */; };
 		7BEE210725BC049500FCDA13 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE210625BC049500FCDA13 /* ViewController.m */; };
 		7BEE210A25BC049500FCDA13 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BEE210825BC049500FCDA13 /* Main.storyboard */; };
@@ -50,6 +51,8 @@
 		7B3CC31E2609E42F006ACC23 /* DisplayDataCtrl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DisplayDataCtrl.h; sourceTree = "<group>"; };
 		7B3CC31F2609E42F006ACC23 /* DisplayDataCtrl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DisplayDataCtrl.m; sourceTree = "<group>"; };
 		7B5C22F325BC571E004942F8 /* FSLibHelp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSLibHelp.h; sourceTree = "<group>"; };
+		7BC4CAA82611BFC2002173B8 /* BezierCtrl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BezierCtrl.h; sourceTree = "<group>"; };
+		7BC4CAA92611BFC2002173B8 /* BezierCtrl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BezierCtrl.m; sourceTree = "<group>"; };
 		7BEE20FC25BC049500FCDA13 /* FSBluetoothSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSBluetoothSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BEE20FF25BC049500FCDA13 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7BEE210025BC049500FCDA13 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -129,6 +132,8 @@
 				7B3CC3132609D46B006ACC23 /* ScanedDevicesCtrl.m */,
 				7B3CC31E2609E42F006ACC23 /* DisplayDataCtrl.h */,
 				7B3CC31F2609E42F006ACC23 /* DisplayDataCtrl.m */,
+				7BC4CAA82611BFC2002173B8 /* BezierCtrl.h */,
+				7BC4CAA92611BFC2002173B8 /* BezierCtrl.m */,
 				7BEE210825BC049500FCDA13 /* Main.storyboard */,
 				7BEE210D25BC049600FCDA13 /* LaunchScreen.storyboard */,
 				7BEE211025BC049600FCDA13 /* Info.plist */,
@@ -303,6 +308,7 @@
 				7BEE210725BC049500FCDA13 /* ViewController.m in Sources */,
 				7B3CC3202609E42F006ACC23 /* DisplayDataCtrl.m in Sources */,
 				7B16D1A125EB2F7F0065C163 /* BleDevice.m in Sources */,
+				7BC4CAAA2611BFC2002173B8 /* BezierCtrl.m in Sources */,
 				7BEE210125BC049500FCDA13 /* AppDelegate.m in Sources */,
 				7BEE214325BC05FD00FCDA13 /* FSCentralManager.m in Sources */,
 				7B3CC3142609D46B006ACC23 /* ScanedDevicesCtrl.m in Sources */,
