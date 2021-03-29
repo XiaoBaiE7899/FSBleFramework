@@ -145,6 +145,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL hasGetLevelParam;
 
 
+// FIXME: 注释应该详细说明，什么情况下，不能启动设备
+/// 启动设备，如果可以启动返回yes，如果不能启动，返回NO
+- (BOOL)startDevice;
+
 /// 改变速度
 /// @param speed 目标速度
 - (void)sendTargetSpeed:(int)speed;

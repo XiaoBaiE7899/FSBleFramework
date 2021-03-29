@@ -6,17 +6,17 @@
 
 @interface FSBleDevice ()
 
-/* 模块厂商 */
-@property (nonatomic) NSString   * _Nullable manufacturer;
-
-/* 模块机型 */
-@property (nonatomic) NSString   * _Nullable model;
-
-/* 硬件版本 */
-@property (nonatomic) NSString   * _Nullable hardware;
-
-/* 软件版本 */
-@property (nonatomic) NSString   * _Nullable software;
+///* 模块厂商 */
+//@property (nonatomic) NSString   * _Nullable manufacturer;
+//
+///* 模块机型 */
+//@property (nonatomic) NSString   * _Nullable model;
+//
+///* 硬件版本 */
+//@property (nonatomic) NSString   * _Nullable hardware;
+//
+///* 软件版本 */
+//@property (nonatomic) NSString   * _Nullable software;
 
 /*是否为英制单位 0:公里  1: 英里  1英里(mi) = 1.60934千米(公里) */
 @property (nonatomic) BOOL imperial;
@@ -250,6 +250,38 @@
 //}
 
 #pragma mark 对外开放方法
+
+- (BOOL)startDevice {
+
+    // 跑步机
+    if (self.module.protocolType == BleProtocolTypeTreadmill) {
+        // 发送跑步机指令
+        [self sendData:[self cmdTreadmillStart]];
+        return YES;
+    }
+
+    // 车表正常待机  睡眠都可以启动
+    if (self.module.protocolType == BleProtocolTypeSection) {
+        if (self.currentStatus == FSDeviceStateNormal ||
+            self.currentStatus == FSDeviceStateSectionSleep) {
+            // 1 写入用书数据
+            [self sendData:[self cmdSectionWriteUserData:0 weight:70 height:170 age:25 sexy:0]];
+            // 2 获取状态
+            [self sendData:[self cmdSectionStatue]];
+            // 3 准备就绪
+            [self sendData:[self cmdSectionReady]];
+            // 4 写入用书数据
+            [self sendData:[self cmdSectionWriteUserData:0 weight:70 height:170 age:25 sexy:0]];
+            // 5 启动
+            [self sendData:[self cmdSectionDadaStart]];
+            return YES;
+        }
+    }
+    FSLog(@"跑步机当前状态是%ld，不能启动，断连设备", (long)self.currentStatus);
+    [self disconnect];
+    return NO;
+}
+
 // 发送速度指令
 - (void)sendTargetSpeed:(int)speed {
 
@@ -946,9 +978,9 @@
         case TreadmillInfo: {
             if (subcmd == TreadmillInfoModel) {
                 // 获取设备机型  这个地方要修改
-                self.manufacturer = FSSF(@"%d", [self readUShort:databytes + 3]);
-                self.model = FSSF(@"%d", [self readUShort:databytes + 5]);
-                FSLog(@"厂家：%@ 型号：%@", self.manufacturer, self.model);
+//                self.manufacturer = FSSF(@"%d", [self readUShort:databytes + 3]);
+//                self.model = FSSF(@"%d", [self readUShort:databytes + 5]);
+//                FSLog(@"厂家：%@ 型号：%@", self.manufacturer, self.model);
             } else if (subcmd == TeadmillInfoSpeed) { // 获取设备速度参数
                 unsigned int max_Speed = databytes[3];
                 unsigned int min_Speed = databytes[4];

@@ -97,6 +97,8 @@
 
 - (IBAction)startDevice:(UIButton *)sender {
     FSLog(@"启动设备");
+    // MARK: 这里需要判断  设备是否可以启动
+    
 }
 
 - (IBAction)stopDevice:(UIButton *)sender {
