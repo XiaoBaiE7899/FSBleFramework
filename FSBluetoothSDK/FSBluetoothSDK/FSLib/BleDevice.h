@@ -180,6 +180,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 发送指令
 - (void)sendCommand:(FSCommand *_Nullable)command;
 
+/// 断连时候的操作
+- (void)onDisconnected;
+
 
 @end
 
