@@ -93,27 +93,6 @@ NS_ASSUME_NONNULL_BEGIN
 /* 错误码 */
 @property (nonatomic, readonly) NSString *errorCode;
 
-/* 运动ID */
-@property (nonatomic, readonly) NSString *uid;
-
-/* 体重 */
-@property (nonatomic, readonly) NSString *weight;
-
-/* 身高 */
-@property (nonatomic, readonly) NSString *height;
-
-/* 年龄 */
-@property (nonatomic, readonly) NSString *age;
-
-/* 性别 */
-@property (nonatomic, readonly) NSString *gender;
-
-/* 调整速度 */
-@property (nonatomic, readonly) NSString *adjustSpeed;
-
-/* 调整坡度 */
-@property (nonatomic, readonly) NSString *adjustSlope;
-
 /* 阻力 */
 @property (nonatomic, readonly) NSString *level;
 

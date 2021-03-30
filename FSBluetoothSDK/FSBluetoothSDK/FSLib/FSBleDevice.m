@@ -208,18 +208,6 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
 @interface FSBleDevice ()
 
-///* 模块厂商 */
-//@property (nonatomic) NSString   * _Nullable manufacturer;
-//
-///* 模块机型 */
-//@property (nonatomic) NSString   * _Nullable model;
-//
-///* 硬件版本 */
-//@property (nonatomic) NSString   * _Nullable hardware;
-//
-///* 软件版本 */
-//@property (nonatomic) NSString   * _Nullable software;
-
 /*是否为英制单位 0:公里  1: 英里  1英里(mi) = 1.60934千米(公里) */
 @property (nonatomic) BOOL imperial;
 
@@ -299,27 +287,6 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
 /* 错误码 */
 @property (nonatomic) NSString *errorCode;
-
-/* 运动ID */
-@property (nonatomic) NSString *uid;
-
-/* 体重 */
-@property (nonatomic) NSString *weight;
-
-/* 身高 */
-@property (nonatomic) NSString *height;
-
-/* 年龄 */
-@property (nonatomic) NSString *age;
-
-/* 性别 */
-@property (nonatomic) NSString *gender;
-
-/* 调整速度 */
-@property (nonatomic) NSString *adjustSpeed;
-
-/* 调整坡度 */
-@property (nonatomic) NSString *adjustSlope;
 
 /* 阻力 */
 @property (nonatomic) NSString *level;
@@ -869,13 +836,13 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     self.heartRate = @"0";
     self.paragraph = @"0";
     self.errorCode = @"";
-    self.uid = @"0";
-    self.weight = @"0";
-    self.height = @"0";
-    self.age = @"0";
-    self.gender = @"";
-    self.adjustSlope = @"";
-    self.adjustSpeed = @"";
+//    self.uid = @"0";
+//    self.weight = @"0";
+//    self.height = @"0";
+//    self.age = @"0";
+//    self.gender = @"";
+//    self.adjustSlope = @"";
+//    self.adjustSpeed = @"";
     self.level = @"0";
     self.frequency = @"0";
     self.countDwonSecond = @"0";
@@ -1660,9 +1627,9 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 unsigned int w = databytes[7];
                 unsigned int h = databytes[8];
                 FSLog(@"uid = %d  体重 = %d 身高：%d", useruid, w, h);
-                self.uid = FSSF(@"%d", useruid);
-                self.weight = FSSF(@"%d", w);
-                self.height = FSSF(@"%d", h);
+//                self.uid = FSSF(@"%d", useruid);
+//                self.weight = FSSF(@"%d", w);
+//                self.height = FSSF(@"%d", h);
             } else if (subcmd == TreadmillControlStop) { // 停止设备（此指令直接停止设备）
 //                PLog(@"停止命令发送成功");
             } else if (subcmd == TreadmillControlPause) { // 暂停
@@ -1680,8 +1647,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             } else if (subcmd == TreadmillControlTarget) { // 控制速度、坡度（用户手动操作）
                 unsigned int speed = databytes[3];
                 unsigned int incline = databytes[4];
-                self.adjustSpeed = FSSF(@"%d", speed);
-                self.adjustSlope = FSSF(@"%d", incline);
+//                self.adjustSpeed = FSSF(@"%d", speed);
+//                self.adjustSlope = FSSF(@"%d", incline);
                 FSLog(@"收到调整速度与坡度：speed = %u incline = %u",speed ,incline);
             }
         }
