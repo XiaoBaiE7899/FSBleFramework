@@ -78,7 +78,6 @@
 - (void)deviceStoped:(NSNotification *)notify {
     FSLog(@"设备已经完全停止了，这里断连");
     [self.device disconnect];
-
 }
 
 - (void)setDevice:(FSBleDevice *)device {

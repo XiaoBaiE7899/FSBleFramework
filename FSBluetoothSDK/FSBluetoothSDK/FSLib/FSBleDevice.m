@@ -449,8 +449,14 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
     // 跑步机
     if (self.module.protocolType == BleProtocolTypeTreadmill) {
-        // 发送跑步机指令
-        [self sendData:[self cmdTreadmillStart]];
+        if (self.currentStatus == FSDeviceStateNormal) {
+            // 发送跑步机指令
+            [self sendData:[self cmdTreadmillStart]];
+        } else {
+            if (self.fsDeviceDeltgate && [self.fsDeviceDeltgate respondsToSelector:@selector(deviceError:)]) {
+                [self.fsDeviceDeltgate deviceError:self];
+            }
+        }
         return YES;
     }
 

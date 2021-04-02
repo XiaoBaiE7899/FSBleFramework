@@ -47,7 +47,8 @@
 #pragma mark  按钮点击事件
 
 - (IBAction)blescanDevice:(UIButton *)sender {
-    FSLog(@"扫描设备");
+    FSLog(@"扫描设备 先清除设备");
+    [self.fitshowManager.devices removeAllObjects];
     if ([self.fitshowManager startScan]) {
         FSLog(@"可以扫描");
     } else {
@@ -100,33 +101,84 @@
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
-    FSLog(@"启动设备");
+    FSLog(@"0402启动设备");
+    if (self.device.connectState != ConnectStateWorking) {
+        FSLog(@"0402设备没连接成功");
+        return;
+    }
+
     // MARK: 这里需要判断  设备是否可以启动
     if ([self.device startDevice]) {
-
+        FSLog(@"0402设备可以启动");
     } else {
-        FSLog(@"设备不能启动");
+        FSLog(@"0402设备不能启动");
     }
     
 }
 
 - (IBAction)stopDevice:(UIButton *)sender {
     FSLog(@"停止设备");
-    [self.device stop];
+    if (!self.device) {
+        FSLog(@"设备都没有，何来停止");
+        return;
+    }
+    if (self.device.currentStatus == FSDeviceStateRunning ||
+        self.device.currentStatus == FSDeviceStatePaused) {
+        [self.device stop];
+        return;
+    }
+
+    FSLog(@"只有运行中&暂停中的状态才能  发送停止");
+
 }
 
 - (IBAction)controlSpeed:(UIButton *)sender {
     FSLog(@"控制速度");
+    if (!self.device) {
+        FSLog(@"设备都没有，何来控制速度");
+        return;
+    }
+    if (self.device.currentStatus != FSDeviceStateRunning) {
+        FSLog(@"设备不是在运行中，不能调整速度");
+        return;
+    }
     [self.device sendTargetSpeed:50];
+}
+- (IBAction)controlSpeedAndIncline:(UIButton *)sender {
+    if (!self.device) {
+        FSLog(@"设备都没有，何来控制坡度&速度");
+        return;
+    }
+    if (self.device.currentStatus != FSDeviceStateRunning) {
+        FSLog(@"设备不是在运行中，不能调整坡度&速度");
+        return;
+    }
+    [self.device sendTargetSpeed:50 targetIncline:5];
 }
 
 - (IBAction)controlIncline:(UIButton *)sender {
     FSLog(@"控制坡度");
+    if (!self.device) {
+        FSLog(@"设备都没有，何来控制坡度");
+        return;
+    }
+    if (self.device.currentStatus != FSDeviceStateRunning) {
+        FSLog(@"设备不是在运行中，不能调整坡度");
+        return;
+    }
     [self.device sendTargetIncline:5];
 }
 
 - (IBAction)controlLevel:(UIButton *)sender {
     FSLog(@"控制阻力");
+    if (!self.device) {
+        FSLog(@"设备都没有，何来控制阻力");
+        return;
+    }
+    if (self.device.currentStatus != FSDeviceStateRunning) {
+        FSLog(@"设备不是在运行中，不能调整阻力");
+        return;
+    }
 //    [self.device sendTargetLevel:3];
     // 测试贝塞尔曲线
     [self presentViewController:self.bezierCtrl animated:YES completion:^{
@@ -178,18 +230,18 @@
 
 #pragma mark 蓝牙外设代理
 // 设备断连的方法
-- (void)device:(BleDevice *)device didDisconnectedWithMode:(DisconnectType)mode {
+- (void)device:(FSBleDevice *)device didDisconnectedWithMode:(DisconnectType)mode {
     switch (mode) {
         case DisconnectTypeNone:{}
             break;
         case DisconnectTypeService:{
-            FSLog(@"代理回调___断连，因为找不到对应的服务");
+            FSLog(@"外设代理回调___断连，因为找不到对应的服务");
         }
             break;
         case DisconnectTypeUser: {}
             break;
         case DisconnectTypeTimeout: {
-            FSLog(@"代理回调___断连，连接超时");
+            FSLog(@"外设代理回调___断连，连接超时");
         }
             break;
         case DisconnectTypeResponse: {}
@@ -205,24 +257,34 @@
 }
 
 // 设备已连接的方法
-- (void)device:(BleDevice *)device didConnectedWithState:(ConnectState)state {
+- (void)device:(FSBleDevice *)device didConnectedWithState:(ConnectState)state {
     switch (state) {
         case ConnectStateWorking:{
-            FSLog(@"代理回调___开始工作");
+            FSLog(@"外设代理回调___开始工作");
         }
             break;
         case ConnectStateConnected:{
-            FSLog(@"代理回调___连接成功");
+            FSLog(@"外设代理回调___连接成功");
         }
             break;
         case ConnectStateConnecting:{
-            FSLog(@"代理回调___连接中");
+            FSLog(@"外设代理回调___连接中");
         }
             break;
         default:
             break;
     }
+}
 
+- (void)deviceError:(FSBleDevice *)device {
+    FSLog(@"外设代理回调___设备故障 当前状态 %ld", (long)device.currentStatus);
+}
+
+- (void)device:(FSBleDevice *)device currentState:(FSDeviceState)newState oldState:(FSDeviceState)oldState {
+    FSLog(@"外设代理回调___新状态%ld  旧状态%ld", (long)newState, (long)oldState);
+    if (newState == FSDeviceStateStarting) {
+        FSLog(@"外设代理回调___启动中  倒计时%@秒", device.countDwonSecond);
+    }
 }
 
 #pragma mark setter && getter

@@ -93,7 +93,7 @@
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="avs-hO-Xdx">
                                 <rect key="frame" x="10" y="250.5" width="124.5" height="50"/>
-                                <state key="normal" title="控制速度"/>
+                                <state key="normal" title="速度5.0"/>
                                 <connections>
                                     <action selector="controlSpeed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="N5E-Tn-RFo"/>
                                 </connections>
@@ -110,7 +110,7 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="h91-it-FAD"/>
                                 </constraints>
-                                <state key="normal" title="控制坡度"/>
+                                <state key="normal" title="坡度5.0"/>
                                 <connections>
                                     <action selector="controlIncline:" destination="BYZ-38-t0r" eventType="touchUpInside" id="72B-6b-9Pt"/>
                                 </connections>
@@ -120,6 +120,16 @@
                                 <state key="normal" title="停止扫描"/>
                                 <connections>
                                     <action selector="stopScan:" destination="BYZ-38-t0r" eventType="touchUpInside" id="k44-1Q-YnQ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aUk-qu-wyk">
+                                <rect key="frame" x="20" y="320.5" width="114" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="Owa-as-AAe"/>
+                                </constraints>
+                                <state key="normal" title="速度坡度都为5.0"/>
+                                <connections>
+                                    <action selector="controlSpeedAndIncline:" destination="BYZ-38-t0r" eventType="touchUpInside" id="m7O-o1-TOz"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -153,10 +163,12 @@
                             <constraint firstItem="ZJx-fl-mGt" firstAttribute="centerY" secondItem="Laa-MH-fHP" secondAttribute="centerY" id="jPF-IQ-aaR"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="mSM-GZ-QGA"/>
                             <constraint firstItem="MfI-0K-beb" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="40" id="mZA-sX-ECT"/>
+                            <constraint firstItem="aUk-qu-wyk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="mqw-6u-NXq"/>
                             <constraint firstItem="jm5-Cv-TQk" firstAttribute="centerY" secondItem="HYA-iY-DXR" secondAttribute="centerY" id="ne3-xC-d9b"/>
                             <constraint firstItem="T42-2L-4Ze" firstAttribute="width" secondItem="avs-hO-Xdx" secondAttribute="width" id="pa2-KD-vDT"/>
                             <constraint firstItem="Laa-MH-fHP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="pq0-PD-JgX"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="height" secondItem="Laa-MH-fHP" secondAttribute="height" id="rF2-qZ-GMh"/>
+                            <constraint firstItem="aUk-qu-wyk" firstAttribute="top" secondItem="avs-hO-Xdx" secondAttribute="bottom" constant="20" id="rXs-oZ-cAX"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="top" secondItem="Rlc-D2-jdF" secondAttribute="bottom" constant="10" id="vMU-2d-dkS"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="centerY" secondItem="Laa-MH-fHP" secondAttribute="centerY" id="vuw-al-hNC"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="height" secondItem="avs-hO-Xdx" secondAttribute="height" id="y01-NS-8M6"/>
