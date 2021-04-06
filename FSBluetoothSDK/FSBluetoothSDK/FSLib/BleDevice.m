@@ -137,7 +137,7 @@
 
 // 发起连接
 - (void)connent:(id)delegate {
-    // FIXME: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
+    // MARK: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
     FSLog(@"蓝牙发起连接");
     // 中心管理为空，直接返回
     if (!_centralMgr) return;
@@ -185,7 +185,7 @@
 - (void)disconnect {
     self.disconnectType = DisconnectTypeUser;
     FSLog(@"主动调用断连");
-    [self.centralMgr.centralManager cancelPeripheralConnection:self.module.peripheral];
+    [self.centralMgr.fsCentralManager cancelPeripheralConnection:self.module.peripheral];
 }
 
 - (void)disconnect:(DisconnectType)mode {
@@ -196,7 +196,7 @@
         [self setValue:@(mode) forKeyPath:@"disconnectType"];
         FSLog(@"请求断开连接  因为::: %ld", (long)mode);
         if (self.centralMgr) {
-            [self.centralMgr.centralManager cancelPeripheralConnection:_module.peripheral];
+            [self.centralMgr.fsCentralManager cancelPeripheralConnection:_module.peripheral];
         } else {
             // 1204 MARK: 管理器为空  直接断连
 //            [self disconnect];
@@ -260,9 +260,9 @@
     // 连接的方法
     [self performSelector:@selector(connectTimeout) withObject:nil afterDelay:3];
     // 先断连
-    [self.centralMgr.centralManager cancelPeripheralConnection:self.module.peripheral];
+    [self.centralMgr.fsCentralManager cancelPeripheralConnection:self.module.peripheral];
     // 再连接
-    [self.centralMgr.centralManager connectPeripheral:self.module.peripheral options:nil];
+    [self.centralMgr.fsCentralManager connectPeripheral:self.module.peripheral options:nil];
 }
 
 // 连接超时
@@ -278,7 +278,7 @@
             // FIXME: 这个方法不需要
             [self willDisconnect];
             // 停止扫描
-            [self.centralMgr.centralManager stopScan];
+            [self.centralMgr.fsCentralManager stopScan];
             // 清楚管理器的所有设备
             [self.centralMgr.devices removeAllObjects];
         }
@@ -354,7 +354,7 @@
             FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
             [self.fsDeviceDeltgate device:self didDisconnectedWithMode:DisconnectTypeTimeout];
             self.disconnectType = DisconnectTypeResponse;
-            [self.centralMgr.centralManager cancelPeripheralConnection:_module.peripheral];
+            [self.centralMgr.fsCentralManager cancelPeripheralConnection:_module.peripheral];
         } else {
             // 重新搜索
             FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
@@ -391,18 +391,11 @@
     [self setValue:@(ConnectStateDisconnected) forKeyPath:@"connectState"];
     if (self.fsDeviceDeltgate && [self.fsDeviceDeltgate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
         FSLog(@"%ld", (long)self.disconnectType);
-        // MARK: 20.12.10  注释
-//        [self.fs_peripheral_delegate device:self didDisconnectedWithMode:DisconnectTypeService];
         // 重新搜索
         self.fsDeviceDeltgate = nil;
     }
     
 }
-
-
-
-
-
 
 #pragma mark  蓝牙外设代理方法
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error {
@@ -487,7 +480,7 @@
     }
     if ([chat.UUID.UUIDString isEqualToString:CHAR_READ_MFRS]) {  // 厂家
         self.m_manufacturer = string;
-        // FIXME: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
+        // MARK: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
         /* 连接以后判断厂商名字 */
         NSString *temp = string.uppercaseString;
         if ([temp isEqualToString:@"FITHOME"] ||

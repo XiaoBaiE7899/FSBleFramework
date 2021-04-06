@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 自定义代理
 @property (nonatomic, assign) id <FSCentralDelegate> centralDelegate;
 
-// 蓝牙中心 FIXME: 这个属性不需要开放出去 如果开放出去，这个属性应该是只读
-@property (nonatomic, strong) CBCentralManager    *centralManager;
+// 蓝牙中心
+@property (nonatomic, readonly) CBCentralManager    *fsCentralManager;
 
 /// 扫描指定的 服务 当前类初始化的同时初始化
 @property (nonatomic, strong) NSMutableArray       *services;
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 初始化方法
 + (FSCentralManager *)managerWithDelegate:(id <FSCentralDelegate>)delegate;
 
-// 这个方法只是为了获取蓝牙中心对象，初始化不能用这个方法 FIXME: 这个方法是否真的需要开放
+// 这个方法只是为了获取蓝牙中心对象，初始化不能用这个方法
 + (FSCentralManager *)manager;
 
 /// 扫描外设，蓝牙未开启返回NO
@@ -52,12 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 断连子类管理器中所有连接的设备
 - (void)disconnectAllDevicesInManager;
-
-// 排序 FIXME: 这个方法不能公开
-- (void)sortRssiForDevice;
-
-// 查找信号最前的设备 FIXME: 这个方法不能公开
-- (void)findNearestDevice;
 
 @end
 

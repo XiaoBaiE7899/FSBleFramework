@@ -52,14 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 /* 设备类型 通过广播的12个字节解析得到的 */
 @property (nonatomic, readonly) FSDeviceType   type;
 
-// 设备类型的字符串 重写getter方法 FIXME: 这个属性不需要开放给被人使用
-@property (nonatomic, copy) NSString * _Nullable typeString;
-
 /* 蓝牙协议类型 重写getter方法 */
 @property (nonatomic, assign) BleProtocolType protocolType;
-
-// FIXME: 蓝牙协议 可能有多中协议，旧的SDK 只有跑步机和车表， 跳绳可能不一样，筋膜枪也可以不一样，改为用枚举来处理
-//@property (nonatomic, assign) BOOL isTreadmillProtocol;
 
 /* 判断是不是步数设备  只有跑步机和椭圆机是 步数设备, 重写了getter方法，内部通过type判断返回 */
 @property (nonatomic, assign) BOOL isStepsDevice;

@@ -13,6 +13,8 @@ static NSMutableDictionary  *manager = nil;
 
 @property (nonatomic) BOOL isScaning;
 
+@property (nonatomic) CBCentralManager    *fsCentralManager;
+
 
 @end
 
@@ -22,7 +24,7 @@ static NSMutableDictionary  *manager = nil;
     if (self = [super init]) {
         if (delegate) {
             self.centralDelegate = delegate;
-            _centralManager  = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
+            _fsCentralManager  = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
             _services = NSMutableArray.array;
 //            [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
             [self initialize];
@@ -40,10 +42,10 @@ static NSMutableDictionary  *manager = nil;
     }
     else if (ble.mgrState == FSManagerStatePoweredOff) {
         ble.centralDelegate = delegate;
-        ble.centralManager  = [[CBCentralManager alloc] initWithDelegate:ble queue:nil];
+        ble.fsCentralManager  = [[CBCentralManager alloc] initWithDelegate:ble queue:nil];
     } else if (!ble.isScaning) {
         ble.centralDelegate = delegate;
-        [ble centralManagerDidUpdateState:ble.centralManager];
+        [ble centralManagerDidUpdateState:ble.fsCentralManager];
     }
     return ble;
 }
@@ -65,13 +67,13 @@ static NSMutableDictionary  *manager = nil;
     if (self.isScaning) return NO;
 
     // 如果有指定扫描服务，扫描指定服务，如果没有，扫描全部设备
-    [self.centralManager scanForPeripheralsWithServices:self.services.count ? self.services : nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
+    [self.fsCentralManager scanForPeripheralsWithServices:self.services.count ? self.services : nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
     return YES;
 }
 
 - (void)stopScan {
     self.isScaning = NO;
-    [self.centralManager stopScan];
+    [self.fsCentralManager stopScan];
 }
 
 - (void)cleanManager {

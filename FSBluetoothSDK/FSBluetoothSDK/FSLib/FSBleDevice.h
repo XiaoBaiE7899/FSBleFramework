@@ -7,11 +7,10 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FSBleDevice : BleDevice
+
 #pragma mark 设备的参数数据
 /* 设备的默认图片，在boudle文件里面，重写getter方法 */
 @property (nonatomic, strong) UIImage *fsDefaultImage;
-
-
 
 /*是否为英制单位 0:公里  1: 英里  1英里(mi) = 1.60934千米(公里) */
 @property (nonatomic, readonly) BOOL imperial;
@@ -117,13 +116,11 @@ NS_ASSUME_NONNULL_BEGIN
 /* 已获取阻力参数*/
 @property (nonatomic, readonly) BOOL hasGetLevelParam;
 
-
-// FIXME: 注释应该详细说明，什么情况下，不能启动设备
-/// 启动设备，如果可以启动返回yes，如果不能启动，返回NO
+/// 启动设备，跑步机只有当设备处于正常待机状态才能启动，车表则是设备处于正常待机或睡眠状态都能正常启动  其他情况都不能启动
 - (BOOL)startDevice;
 
-/// 改变速度
-/// @param speed 目标速度
+/// 改变速度  只有跑步机才支持改变速度
+/// @param speed 目标速度  速度单位是0.1, e.g. 如果要把速度调整到5.0，应该传承50，以此类推
 - (void)sendTargetSpeed:(int)speed;
 
 /// 改变坡度
@@ -132,7 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /// 同时控制速度&坡度
-/// @param speed 目标速度
+/// @param speed 目标速度 速度单位是0.1, e.g. 如果要把速度调整到5.0，应该传承50，以此类推
 /// @param incline 目标坡度
 - (void)sendTargetSpeed:(int)speed targetIncline:(int)incline;
 
@@ -147,6 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param incline 目标坡度
 - (void)sendTargetLevel:(int)level targetIncline:(int)incline;
 
+// MARK: 恢复暂停，只有跑步机1.1协议才有，只有设备是跑步机并且协议是1.1版本的才有暂停功能，车表不会发送指令
 /// 暂停设备
 - (void)pause;
 

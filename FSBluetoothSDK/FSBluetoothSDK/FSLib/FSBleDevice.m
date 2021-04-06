@@ -1485,6 +1485,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             self.currentStatus = subcmd;
             // 状态统一处理
             [self fsResetDeviceState];
+            // 输入出
+            FSLog(@"原始  当前状态%hu", subcmd);
             // MARK: 新旧状态都不是初始化状态 并且新旧状态不一致  通过代理回调状态改变
             if (self.currentStatus != FSDeviceStateNone &&
                 self.oldStatus != FSDeviceStateNone &&
@@ -1494,11 +1496,6 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                     [self.fsDeviceDeltgate device:self currentState:self.currentStatus oldState:self.oldStatus];
                 }
             }
-
-            // 输入出
-            FSLog(@"原始  当前状态%hu", subcmd);
-            // FIXME:  状态改变 通过代理回调 在这里增加代码
-
             // MARK: 2021年，康乐佳  发送停止指令以后  状态的变化是3-1-0 这里要做兼容
             // 添加停止中
             if (self.oldStatus == FSDeviceStateRunning &&
