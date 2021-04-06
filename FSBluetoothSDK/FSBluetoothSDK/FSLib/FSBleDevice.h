@@ -105,12 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
 /* 功率 */
 @property (nonatomic, readonly) NSString *watt;
 
-/* 判断设备是不是正在暂停中，重写了getter方法， */
-@property (nonatomic, assign) BOOL isPausing;
-
-/* 判断设备是不是正在运行 重写了getter方法， 运动设备不同，内部判断也不同 */
-//@property (nonatomic, assign) BOOL isRunning; // 状态重新封装以后，这个不需要了
-
 /* 设备是否已经停止  重写setter方法 */
 @property (nonatomic, assign) BOOL hasStoped;
 
@@ -148,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendTargetLevel:(int)level;
 
 
-/// 同时控制阻力&批斗
+/// 同时控制阻力&坡度
 /// @param level 目标阻力
 /// @param incline 目标坡度
 - (void)sendTargetLevel:(int)level targetIncline:(int)incline;
@@ -159,7 +153,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 停止设备
 - (void)stop;
 
-// 恢复设备 到运行中
+// MARK: 恢复设备，只有跑步机1.1协议才有，只有设备是跑步机并且协议是1.1版本的才有暂停功能，车表不会发送指令
+/// 恢复设备 到运行中
 - (void)resume;
 
 @end

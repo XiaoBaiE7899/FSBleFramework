@@ -123,7 +123,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aUk-qu-wyk">
-                                <rect key="frame" x="20" y="320.5" width="114" height="50"/>
+                                <rect key="frame" x="20" y="320.5" width="123" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Owa-as-AAe"/>
                                 </constraints>
@@ -132,10 +132,18 @@
                                     <action selector="controlSpeedAndIncline:" destination="BYZ-38-t0r" eventType="touchUpInside" id="m7O-o1-TOz"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jYU-u5-M2B">
+                                <rect key="frame" x="146" y="320.5" width="123" height="50"/>
+                                <state key="normal" title="恢复设备到运行中"/>
+                                <connections>
+                                    <action selector="restore:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kYX-2A-LDZ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="AAv-CK-ED7" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="17" id="0sy-bW-9L6"/>
+                            <constraint firstItem="jYU-u5-M2B" firstAttribute="centerY" secondItem="aUk-qu-wyk" secondAttribute="centerY" id="4Pn-c1-4pG"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="leading" secondItem="avs-hO-Xdx" secondAttribute="trailing" constant="10" id="59x-GW-xIh"/>
                             <constraint firstItem="ZJx-fl-mGt" firstAttribute="width" secondItem="Laa-MH-fHP" secondAttribute="width" id="5tH-iw-2a2"/>
                             <constraint firstItem="AAv-CK-ED7" firstAttribute="width" secondItem="MfI-0K-beb" secondAttribute="width" id="69W-Ia-ATz"/>
@@ -154,6 +162,7 @@
                             <constraint firstItem="Tf2-Er-UjU" firstAttribute="height" secondItem="MfI-0K-beb" secondAttribute="height" id="Vbq-Mk-xAh"/>
                             <constraint firstItem="Tf2-Er-UjU" firstAttribute="width" secondItem="MfI-0K-beb" secondAttribute="width" id="W9k-k4-Q7e"/>
                             <constraint firstItem="ZJx-fl-mGt" firstAttribute="leading" secondItem="Rlc-D2-jdF" secondAttribute="trailing" constant="10" id="ZjR-uJ-QNC"/>
+                            <constraint firstItem="jYU-u5-M2B" firstAttribute="leading" secondItem="aUk-qu-wyk" secondAttribute="trailing" constant="3" id="aM6-KX-K3b"/>
                             <constraint firstItem="HYA-iY-DXR" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="bKY-eQ-R97"/>
                             <constraint firstAttribute="trailing" secondItem="jm5-Cv-TQk" secondAttribute="trailing" constant="17" id="bya-Ed-1JJ"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="width" secondItem="Laa-MH-fHP" secondAttribute="width" id="eyv-EW-EKb"/>
@@ -168,10 +177,12 @@
                             <constraint firstItem="T42-2L-4Ze" firstAttribute="width" secondItem="avs-hO-Xdx" secondAttribute="width" id="pa2-KD-vDT"/>
                             <constraint firstItem="Laa-MH-fHP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="pq0-PD-JgX"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="height" secondItem="Laa-MH-fHP" secondAttribute="height" id="rF2-qZ-GMh"/>
+                            <constraint firstItem="jYU-u5-M2B" firstAttribute="height" secondItem="aUk-qu-wyk" secondAttribute="height" id="rPB-60-Q7U"/>
                             <constraint firstItem="aUk-qu-wyk" firstAttribute="top" secondItem="avs-hO-Xdx" secondAttribute="bottom" constant="20" id="rXs-oZ-cAX"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="top" secondItem="Rlc-D2-jdF" secondAttribute="bottom" constant="10" id="vMU-2d-dkS"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="centerY" secondItem="Laa-MH-fHP" secondAttribute="centerY" id="vuw-al-hNC"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="height" secondItem="avs-hO-Xdx" secondAttribute="height" id="y01-NS-8M6"/>
+                            <constraint firstItem="jYU-u5-M2B" firstAttribute="width" secondItem="aUk-qu-wyk" secondAttribute="width" id="yLj-Bc-xW3"/>
                             <constraint firstItem="ZJx-fl-mGt" firstAttribute="height" secondItem="Laa-MH-fHP" secondAttribute="height" id="yrG-ZX-B1P"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="yt8-oY-hLY"/>
                             <constraint firstItem="AAv-CK-ED7" firstAttribute="height" secondItem="MfI-0K-beb" secondAttribute="height" id="ziP-Pb-zEr"/>
@@ -933,24 +944,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RPk-VW-Ufp" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1748" y="62"/>
-        </scene>
-        <!--Bezier Ctrl-->
-        <scene sceneID="UUl-gQ-I2H">
-            <objects>
-                <viewController storyboardIdentifier="BezierCtrl" id="x5U-Pp-jek" customClass="BezierCtrl" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="eFp-tb-rIK"/>
-                        <viewControllerLayoutGuide type="bottom" id="CJH-uo-fDu"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="Je3-8z-g32">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="SBS-Oh-8Ex" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2567" y="62"/>
         </scene>
     </scenes>
     <resources>

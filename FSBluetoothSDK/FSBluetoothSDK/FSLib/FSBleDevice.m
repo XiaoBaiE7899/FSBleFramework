@@ -695,6 +695,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     }
     if (self.module.protocolType == BleProtocolTypeTreadmill) {
         FSLog(@"跑步机发送暂停指令");
+        [self sendData:[self cmdTreadmillPause]];
         return;
     }
 
@@ -731,7 +732,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
         return;
     }
 
-    if (!self.isPausing) {
+    if (self.currentStatus == FSDeviceStatePaused) {
         FSLog(@"设备不是正在暂停中，直接返回");
         return;
     }
@@ -805,11 +806,12 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     return NO;
 }
 
-- (BOOL)isPausing {
-    // 车表是否暂停
-    if (self.module.protocolType == BleProtocolTypeSection) {
-        return self.currentStatus == FSDeviceStatePaused ? YES : NO;
-    }
+- (void)deviceIsPausing {
+    // 车表是否暂停  直接使用状态判断
+    if (self.module.protocolType == BleProtocolTypeSection) return;
+//    if (self.module.protocolType == BleProtocolTypeSection) {
+//        return self.currentStatus == FSDeviceStatePaused ? YES : NO;
+//    }
     /*
      正常的暂停 状态为 TreadmillStausPauseds || TreadmillStausPaused
      20.09.14 迈动工厂测试 暂停的时候设备还在运行中，但是速度为0
@@ -822,9 +824,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
     // 判断跑步机是否整处于暂停状态
     if (self.currentStatus == FSDeviceStatePaused || (self.currentStatus == FSDeviceStateRunning && self.speed.intValue == 0)) {
-        return YES;
-    } else {
-        return NO;
+        self.currentStatus = FSDeviceStatePaused;
     }
 }
 
@@ -853,7 +853,6 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     self.frequency = @"0";
     self.countDwonSecond = @"0";
     self.watt = @"0";
-    self.isPausing = NO;
     self.hasStoped = NO;
     self.hasGetLevelParam = NO;
     self.hasGetSpeedParam = NO;
@@ -1097,6 +1096,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             default:
                 break;
         }
+        // 判断跑步机是否在处于暂停
+        [self deviceIsPausing];
         return;
     }
     if (self.module.protocolType == BleProtocolTypeSection) {
@@ -1206,7 +1207,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 /// 暂停
 - (NSData *)cmdTreadmillPause {
     uint8_t cmd[] = {BLE_CMD_START, TreadmillControl,
-    TreadmillControlStop,0, BLE_CMD_END};
+        TreadmillControlPause,0, BLE_CMD_END};
     return [self prepareSendData:cmd length:sizeof(cmd)];
 }
 

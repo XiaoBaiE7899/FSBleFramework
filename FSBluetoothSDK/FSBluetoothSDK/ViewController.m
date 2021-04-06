@@ -10,7 +10,6 @@
 #import "FSLibHelp.h"
 #import "ScanedDevicesCtrl.h"
 #import "DisplayDataCtrl.h"
-#import "BezierCtrl.h"
 
 @interface ViewController () <FSCentralDelegate, FSDeviceDelegate>
 
@@ -26,9 +25,6 @@
 @property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
 // 展示数据的控制器
 @property (nonatomic, strong) DisplayDataCtrl   *datasCtrl;
-
-// 贝塞尔曲线测试控制器
-@property (nonatomic, strong) BezierCtrl *bezierCtrl;
 
 @end
 
@@ -179,14 +175,20 @@
         FSLog(@"设备不是在运行中，不能调整阻力");
         return;
     }
-//    [self.device sendTargetLevel:3];
-    // 测试贝塞尔曲线
-    [self presentViewController:self.bezierCtrl animated:YES completion:^{
-
-    }];
-
+    [self.device sendTargetLevel:3];
 }
 
+- (IBAction)restore:(UIButton *)sender {
+    /*
+     MARK: 有的设备发送恢复指令无法恢复，只能通过设备的物理键恢复
+     1 暂时只有跑步机才支持恢复
+     2 如果设备状态不是出于暂停中，无法返回恢复
+     */
+    if (!self.device) return;
+    if (self.device.module.protocolType != BleProtocolTypeTreadmill) return;
+    if (self.device.currentStatus != FSDeviceStatePaused) return;
+    [self.device resume];
+}
 
 
 #pragma mark 蓝牙中心代理
@@ -314,15 +316,6 @@
 
     }
     return _datasCtrl;
-}
-
-- (BezierCtrl *)bezierCtrl {
-    if (!_bezierCtrl) {
-        _bezierCtrl = (BezierCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([BezierCtrl class])];
-
-    }
-    return _bezierCtrl;
-
 }
 
 #pragma mark  Private methods
