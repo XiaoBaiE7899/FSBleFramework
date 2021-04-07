@@ -97,17 +97,17 @@
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
-    FSLog(@"0402启动设备");
+    FSLog(@"启动设备");
     if (self.device.connectState != ConnectStateWorking) {
-        FSLog(@"0402设备没连接成功");
+        FSLog(@"设备没连接成功");
         return;
     }
 
     // MARK: 这里需要判断  设备是否可以启动
     if ([self.device startDevice]) {
-        FSLog(@"0402设备可以启动");
+        FSLog(@"可以启动");
     } else {
-        FSLog(@"0402设备不能启动");
+        FSLog(@"设备不能启动");
     }
     
 }
@@ -190,6 +190,16 @@
     [self.device resume];
 }
 
+- (IBAction)pauseAction:(UIButton *)sender {
+    /*
+     暂时只有跑步机，并且使用1.1协议的才有暂停指令
+     设备只有在运行中发送暂停指令才被执行
+     */
+    if (!self.device) return;
+    if (self.device.module.protocolType != BleProtocolTypeTreadmill) return;
+    [self.device pause];
+
+}
 
 #pragma mark 蓝牙中心代理
 - (void)manager:(FSCentralManager *)manager didUpdateState:(FSManagerState)state {

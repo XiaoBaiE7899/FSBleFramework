@@ -2,6 +2,19 @@
 #import "FSBleDevice.h"
 #import "FSLibHelp.h"
 
+/*
+  英制单位指令发收情况
+  用户信息写死：id:0 体重:70 身高:170 年龄:25 性别:0
+  1连接成功 速度参数、坡度参数、累计里程、写入用户信息
+  2启动过程 准备开始（53 01）、写入用户信息（53 00）、正式启动（53 09）
+
+  黑色跑步机
+  1连接成功 速度参数、坡度参数、累计里程、写入用户信息
+  2启动过程 准备开始（53 01）、写入用户数据（53 00）
+
+
+ */
+
 // 蓝牙命令 开始 && 结束
 typedef NS_ENUM(NSInteger, BLE_CMD) {
     /* 指令帧头 */
@@ -451,7 +464,16 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     if (self.module.protocolType == BleProtocolTypeTreadmill) {
         if (self.currentStatus == FSDeviceStateNormal) {
             // 发送跑步机指令
+//            [self sendData:[self cmdTreadmillStart]];
+            // FIXME: 这里需要根据设备是否支持暂停发送不同指令 设备不支持暂停，发送  1： 53 01  2： 53 00 设备支持暂停：1：53 01 2：53 00 3：53 09 就是如果支持暂停，多发一条正式开始的指令
+            // 1 准备开始
             [self sendData:[self cmdTreadmillStart]];
+            // 2 写入用户数据
+            [self sendData:[self cmdTreadmillUserInfo:0 weight:70 height:170 age:25 sexy:0]];
+            if (self.supportPause) {
+                // 正式开始
+                [self resume];
+            } 
         } else {
             if (self.fsDeviceDeltgate && [self.fsDeviceDeltgate respondsToSelector:@selector(deviceError:)]) {
                 [self.fsDeviceDeltgate deviceError:self];
@@ -732,7 +754,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
         return;
     }
 
-    if (self.currentStatus == FSDeviceStatePaused) {
+    if (self.currentStatus != FSDeviceStatePaused) {
         FSLog(@"设备不是正在暂停中，直接返回");
         return;
     }
@@ -1150,6 +1172,11 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 /// 累计里程
 - (NSData *)cmdTreadmillTotalInfo {
     uint8_t cmd[] = {BLE_CMD_START,TreadmillInfo, TeadmillInfoTotal, 0x00, BLE_CMD_END};
+    return [self prepareSendData:cmd length:sizeof(cmd)];
+}
+
+- (NSData *)cmdTreadmillUserInfo:(int)u_id weight:(int)w height:(int)h age:(int)a sexy:(int)sex {
+    uint8_t cmd[] = {BLE_CMD_START,TreadmillControl, TreadmillControlUser, (Byte)((u_id >> 24) & 0xFF), (Byte)((u_id >> 16) & 0xFF), (Byte)((u_id >> 8) & 0xFF), (Byte)(u_id & 0xFF), w, h, a, sex, 0x00, BLE_CMD_END};
     return [self prepareSendData:cmd length:sizeof(cmd)];
 }
 
