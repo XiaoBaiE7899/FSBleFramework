@@ -15,7 +15,6 @@ static NSMutableDictionary  *manager = nil;
 
 @property (nonatomic) CBCentralManager    *fsCentralManager;
 
-
 @end
 
 @implementation FSCentralManager
