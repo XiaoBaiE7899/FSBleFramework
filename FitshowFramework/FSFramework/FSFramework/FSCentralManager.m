@@ -1,4 +1,13 @@
 
+/*
+ SDK  版本记录
+ 1.0  根据运动秀自己的app蓝牙扫描、连接、控制、断连的逻辑，封装成sdk
+ 1.0.1  解决 kinomap 反馈的问题  修改地方  fixme:1.0.1
+      (1). When there is a device in the FSCentralManagerdevicesproperty, we can't connect on it. We need to clear the devices array and then do a new scan to connect the device found.
+      (2). With a treadmill, I am able to connect it successfully and receive data. When I remove the safety key from the treadmill, it stops and I receive the FSDeviceStateTreadmillDisable. When a plug again the safety key, we don't receive any event so we can not restart the treadmill.
+      2021.04.12  解决，因为设备断连以后没重置，
+ */
+
 #import "FSCentralManager.h"
 #import "FSLibHelp.h"
 
@@ -25,7 +34,6 @@ static NSMutableDictionary  *manager = nil;
             self.centralDelegate = delegate;
             _fsCentralManager  = [[CBCentralManager alloc] initWithDelegate:self queue:nil];
             _services = NSMutableArray.array;
-//            [self.centralManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
             [self initialize];
         }
     }
@@ -172,7 +180,7 @@ static NSMutableDictionary  *manager = nil;
     // 先找到设备，在去找服务
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) {
-        FSLog(@"外设与中心建立连接，开始查找外设的服务，运动秀的设备到这里不能算是连接成功，要找到FFF1,FFF2 后才算连接成功");
+//        FSLog(@"外设与中心建立连接，开始查找外设的服务，运动秀的设备到这里不能算是连接成功，要找到FFF1,FFF2 后才算连接成功");
         [peripheral discoverServices:nil];
     }
 }
@@ -181,7 +189,7 @@ static NSMutableDictionary  *manager = nil;
 
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) { // 连接失败就重连
-        FSLog(@"断开重连^^^重连");
+//        FSLog(@"断开重连^^^重连");
         [device willDisconnect];
     }
 }
@@ -190,7 +198,7 @@ static NSMutableDictionary  *manager = nil;
     // 先找到设备，在去找服务
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) { // 连接失败就重连
-        FSLog(@"连接失败^^^重连");
+//        FSLog(@"连接失败^^^重连");
         [device willDisconnect];
     }
 }
@@ -272,9 +280,6 @@ static NSMutableDictionary  *manager = nil;
         device = [super discoverModule:module];
     }
     return device;
-
-    FSLog(@"子类发现模块  %@", module.name);
-
 }
 
 
@@ -314,14 +319,7 @@ static NSMutableDictionary  *manager = nil;
 
 @end
 
-/*
- SDK  版本记录
- 1.0  根据运动秀自己的app蓝牙扫描、连接、控制、断连的逻辑，封装成sdk
- 1.0.1  解决 zwift 反馈的问题  修改地方  fixme:1.0.1
-      (1). When there is a device in the FSCentralManagerdevicesproperty, we can't connect on it. We need to clear the devices array and then do a new scan to connect the device found.
-      (2). With a treadmill, I am able to connect it successfully and receive data. When I remove the safety key from the treadmill, it stops and I receive the FSDeviceStateTreadmillDisable. When a plug again the safety key, we don't receive any event so we can not restart the treadmill.
-      2021.04.12  解决，因为设备断连以后没重置，
- */
+
 
 
 

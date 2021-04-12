@@ -133,13 +133,19 @@
         FSLog(@"设备都没有，何来停止");
         return;
     }
-    if (self.device.currentStatus == FSDeviceStateRunning ||
-        self.device.currentStatus == FSDeviceStatePaused) {
+    if (self.device.isConnected) {
+        // 设备只有有连接就可以停止
+        FSLog(@"发送停止指令");
         [self.device stop];
-        return;
     }
 
-    FSLog(@"只有运行中&暂停中的状态才能  发送停止");
+//    if (self.device.currentStatus == FSDeviceStateRunning ||
+//        self.device.currentStatus == FSDeviceStatePaused) {
+//        [self.device stop];
+//        return;
+//    }
+
+//    FSLog(@"只有运行中&暂停中的状态才能  发送停止");
 
 }
 

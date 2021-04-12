@@ -419,7 +419,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
 #pragma mark 重写父类的方法
 - (BOOL)onService {
-    FSLog(@"执行子类onService");
+//    FSLog(@"执行子类onService");
     CBUUID *server = UUID(SERVICES_UUID); // 服务
     CBUUID *send = UUID(CHAR_WRITE_UUID); // 写特征
     CBUUID *recv = UUID(CHAR_NOTIFY_UUID); //听特征
@@ -461,7 +461,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 }
 
 - (void)onConnected {
-    FSLog(@"执行子类onConnected");
+//    FSLog(@"执行子类onConnected");
     /*
      数据重置---清除指令---获取状态---更新设备参数--- 写入用户数据--- 启动心跳包
      */
@@ -476,7 +476,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 }
 
 - (BOOL)onUpdateData:(FSCommand *_Nullable)cmd {
-    FSLog(@"xb1007%@", self.module.name);
+//    FSLog(@"xb1007%@", self.module.name);
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readyTimeOut) object:nil];
 
     // !!!: 判断数据是否合法
@@ -531,13 +531,13 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 }
 
 - (void)onDisconnected {
-    FSLog(@"执行子类onDisconnected");
+//    FSLog(@"执行子类onDisconnected");
     [self.cmdQueueTimer invalidate];
     self.cmdQueueTimer = nil;
     [self.heartbeatTimer invalidate];
     self.heartbeatTimer = nil;
     // FIXME: 1.0.1 设备所信息重置
-    FSLog(@"重置连接状态");
+//    FSLog(@"重置连接状态");
     self.connectState = ConnectStateDisconnected;
     // 调用父类的方法，设置连接的状态为：没有连接
     [super onDisconnected];
@@ -590,7 +590,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             return YES;
         }
     }
-    FSLog(@"跑步机当前状态是%ld，不能启动，断连设备", (long)self.currentStatus);
+//    FSLog(@"跑步机当前状态是%ld，不能启动，断连设备", (long)self.currentStatus);
     [self disconnect];
     return NO;
 }
@@ -606,11 +606,11 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      5 发送指令
      */
     if (self.module.protocolType != BleProtocolTypeTreadmill) {
-        FSLog(@"不是跑步机，速度不支持控制");
+//        FSLog(@"不是跑步机，速度不支持控制");
         return;
     }
     if (self.speed.intValue == speed) {
-        FSLog(@"当前速度与目标速度相同，不需要发送指令");
+//        FSLog(@"当前速度与目标速度相同，不需要发送指令");
         return;
     }
     // 目标速度
@@ -638,11 +638,11 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      4 根据设备类型不同，发送不停指令
      */
     if (!self.supportIncline) {
-        FSLog(@"设备不支持坡度控制");
+//        FSLog(@"设备不支持坡度控制");
         return;
     }
     if (self.incline.intValue == incline) {
-        FSLog(@"目标坡度等于当前坡度，不需要发送指令");
+//        FSLog(@"目标坡度等于当前坡度，不需要发送指令");
         return;
     }
     // 目标坡度
@@ -680,12 +680,12 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      4 速度、坡度都是可以控制，发送指令
      */
     if (self.module.protocolType != BleProtocolTypeTreadmill) {
-        FSLog(@"只有跑步机才支持速度控制");
+//        FSLog(@"只有跑步机才支持速度控制");
         return;
     }
     if (self.speed.intValue == speed &&
         self.incline.intValue == incline) {
-        FSLog(@"速度&坡度  等于目标速度&坡度");
+//        FSLog(@"速度&坡度  等于目标速度&坡度");
         return;
     }
     int targetSpeed = speed;
@@ -700,7 +700,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     if (!self.supportIncline) {
         // 设备不支持坡度控制
         if (targetSpeed == self.speed.intValue) {
-            FSLog(@"坡度不能控制，目标速度等于当前速度，不需要发送指令");
+//            FSLog(@"坡度不能控制，目标速度等于当前速度，不需要发送指令");
             return;
         }
         [self sendData:[self cmdTreadmillControlSpeed:targetSpeed incline:0]];
@@ -708,7 +708,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
         // 设备支持坡度控制
         if (targetSpeed == self.speed.intValue &&
             targetIncline == self.incline.intValue) {
-            FSLog(@"坡度可以控制，目标速度&坡度等于当前的速度&坡度，不需要发送指令");
+//            FSLog(@"坡度可以控制，目标速度&坡度等于当前的速度&坡度，不需要发送指令");
             return;
         }
         [self sendData:[self cmdTreadmillControlSpeed:targetSpeed incline:targetIncline]];
@@ -726,15 +726,15 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      5 发送指令
      */
     if (self.module.protocolType == BleProtocolTypeTreadmill) {
-        FSLog(@"跑步机不支持阻力控制");
+//        FSLog(@"跑步机不支持阻力控制");
         return;
     }
     if (!self.supportLevel) {
-        FSLog(@"设备不支持阻力控制");
+//        FSLog(@"设备不支持阻力控制");
         return;
     }
     if (level == self.level.intValue) {
-        FSLog(@"当前阻力等于目标阻力，不需要发送指令");
+//        FSLog(@"当前阻力等于目标阻力，不需要发送指令");
         return;
     }
     // 目标阻力
@@ -760,7 +760,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      4 设备的阻力&坡度都可以控制，判断目标阻力&目标坡度是否相等
      */
     if (!self.supportLevel && !self.supportIncline) {
-        FSLog(@"阻力速度，都不可以控制，不用发指令");
+//        FSLog(@"阻力速度，都不可以控制，不用发指令");
         return;
     }
     if (!self.supportLevel && self.supportIncline) {
@@ -788,7 +788,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
     if (targetLevel == self.level.intValue &&
         targetIncline == self.incline.intValue) {
-        FSLog(@"设备阻力&坡度，都可以控制，但是目标阻力&坡度  等于  设备当前的阻力&坡度");
+//        FSLog(@"设备阻力&坡度，都可以控制，但是目标阻力&坡度  等于  设备当前的阻力&坡度");
         return;
     }
     // 发送控制阻力和坡度的指令
@@ -803,17 +803,17 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      根据不同设备类型不同，发送不同指令
      */
     if (!self.supportPause) {
-        FSLog(@"设备不支持暂停");
+//        FSLog(@"设备不支持暂停");
         return;
     }
     if (self.module.protocolType == BleProtocolTypeTreadmill) {
-        FSLog(@"跑步机发送暂停指令");
+//        FSLog(@"跑步机发送暂停指令");
         [self sendData:[self cmdTreadmillPause]];
         return;
     }
 
     if (self.module.protocolType == BleProtocolTypeSection) {
-        FSLog(@"车表发送暂停指令");
+//        FSLog(@"车表发送暂停指令");
         return;
     }
 }
@@ -841,12 +841,12 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
      3 发送跑步机  恢复指令
      */
     if (self.module.protocolType == BleProtocolTypeSection) {
-        FSLog(@"不是跑步机，直接返回");
+//        FSLog(@"不是跑步机，直接返回");
         return;
     }
 
     if (self.currentStatus != FSDeviceStatePaused) {
-        FSLog(@"设备不是正在暂停中，直接返回");
+//        FSLog(@"设备不是正在暂停中，直接返回");
         return;
     }
     // 发送恢复指令 以后3秒判断设备是否有回复
@@ -857,14 +857,14 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 - (UIImage *)fsDefaultImage {
     NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"FSDeiveceDefImg" ofType:@"bundle"];
     if (!bundlePath) {
-        FSLog(@"bundle 文件为空，直接返回空");
+//        FSLog(@"bundle 文件为空，直接返回空");
         return nil;
     }
 
     NSString *str = FSSF(@"device_deficon_%ld.png", (long)self.module.type);
     UIImage *iconImage = [UIImage imageWithContentsOfFile:[bundlePath stringByAppendingPathComponent:str]];
     if (!iconImage) {
-        FSLog(@"bundle 文件找不到图片，直接返回空");
+//        FSLog(@"bundle 文件找不到图片，直接返回空");
         return nil;
     }
     return iconImage;
@@ -879,7 +879,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 //    FSLog(@"设备是否完全停止");
     // 车表是否完全停止
     if (self.module.protocolType == BleProtocolTypeSection) {
-        FSLog(@"车表是否停止");
+//        FSLog(@"车表是否停止");
         if (self.oldStatus == FSDeviceStateRunning &&
             self.currentStatus == FSDeviceStateNormal) {
             return YES;
@@ -896,25 +896,25 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     //
     if (self.oldStatus == FSDeviceStateTreadmillStopping &&
         self.currentStatus == FSDeviceStateNormal) {
-        FSLog(@"0322 不支持暂停 的设备");
+//        FSLog(@"0322 不支持暂停 的设备");
         return YES;
     }
     // MARK: 9.14 脉动工厂参加体博会设备 不会进入4状态，状态3&&速度0即为暂停，再发停止，就停止
     if (self.oldStatus == FSDeviceStateRunning &&
         self.currentStatus == FSDeviceStateNormal) {
-        FSLog(@"0322 脉动工厂参加体博会设备");
+//        FSLog(@"0322 脉动工厂参加体博会设备");
         return YES;
     }
     // MARK: 2021.02.19 康乐佳 发送停止指令以后  3-1-0
     if (self.oldStatus == FSDeviceStateTreadmillEnd &&
         self.currentStatus == FSDeviceStateNormal) {
-        FSLog(@"0322 脉动工厂参加体博会设备");
+//        FSLog(@"0322 脉动工厂参加体博会设备");
         return YES;
     }
     // 暂停到待机
     if (self.oldStatus == FSDeviceStatePaused &&
         self.currentStatus == FSDeviceStateNormal) {
-        FSLog(@"0322 脉动工厂参加体博会设备");
+//        FSLog(@"0322 脉动工厂参加体博会设备");
         return YES;
     }
     return NO;
@@ -1007,7 +1007,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 }
 
 - (NSString *)getBinaryByDecimal:(NSInteger)decimal {
-    FSLog(@"配置信息%ld", (long)decimal);
+//    FSLog(@"配置信息%ld", (long)decimal);
 
     NSString *binary = @"";
     while (decimal) {
@@ -1533,7 +1533,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 self.minSpeed = FSSF(@"%u", min_Speed);
                 self.supportSpeed = control > 0 ? YES : NO;
                 // issues#484  如果设备是英制单位，返回来的值就是英制单位
-                FSLog(@"最大速度%@  最小速度%@  控制%d", self.maxSpeed, self.minSpeed, self.supportSpeed);
+//                FSLog(@"最大速度%@  最小速度%@  控制%d", self.maxSpeed, self.minSpeed, self.supportSpeed);
                 self.hasGetSpeedParam = YES;
             } else if (subcmd == TeadmillInfoIncline) { // 获取设备坡度参数
                 unsigned int maxIncline = databytes[3];
@@ -1547,7 +1547,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 FSLog(@"%lu", (unsigned long)data.length);
                 switch (data.length) {
                     case 5: { // 坡度数据没下发 最大坡度 最小坡度 是否英制单位，暂停，坡度是否可以控制
-                        FSLog(@"公英制测试：获取坡度信息的指令无数据返回");
+//                        FSLog(@"公英制测试：获取坡度信息的指令无数据返回");
                         self.maxIncline = @"0";
                         self.minIncline = @"0";
                         self.imperial = NO;
@@ -1556,7 +1556,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                     }
                         break;
                     case 7: { // 没有发配信息 英制单位、支持暂停设置为0， 最大、最小坡度、坡度是否可以控制可以赋值
-                        FSLog(@"公英制测试：999999配置信息没上报");
+//                        FSLog(@"公英制测试：999999配置信息没上报");
                         self.maxIncline = FSSF(@"%d", maxIncline);
                         self.minIncline = FSSF(@"%d", minIncline);
                         self.imperial = NO;
@@ -1569,8 +1569,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                         unsigned int imperial = databytes[5] & 0x01;
                         unsigned int pause = databytes[5] & 0x02;
                         // 配置信息 转为2进制  输出为字符串
-                        FSLog(@"公英制测试：%@", [self getBinaryByDecimal:databytes[5]]);
-                        FSLog(@"0310公英制测试  暂停%d  英制%d", pause, imperial);
+//                        FSLog(@"公英制测试：%@", [self getBinaryByDecimal:databytes[5]]);
+//                        FSLog(@"0310公英制测试  暂停%d  英制%d", pause, imperial);
                         unsigned int control = maxIncline - minIncline;
                         self.maxIncline = FSSF(@"%d", maxIncline);
                         self.minIncline = FSSF(@"%d", minIncline);
@@ -1598,7 +1598,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             // 状态统一处理
             [self fsResetDeviceState];
             // 输入出
-            FSLog(@"原始  当前状态%hu", subcmd);
+//            FSLog(@"原始  当前状态%hu", subcmd);
             // MARK: 新旧状态都不是初始化状态 并且新旧状态不一致  通过代理回调状态改变
             if (self.currentStatus != FSDeviceStateNone &&
                 self.oldStatus != FSDeviceStateNone &&
@@ -1612,13 +1612,13 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             // 添加停止中
             if (self.oldStatus == FSDeviceStateRunning &&
                 self.currentStatus == FSDeviceStateTreadmillStopping) {
-                FSLog(@"添加loading   停止中的加载框");
+//                FSLog(@"添加loading   停止中的加载框");
             }
 
             // 去掉停止中
             if (self.oldStatus == FSDeviceStateTreadmillStopping &&
                 self.currentStatus != FSDeviceStateTreadmillStopping) {
-                FSLog(@"去掉loading  停止中的加载框");
+//                FSLog(@"去掉loading  停止中的加载框");
             }
 
             /*
@@ -1646,7 +1646,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             // 12.7 保存连接
             if (self.hasStoped) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
-                FSLog(@"设备已经完全停止了");
+//                FSLog(@"设备已经完全停止了");
                 [self disconnect];
             }
             
@@ -1675,7 +1675,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 unsigned int _paragraph = databytes[14];
                 self.incline = FSSF(@"%d", _incline);
                 self.eElapsedTime = FSSF(@"%d", _time);
-                FSLog(@"0329上报的距离%d  上报的速度%d", _distance, _speed);
+//                FSLog(@"0329上报的距离%d  上报的速度%d", _distance, _speed);
                 // 设备上报的距离
                 NSString *device_dist = FSSF(@"%d", _distance);
                 // 设备上报的速度
@@ -1713,7 +1713,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             } else if (subcmd == TreadmillStausError) { // 设备故障状态
                 unsigned int code = databytes[3];
                 self.errorCode = FSSF(@"%d", code);
-                FSLog(@"设备故障，故障码： %u",code);
+//                FSLog(@"设备故障，故障码： %u",code);
                 // 不显示加载框
                 // 代理回调
                 if ([self.fsDeviceDeltgate respondsToSelector:@selector(deviceError:)]) {
@@ -1729,9 +1729,9 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 }
                 // 这个需要重新写
                 unsigned int distubcode = databytes[3];
-                FSLog(@"禁止启动状态（1.0.5）,禁止码： %u",distubcode);
+//                FSLog(@"禁止启动状态（1.0.5）,禁止码： %u",distubcode);
             } else if (subcmd == TreadmillStausReady) {
-                FSLog(@"设备就绪（1.1）CONTROL_READY 指令后应为此状态");
+//                FSLog(@"设备就绪（1.1）CONTROL_READY 指令后应为此状态");
             } else if (subcmd == TreadmillStausPaused ||
                        subcmd == TreadmillStausPauseds) { // 暂停
             }
@@ -1742,7 +1742,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 unsigned int useruid = [self readUInt:databytes + 3];
                 unsigned int w = databytes[7];
                 unsigned int h = databytes[8];
-                FSLog(@"uid = %d  体重 = %d 身高：%d", useruid, w, h);
+//                FSLog(@"uid = %d  体重 = %d 身高：%d", useruid, w, h);
 //                self.uid = FSSF(@"%d", useruid);
 //                self.weight = FSSF(@"%d", w);
 //                self.height = FSSF(@"%d", h);
@@ -1753,7 +1753,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             } else if (subcmd == TreadmillControlReady) { // 准备开始（1.1）（START 前写入运动数据）
                 unsigned int startsecond = databytes[3];
                 // MARK: 这里只会进来一次
-                self.countDwonSecond = FSSF(@"%d", startsecond) ;
+                self.countDwonSecond = FSSF(@"%d", startsecond);
+                FSLog(@"启动中  倒计时___%@___秒", self.countDwonSecond);
             } else if (subcmd == TreadmillControlSpeed) { // 速度数据(程式模式)
                //  没有程式模式，这个指令不做处理
             } else if (subcmd == TreadmillControlStart) { // 开始或恢复设备运行（1.1 正式启动）
@@ -1765,7 +1766,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 unsigned int incline = databytes[4];
 //                self.adjustSpeed = FSSF(@"%d", speed);
 //                self.adjustSlope = FSSF(@"%d", incline);
-                FSLog(@"收到调整速度与坡度：speed = %u incline = %u",speed ,incline);
+//                FSLog(@"收到调整速度与坡度：speed = %u incline = %u",speed ,incline);
             }
         }
             break;
@@ -1775,7 +1776,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 unsigned int distance = [self readUShort:databytes + 5];
                 unsigned int calory = [self readUShort:databytes + 7];
                 unsigned int step = [self readUShort:databytes + 9];
-                FSLog(@"读到运动数据： 时间 %D 距离 %D 卡落里 %D 步数 %D",time,distance,calory,step);
+//                FSLog(@"读到运动数据： 时间 %D 距离 %D 卡落里 %D 步数 %D",time,distance,calory,step);
             } else if (subcmd == TreadmillDataInfo) { // 读取跑步机信息
 //                PLog(@"读取跑步机信息的数据，数据解析还没写");
             }
@@ -1806,8 +1807,8 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 uint pause = databytes[5] & 0x02;
                 uint device_config     = databytes[5];
                 uint device_paragraph  = databytes[6];
-                FSLog(@"最小阻力%d、是否为英制单位%d、是否支持暂停%d", min_level, unit, pause);
-                FSLog(@"最大阻力%d、最大坡度坡度%d、配置%d、段数%d", max_resistance, max_incline, device_config, device_paragraph);
+//                FSLog(@"最小阻力%d、是否为英制单位%d、是否支持暂停%d", min_level, unit, pause);
+//                FSLog(@"最大阻力%d、最大坡度坡度%d、配置%d、段数%d", max_resistance, max_incline, device_config, device_paragraph);
                 self.maxLevel  = FSSF(@"%d", max_resistance);
                 self.maxIncline = FSSF(@"%d", max_incline);
                 self.imperial = unit;
@@ -1825,7 +1826,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
             // 设置新状态
             self.currentStatus = subcmd;
             [self fsResetDeviceState];
-            FSLog(@"原始  当前状态%ld", (long)subcmd);
+//            FSLog(@"原始  当前状态%ld", (long)subcmd);
             // MARK: 新旧状态都不是初始化状态 并且新旧状态不一致  通过代理回调状态改变
             if (self.currentStatus != FSDeviceStateNone &&
                 self.oldStatus != FSDeviceStateNone &&
@@ -1838,13 +1839,13 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
             if (self.hasStoped) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
+                [self disconnect];
             }
 
             // ???: 这有个问题， 车表停止正常情况，状态应该由运行中到待机，但是君斯达的会先从运行中变成启动中，在变到待机状态
 //                if (device.oldStatus.intValue == CarTableParamStatusRunning &&
 //                    device.currentStatus.intValue == CarTableParamStatusNormal) {
 //                    [device disconnect];
-//                    [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
 //                    return;
 //                }
             // !!!: 这里对君斯大的设备做特殊处理,理论上来讲，这个设备还么量产，应该有厂家修改，app严格执行对外的开放协议就好
@@ -1858,9 +1859,9 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
             // 判断二级指令
             if (subcmd == SectionParamStatusNormal) { // 待机
-                FSLog(@"待机………………………………………………");
+//                FSLog(@"待机………………………………………………");
             } else if (subcmd == SectionParamStatusError) { // 故障
-                FSLog(@"0226 设备故障");
+//                FSLog(@"0226 设备故障");
                 // 断连
                 [self disconnect];
                 // 代理回调
@@ -1876,7 +1877,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 uint watt    = [self readUShort:databytes + 9];
                 uint slope  = databytes[11];
                 uint duanshu = databytes[12];
-                FSLog(@"0305速度%d 阻力%d 频率%d 心率%d 瓦特%d 坡度%d 段数%d", spd, resistance, frequency, heart_Rate, watt, slope, duanshu);
+//                FSLog(@"0305速度%d 阻力%d 频率%d 心率%d 瓦特%d 坡度%d 段数%d", spd, resistance, frequency, heart_Rate, watt, slope, duanshu);
                 self.speed = FSSF(@"%d", spd);
                 self.level = FSSF(@"%d", resistance);
                 self.frequency = FSSF(@"%d", frequency);
@@ -1885,9 +1886,9 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 self.incline = FSSF(@"%d", slope);
                 self.paragraph = FSSF(@"%d", duanshu);
             } else if (subcmd == SectionParamStatusSleep) { // 睡眠
-                FSLog(@"睡眠");
+//                FSLog(@"睡眠");
             } else if (subcmd == SectionParamStatusRunning) { // 运行中
-                FSLog(@"运行中"); // 02 42 02 0000 00 0000 79 0000 00 02 3b 03
+//                FSLog(@"运行中"); // 02 42 02 0000 00 0000 79 0000 00 02 3b 03
 // 开始02 状态42 运行02 速度0000 阻力00 频率0000 心率79 瓦特0000 坡度00  段数02 检验3b 结束03
                 uint spd   = [self readUShort:databytes + 3];
                 uint resistance    = databytes[5];
@@ -1897,7 +1898,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 
                 uint slope  = databytes[11];
                 uint duanshu = databytes[12];
-                FSLog(@"0305 速度%d 阻力%d 频率%d 心率%d 瓦特%d 坡度%d 段数%d", spd, resistance, frequency, heart_Rate, watt, slope, duanshu);
+//                FSLog(@"0305 速度%d 阻力%d 频率%d 心率%d 瓦特%d 坡度%d 段数%d", spd, resistance, frequency, heart_Rate, watt, slope, duanshu);
                 self.speed = FSSF(@"%d", spd);
                 self.level = FSSF(@"%d", resistance);
                 self.frequency = FSSF(@"%d", frequency);
@@ -1907,7 +1908,13 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 self.paragraph = FSSF(@"%d", duanshu);
 
             } else if (subcmd == SectionParamStatusStarting) { // 启动中
-                FSLog(@"启动中");
+//                FSLog(@"启动中");
+
+                unsigned int startsecond = databytes[3];
+
+                // MARK: 这里只会进来一次
+                self.countDwonSecond = FSSF(@"%d", startsecond);
+                FSLog(@"启动中  倒计时___%@___秒", self.countDwonSecond);
             }
         }
             break;
@@ -1920,17 +1927,17 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
                 uint count    = [self readUShort:databytes + 9];
                 // !!!: 距离赋值的地方
                 if (databytes[6] & 0x80) { // 判断是不是以10米为单位的
-                    FSLog(@"距离单位:::10米");
+//                    FSLog(@"距离单位:::10米");
                     distance = MAKEWORD(databytes[5], databytes[6] & 0x7f) * 10;
                 } else {
-                    FSLog(@"距离单位:::米");
+//                    FSLog(@"距离单位:::米");
                     distance = MAKEWORD(databytes[5], databytes[6]);
                 }
                 self.eElapsedTime = FSSF(@"%d", runtime);
                 self.distance = FSSF(@"%d", distance);
                 self.calory = FSSF(@"%d", calory);
                 self.counts = FSSF(@"%d", count);
-                FSLog(@"0305 时间%d 距离%d 卡路里%d  计数%d", runtime, distance, calory, count);
+//                FSLog(@"0305 时间%d 距离%d 卡路里%d  计数%d", runtime, distance, calory, count);
             } else if (subcmd == SectionDataSportInfo) { // 获取用户信息
 
             } else if (subcmd == SectionDataProgramData) { // 获取程式信息

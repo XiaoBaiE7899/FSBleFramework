@@ -1,8 +1,6 @@
 
 #import "DisplayDataCtrl.h"
 #import <FSFramework/FSFramework.h>
-//#import "FSLibHelp.h"
-//#import "FSBleDevice.h"
 
 @interface DisplayDataCtrl ()
 // 是否为英制设备

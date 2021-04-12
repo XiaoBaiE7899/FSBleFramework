@@ -138,7 +138,7 @@
 // 发起连接
 - (void)connent:(id)delegate {
     // MARK: 2021年3月9日 增加过滤 厂商名=FITHOME || 厂商名=JIANJIA  || 模块名称=JJ-开头 || 模块名称=ZV-开头 || 模块名称=FH-开头 || 模块类型=JJ-开头
-    FSLog(@"蓝牙发起连接");
+//    FSLog(@"蓝牙发起连接");
     // 中心管理为空，直接返回
     if (!_centralMgr) return;
     // 自定义外设有值，现在置空，在重新赋值
@@ -184,7 +184,7 @@
 
 - (void)disconnect {
     self.disconnectType = DisconnectTypeUser;
-    FSLog(@"主动调用断连");
+//    FSLog(@"主动调用断连");
     [self.centralMgr.fsCentralManager cancelPeripheralConnection:self.module.peripheral];
 }
 
@@ -194,7 +194,7 @@
     }
     if (self.connectState != ConnectStateConnected) {
         [self setValue:@(mode) forKeyPath:@"disconnectType"];
-        FSLog(@"请求断开连接  因为::: %ld", (long)mode);
+//        FSLog(@"请求断开连接  因为::: %ld", (long)mode);
         if (self.centralMgr) {
             [self.centralMgr.fsCentralManager cancelPeripheralConnection:_module.peripheral];
         } else {
@@ -271,9 +271,9 @@
 // 连接超时
 - (void)connectTimeout {
     self.reconnect++;
-    FSLog(@"连接次数%d", self.reconnect);
+//    FSLog(@"连接次数%d", self.reconnect);
     if (self.reconnect > 3) {
-        FSLog(@"连接超时");
+//        FSLog(@"连接超时");
         // 通过代理回调，回调断连类型
         if (self.fsDeviceDeltgate && [self.fsDeviceDeltgate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
             [self disconnect];
@@ -348,18 +348,18 @@
         _cmdQueueTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
         [[NSRunLoop currentRunLoop] addTimer:_cmdQueueTimer forMode:NSRunLoopCommonModes];
     } else if (_commands.count) {
-        FSLog(@"指令失败次数%d", self.cmdFailCnt);
+//        FSLog(@"指令失败次数%d", self.cmdFailCnt);
         // MARK: 特殊指令，一直发送
         [self onFailedSend:cmd];
 
         if (++self.cmdFailCnt == 3) {
-            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
+//            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
             [self.fsDeviceDeltgate device:self didDisconnectedWithMode:DisconnectTypeTimeout];
             self.disconnectType = DisconnectTypeResponse;
             [self.centralMgr.fsCentralManager cancelPeripheralConnection:_module.peripheral];
         } else {
             // 重新搜索
-            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
+//            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
             [self commit];
         }
     }
@@ -392,7 +392,7 @@
 
     [self setValue:@(ConnectStateDisconnected) forKeyPath:@"connectState"];
     if (self.fsDeviceDeltgate && [self.fsDeviceDeltgate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-        FSLog(@"%ld", (long)self.disconnectType);
+//        FSLog(@"%ld", (long)self.disconnectType);
         // 重新搜索
         self.fsDeviceDeltgate = nil;
     }
@@ -401,7 +401,7 @@
 
 #pragma mark  蓝牙外设代理方法
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error {
-    FSLog(@"外设发现服务，查找服务");
+//    FSLog(@"外设发现服务，查找服务");
     if (error) return;
     [peripheral.services enumerateObjectsUsingBlock:^(CBService * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         CBService *service = obj;
@@ -421,7 +421,7 @@
             [self disconnect:DisconnectTypeNone];
             [self.centralMgr.devices removeAllObjects];
         }  else {
-            FSLog(@"外设代理：%@", self.fsDeviceDeltgate);
+//            FSLog(@"外设代理：%@", self.fsDeviceDeltgate);
         }
 
         // 准备连接
@@ -431,7 +431,7 @@
 
 // 发送数据
 - (void)writeToPeripheral:(CBPeripheral *)peripheral Character:(CBCharacteristic *)characteristic data:(UInt8 *)bytes length:(int)length {
-    FSLog(@"发送数据");
+//    FSLog(@"发送数据");
     NSData * data = [NSData dataWithBytes:bytes length: length];
     if (peripheral) {
         [peripheral writeValue:data forCharacteristic:characteristic type:CBCharacteristicWriteWithoutResponse];
@@ -440,7 +440,7 @@
 
 // 写的回调
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(nullable NSError *)error {
-    FSLog(@"写入特征值");
+//    FSLog(@"写入特征值");
 //    PLog(@"❤❤❤❤❤❤❤❤❤❤❤❤❤❤%@", NSStringFromSelector(_cmd));
 }
 
@@ -451,13 +451,12 @@
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
-    FSLog(@"收到数据");
+//    FSLog(@"收到数据");
     if (self.module.isFitshow) { // 如果是运动秀的模块 获取指定数据
         if ([self moduleInfoAgterConnented:characteristic]) {
             return;
         }
     }
-//    FSLog(@"接收(%@): %@", peripheral.name, characteristic.value.toString());
     FSLog(@"接收(%@): %@", peripheral.name, [self dataToString:characteristic.value]);
 //    _receiveCmd.chrt = characteristic;
 //    _receiveCmd.data = characteristic.value;

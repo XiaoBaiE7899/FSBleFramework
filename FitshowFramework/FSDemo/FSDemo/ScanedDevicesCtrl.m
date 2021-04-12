@@ -8,9 +8,6 @@
 #import "ScanedDevicesCtrl.h"
 #import <FSFramework/FSFramework.h>
 
-//#import "FSLibHelp.h"
-//#import "FSCentralManager.h"
-
 @interface DeviceCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *deviceImage;
@@ -49,7 +46,11 @@
     self.tableView.estimatedRowHeight = 90;
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+}
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self.tableView reloadData];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

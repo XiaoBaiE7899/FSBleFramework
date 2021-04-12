@@ -2,7 +2,6 @@
 // 已经扫描到的设备
 
 #import <UIKit/UIKit.h>
-//#import "FSBleDevice.h"
 #import <FSFramework/FSFramework.h>
 
 NS_ASSUME_NONNULL_BEGIN
