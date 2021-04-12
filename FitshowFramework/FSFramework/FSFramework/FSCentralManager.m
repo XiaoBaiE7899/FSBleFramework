@@ -314,6 +314,15 @@ static NSMutableDictionary  *manager = nil;
 
 @end
 
+/*
+ SDK  版本记录
+ 1.0  根据运动秀自己的app蓝牙扫描、连接、控制、断连的逻辑，封装成sdk
+ 1.0.1  解决 zwift 反馈的问题  修改地方  fixme:1.0.1
+      (1). When there is a device in the FSCentralManagerdevicesproperty, we can't connect on it. We need to clear the devices array and then do a new scan to connect the device found.
+      (2). With a treadmill, I am able to connect it successfully and receive data. When I remove the safety key from the treadmill, it stops and I receive the FSDeviceStateTreadmillDisable. When a plug again the safety key, we don't receive any event so we can not restart the treadmill.
+      2021.04.12  解决，因为设备断连以后没重置，
+ */
+
 
 
 

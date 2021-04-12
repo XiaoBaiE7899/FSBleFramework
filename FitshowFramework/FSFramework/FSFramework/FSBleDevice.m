@@ -536,6 +536,9 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     self.cmdQueueTimer = nil;
     [self.heartbeatTimer invalidate];
     self.heartbeatTimer = nil;
+    // FIXME: 1.0.1 设备所信息重置
+    FSLog(@"重置连接状态");
+    self.connectState = ConnectStateDisconnected;
     // 调用父类的方法，设置连接的状态为：没有连接
     [super onDisconnected];
 }
@@ -876,6 +879,7 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 //    FSLog(@"设备是否完全停止");
     // 车表是否完全停止
     if (self.module.protocolType == BleProtocolTypeSection) {
+        FSLog(@"车表是否停止");
         if (self.oldStatus == FSDeviceStateRunning &&
             self.currentStatus == FSDeviceStateNormal) {
             return YES;
@@ -952,13 +956,6 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
     self.heartRate = @"0";
     self.paragraph = @"0";
     self.errorCode = @"";
-//    self.uid = @"0";
-//    self.weight = @"0";
-//    self.height = @"0";
-//    self.age = @"0";
-//    self.gender = @"";
-//    self.adjustSlope = @"";
-//    self.adjustSpeed = @"";
     self.level = @"0";
     self.frequency = @"0";
     self.countDwonSecond = @"0";

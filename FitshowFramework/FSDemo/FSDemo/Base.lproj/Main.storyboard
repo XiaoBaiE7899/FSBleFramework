@@ -149,6 +149,16 @@
                                     <action selector="pauseAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="2ZW-U1-qXk"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RcQ-sL-QFD">
+                                <rect key="frame" x="26" y="378" width="62" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="vmQ-ES-P8d"/>
+                                </constraints>
+                                <state key="normal" title="断开连接"/>
+                                <connections>
+                                    <action selector="disconnectAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="a6c-ML-gA5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
@@ -164,6 +174,7 @@
                             <constraint firstItem="T42-2L-4Ze" firstAttribute="leading" secondItem="zH3-N7-Bhu" secondAttribute="trailing" constant="10" id="I7I-VA-zEe"/>
                             <constraint firstItem="Tf2-Er-UjU" firstAttribute="top" secondItem="AAv-CK-ED7" secondAttribute="bottom" constant="10" id="IRq-Vq-JyF"/>
                             <constraint firstAttribute="trailing" secondItem="T42-2L-4Ze" secondAttribute="trailing" constant="10" id="LQD-C6-Y7L"/>
+                            <constraint firstItem="RcQ-sL-QFD" firstAttribute="top" secondItem="aUk-qu-wyk" secondAttribute="bottom" constant="7.5" id="M1T-78-U2Z"/>
                             <constraint firstItem="zH3-N7-Bhu" firstAttribute="centerY" secondItem="avs-hO-Xdx" secondAttribute="centerY" id="Mzl-Ny-FPC"/>
                             <constraint firstItem="HYA-iY-DXR" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" constant="40" id="NFS-x4-6Vq"/>
                             <constraint firstItem="T42-2L-4Ze" firstAttribute="centerY" secondItem="avs-hO-Xdx" secondAttribute="centerY" id="SFX-Fg-9T7"/>
@@ -188,6 +199,7 @@
                             <constraint firstItem="aUk-qu-wyk" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="20" id="mqw-6u-NXq"/>
                             <constraint firstItem="jm5-Cv-TQk" firstAttribute="centerY" secondItem="HYA-iY-DXR" secondAttribute="centerY" id="ne3-xC-d9b"/>
                             <constraint firstItem="T42-2L-4Ze" firstAttribute="width" secondItem="avs-hO-Xdx" secondAttribute="width" id="pa2-KD-vDT"/>
+                            <constraint firstItem="RcQ-sL-QFD" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="26" id="pdF-aj-kBW"/>
                             <constraint firstItem="Laa-MH-fHP" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="10" id="pq0-PD-JgX"/>
                             <constraint firstItem="Rlc-D2-jdF" firstAttribute="height" secondItem="Laa-MH-fHP" secondAttribute="height" id="rF2-qZ-GMh"/>
                             <constraint firstItem="jYU-u5-M2B" firstAttribute="height" secondItem="aUk-qu-wyk" secondAttribute="height" id="rPB-60-Q7U"/>

@@ -97,7 +97,7 @@
     self.incline.text = _device.incline;
     self.level.text = _device.level;
     self.time.text = _device.eElapsedTime;
-    self.distance.text = FSSF(@"%.1f", [_device.distance intValue] / 100.0);
+    self.distance.text = FSSF(@"%.2f", [_device.distance intValue] / 1000.0);
     self.calory.text = _device.calory;
     self.steps.text = _device.steps;
     self.counts.text = _device.counts;

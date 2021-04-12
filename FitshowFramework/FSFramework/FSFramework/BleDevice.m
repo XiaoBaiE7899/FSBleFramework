@@ -227,7 +227,6 @@
         // 取消执行连接超时的方法
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connectTimeout) object:nil];
         [self onConnected];
-
     }
 }
 
@@ -257,12 +256,16 @@
 #pragma mark 内部方法
 // 正式开始连接
 - (void)reconnectAction {
-    // 连接的方法
-    [self performSelector:@selector(connectTimeout) withObject:nil afterDelay:3];
+    // FIXME: 1.0.1 取消执行连接超时的方法
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connectTimeout) object:nil];
     // 先断连
     [self.centralMgr.fsCentralManager cancelPeripheralConnection:self.module.peripheral];
     // 再连接
     [self.centralMgr.fsCentralManager connectPeripheral:self.module.peripheral options:nil];
+    // FIXME: 1.0.1 重新连接的时候，先把设备断连状态设置为未知状态，不然不会查找服务
+    self.disconnectType = DisconnectTypeNone;
+    // FIXME: 1.0.1 3秒后判断是否连接成功
+    [self performSelector:@selector(connectTimeout) withObject:nil afterDelay:3];
 }
 
 // 连接超时
@@ -346,7 +349,6 @@
         [[NSRunLoop currentRunLoop] addTimer:_cmdQueueTimer forMode:NSRunLoopCommonModes];
     } else if (_commands.count) {
         FSLog(@"指令失败次数%d", self.cmdFailCnt);
-
         // MARK: 特殊指令，一直发送
         [self onFailedSend:cmd];
 

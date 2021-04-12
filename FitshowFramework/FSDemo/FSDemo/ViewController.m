@@ -33,16 +33,21 @@
     [super viewDidLoad];
     // 初始化  中心管理器
     self.fitshowManager = [FitshowManager managerWithDelegate:self];
+    // 监听设备完全停止
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceStop) name:kFitshowHasStoped object:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 }
 
+- (void)deviceStop {
+    FSLog(@"设备已经停止，这里可以做数据统计&分析");
+}
+
 #pragma mark  按钮点击事件
 
 - (IBAction)blescanDevice:(UIButton *)sender {
-    FSLog(@"扫描设备 先清除设备");
     [self.fitshowManager.devices removeAllObjects];
     if ([self.fitshowManager startScan]) {
         FSLog(@"可以扫描");
@@ -52,9 +57,9 @@
 }
 
 - (IBAction)stopScan:(UIButton *)sender {
-    FSLog(@"停止扫描");
     [self.fitshowManager stopScan];
 }
+
 - (IBAction)deviceHasScanned:(UIButton *)sender {
     if (!self.fitshowManager) {
         FSLog(@"中心管理器没有初始化");
@@ -92,7 +97,18 @@
         return;
     }
     [self.fitshowManager stopScan];
+//    if (self.device.disconnect == ) {
+//
+//    }
+//    self.connectState == ConnectStateDisconnected
+//    FSLog(@"调用连接 连接状态%ld", (long)self.device.connectState);
+//    [self.device setValue:@(0) forKey:@"connectState"];
     [self.device connent:self];
+}
+- (IBAction)disconnectAction:(UIButton *)sender {
+    if (self.device) {
+        [self.device disconnect];
+    }
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
@@ -230,12 +246,12 @@
 }
 
 - (void)manager:(FSCentralManager *)manager didNearestDevice:(FSBleDevice *)device {
-    if (self.device &&
-        self.device.module.peripheral == device.module.peripheral) {
-        FSLog(@"当前设备已经是信号强度最大的设备了，无需要更新设备");
-        return;
-    }
-    FSLog(@"更新附近的设备");
+//    if (self.device &&
+//        self.device.module.peripheral == device.module.peripheral) {
+//        FSLog(@"当前设备已经是信号强度最大的设备了，无需要更新设备");
+//        return;
+//    }
+//    FSLog(@"更新附近的设备");
     self.device = device;
 }
 
