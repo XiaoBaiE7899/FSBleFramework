@@ -1536,14 +1536,17 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
 //                FSLog(@"最大速度%@  最小速度%@  控制%d", self.maxSpeed, self.minSpeed, self.supportSpeed);
                 self.hasGetSpeedParam = YES;
             } else if (subcmd == TeadmillInfoIncline) { // 获取设备坡度参数
-                unsigned int maxIncline = databytes[3];
-                unsigned int minIncline = databytes[4];
+                int maxIncline = databytes[3];
+                int minIncline = databytes[4];
                 /*
                   这个指令的  设备的配置信息可以拿不到 可以根据返回的数据长度去判断信息是否完整。
                  不响应返回  返回5个字节：  02 53 03 53 03
                  没有配置信息 返回7个字节： 02 53 03 16  00 ** 03
                  有配置信息   返回8个字节：  02 53 03 16 00 90 ** 03
                  */
+                // !!!: 210427 最大坡度  最小坡度  是有符号的整数，第一位是符号位 因此最大的数据就是127
+                if (maxIncline > 127) maxIncline = (256 - maxIncline) * -1;
+                if (minIncline > 127) minIncline = (256 - minIncline) * -1;
                 FSLog(@"%lu", (unsigned long)data.length);
                 switch (data.length) {
                     case 5: { // 坡度数据没下发 最大坡度 最小坡度 是否英制单位，暂停，坡度是否可以控制
@@ -1799,14 +1802,17 @@ typedef NS_ENUM(NSInteger, Section_START_MODE) {
         case SectionParam: {
             // 判断二级指令
             if (subcmd == SectionParamInfo) { // 获取阻力、坡度、配置、段数
-                uint max_resistance    = databytes[3];
-                uint max_incline       = databytes[4];
+                int max_resistance    = databytes[3];
+                int max_incline       = databytes[4];
                 /// !!!: FS 最小阻力、单位、是否支持暂停的赋值 协议里面写的时候配置信息
                 uint min_level         = (databytes[5] & 0x04) ? 1 : 0;
                 uint unit = databytes[5] & 0x01;
                 uint pause = databytes[5] & 0x02;
                 uint device_config     = databytes[5];
                 uint device_paragraph  = databytes[6];
+                /* !!!: 210427 最大坡度  最小坡度  是有符号的整数，第一位是符号位 因此最大的数据就是127*/
+                if (max_resistance > 127) max_resistance = (256 - max_resistance) * -1;
+                if (max_incline > 127) max_incline = (256 - max_incline) * -1;
 //                FSLog(@"最小阻力%d、是否为英制单位%d、是否支持暂停%d", min_level, unit, pause);
 //                FSLog(@"最大阻力%d、最大坡度坡度%d、配置%d、段数%d", max_resistance, max_incline, device_config, device_paragraph);
                 self.maxLevel  = FSSF(@"%d", max_resistance);

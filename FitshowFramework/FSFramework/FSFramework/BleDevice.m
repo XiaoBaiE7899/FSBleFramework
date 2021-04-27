@@ -110,6 +110,9 @@
 // 指令失败次数，联系失败3次， 断连
 @property (nonatomic, assign) int cmdFailCnt;
 
+/* 210421 意外断连 重新连接的标记*/
+@property (nonatomic, assign) BOOL accidentalReconnect;
+
 @end
 
 
@@ -146,6 +149,8 @@
         self.fsDeviceDeltgate = nil;
     }
     self.fsDeviceDeltgate = delegate;
+    // 意外断连 设备为NO
+    self.accidentalReconnect = NO;
     // 判断连接状态
     if (self.connectState == ConnectStateDisconnected) {
         // 为连接状态
@@ -213,6 +218,29 @@
 
 - (void)willDisconnect {
     [self onDisconnected];
+    // 210421
+    // 增加意外断连重新连接的方法
+    if (self.disconnectType == DisconnectTypeUser) {
+        [self clearSend];
+        return;
+    }
+
+    // 判断是什么问题断开连接
+    if (_centralMgr.mgrState == FSManagerStatePoweredOff) { // 系统开关关闭
+        self.disconnectType = FSManagerStatePoweredOff;
+    }
+
+    if (self.disconnectType == DisconnectTypeNone) {
+        if (self.connectState != ConnectStateConnecting) {
+            // 设置重连
+            self.reconnect = 1;
+            // 意外断开重连
+            self.accidentalReconnect = YES;
+            [self setValue:@(ConnectStateReconnecting) forKeyPath:@"connectState"];
+            [self reconnectAction];
+            return;
+        }
+    }
 
 }
 
@@ -351,8 +379,9 @@
 //        FSLog(@"指令失败次数%d", self.cmdFailCnt);
         // MARK: 特殊指令，一直发送
         [self onFailedSend:cmd];
-
-        if (++self.cmdFailCnt == 3) {
+        self.cmdFailCnt++;
+        FSLog(@"连续失败:::%@", self.cmdFailCnt);
+        if (self.cmdFailCnt == 3) {
 //            FSLog(@"20210322判断失败次数%d", self.cmdFailCnt);
             [self.fsDeviceDeltgate device:self didDisconnectedWithMode:DisconnectTypeTimeout];
             self.disconnectType = DisconnectTypeResponse;
@@ -458,6 +487,12 @@
         }
     }
     FSLog(@"接收(%@): %@", peripheral.name, [self dataToString:characteristic.value]);
+    if (!self.accidentalReconnect &&
+        self.fsDeviceDeltgate &&
+        [self.fsDeviceDeltgate respondsToSelector:@selector(device:didConnectedWithState:)]) {
+        FSLog(@"回调蓝牙正在工作中~~~~~");
+        [self.fsDeviceDeltgate device:self didConnectedWithState:ConnectStateWorking];
+    }
 //    _receiveCmd.chrt = characteristic;
 //    _receiveCmd.data = characteristic.value;
     self.receiveCmd.chrt = characteristic;
