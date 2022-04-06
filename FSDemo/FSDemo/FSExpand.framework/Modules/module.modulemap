@@ -1,0 +1,6 @@
+framework module FSExpand {
+  umbrella header "FSExpand.h"
+
+  export *
+  module * { export * }
+}

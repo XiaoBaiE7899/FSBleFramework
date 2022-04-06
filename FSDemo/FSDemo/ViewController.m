@@ -1,0 +1,287 @@
+//
+//  ViewController.m
+//  FSBluetoothSDK
+//
+//  Created by zt on 2021/1/23.
+//
+
+#import "ViewController.h"
+#import "ScanedDevicesCtrl.h"
+#import "DisplayDataCtrl.h"
+#import <FSBleFramework/FSBleFramework.h>
+
+
+
+@interface ViewController () <FSCentralDelegate, BleDeviceDelegate>
+
+
+// 设备的默认图片
+@property (weak, nonatomic) IBOutlet UIImageView *deviceImg;
+// 模块名称
+@property (weak, nonatomic) IBOutlet UILabel *moduleName;
+// 已扫描到的设备
+@property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
+// 展示数据的控制器
+@property (nonatomic, strong) DisplayDataCtrl   *datasCtrl;
+
+@property (nonatomic, strong) BleManager *fsManager;
+
+@property (nonatomic, strong) FSBaseDevice *fsDevice;;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // 初始化  中心管理器
+    self.fsManager = [FSManager managerWithDelegate:self];
+    // 监听设备完全停止
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fsdeviceDidStop:) name:kFitshowHasStoped object:nil];
+}
+
+- (void)fsdeviceDidStop:(NSNotification *)sender {
+    FSLog(@"22.4.1  设备完全停止了");
+    // FIXME: 可以做一些数据统计之类的东西
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kFitshowHasStoped object:nil];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+}
+
+#pragma mark  按钮点击事件
+
+- (IBAction)blescanDevice:(UIButton *)sender {
+    if ([self.fsManager startScan]) {
+        FSLog(@"可以扫描");
+    } else {
+        FSLog(@"不可以扫描");
+    }
+
+}
+
+- (IBAction)stopScan:(UIButton *)sender {
+    [self.fsManager stopScan];
+
+}
+
+- (IBAction)deviceHasScanned:(UIButton *)sender {
+    // 所有设备
+    FSLog(@"点击所有设备");
+    FSLog(@"管理器的设备的个数：%lu", (unsigned long)self.fsManager.devices.count);
+    if (self.fsManager.devices.count) {
+//        [self.navigationController pushViewController:self.scanedCtl animated:YES];
+        [self presentViewController:self.scanedCtl animated:YES completion:^{
+        }];
+    }
+}
+
+- (IBAction)displaySportDatas:(UIButton *)sender {
+    /* 判断设备是否在运行中，如果不是在运行中，不能展示 */
+    [self presentViewController:self.datasCtrl animated:YES completion:^{
+    }];
+}
+
+- (IBAction)contentDevice:(UIButton *)sender {
+    [self.fsManager stopScan];
+    if (self.fsDevice) {
+        FSLog(@"连接最近的设备");
+        [self.fsDevice connent:self];
+    }
+}
+
+- (IBAction)disconnectAction:(UIButton *)sender {
+}
+
+- (IBAction)startDevice:(UIButton *)sender {
+    if ([self.fsDevice start]) {
+        FSLog(@"运动秀的设备可以启动");
+    } else {
+        FSLog(@"运动秀的设备不能启动");
+    }
+}
+
+- (IBAction)stopDevice:(UIButton *)sender {
+    FSLog(@"设备通过指令停止");
+    [self.fsDevice stop];
+}
+
+- (IBAction)controlSpeed:(UIButton *)sender {
+    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+        FSLog(@"控制跑步机速度");
+        [self.fsDevice targetSpeed:50 incline:self.fsDevice.incline.intValue];
+    }
+}
+
+- (IBAction)controlSpeedAndIncline:(UIButton *)sender {
+    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+        FSLog(@"控制跑步机速度与坡度");
+        [self.fsDevice targetSpeed:50 incline:5];
+    }
+}
+
+- (IBAction)controlIncline:(UIButton *)sender {
+    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+        FSLog(@"控制跑步机  坡度");
+        [self.fsDevice targetSpeed:self.fsDevice.speed.intValue * 10 incline:5];
+    }
+}
+
+- (IBAction)controlLevel:(UIButton *)sender {
+}
+
+- (IBAction)restore:(UIButton *)sender {
+    /*
+     MARK: 有的设备发送恢复指令无法恢复，只能通过设备的物理键恢复
+     1 暂时只有跑步机才支持恢复
+     2 如果设备状态不是出于暂停中，无法返回恢复
+     */
+}
+
+- (IBAction)pauseAction:(UIButton *)sender {
+    /*
+     暂时只有跑步机，并且使用1.1协议的才有暂停指令
+     设备只有在运行中发送暂停指令才被执行
+     */
+}
+
+- (ScanedDevicesCtrl *)scanedCtl {
+    if (!_scanedCtl) {
+        _scanedCtl = (ScanedDevicesCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([ScanedDevicesCtrl class])];
+//        __weak typeof(self) weakSelf = self;
+        weakObj(self);
+        _scanedCtl.selectDevice = ^(FSBaseDevice * _Nonnull device) {
+            FSLog(@"选中的设备%@", device.module.name);
+            weakself.fsDevice = device;
+//            [device connent:weakself];
+        };
+    }
+    return _scanedCtl;
+}
+
+- (DisplayDataCtrl *)datasCtrl {
+    if (!_datasCtrl) {
+        _datasCtrl = (DisplayDataCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([DisplayDataCtrl class])];
+
+    }
+    return _datasCtrl;
+}
+
+#pragma mark  Private methods
+- (UIViewController *)storyboardWithName:(NSString *)name storyboardID:(NSString *)sid {
+    if (sid) {
+        return [[UIStoryboard storyboardWithName:name bundle:nil] instantiateViewControllerWithIdentifier:sid];
+    }
+    else if (name) {
+        return [[UIStoryboard storyboardWithName:name bundle:nil] instantiateInitialViewController];
+    }
+
+    return nil;
+}
+
+#pragma mark 蓝牙相关
+
+- (void)manager:(BleManager * _Nonnull)manager didUpdateState:(FSCentralState)state {
+    FSLog(@"22.3.24系统蓝牙状态只有为1才是可以使用的 %d", state);
+}
+
+- (void)manager:(BleManager *)manager didDiscoverDevice:(BleDevice *)device {
+    FSLog(@"^^^^22.3.24...设备已经找到%@", device.module.name);
+    if ([device isKindOfClass:[FSBaseDevice class]]) {
+        FSLog(@"是运动秀的设备**");
+        FSLog(@"最近的设备是%@", device.module.name);
+    } else {
+        FSLog(@"不是运动秀的设备*****");
+    }
+}
+
+- (void)device:(BleDevice *)device didConnectedWithState:(FSConnectState)state {
+    switch (state) {
+        case FSConnectStateDisconnected: {
+            FSLog(@"22.4.1  FSConnectStateDisconnected");
+        }
+            break;
+        case FSConnectStateConnecting: {
+            FSLog(@"22.4.1 FSConnectStateConnecting");
+        }
+            break;
+        case FSConnectStateReconnecting: {
+            FSLog(@"22.4.1 FSConnectStateReconnecting");
+        }
+            break;
+        case FSConnectStateConnected: {
+            FSLog(@"22.4.1 FSConnectStateConnected");
+        }
+            break;
+        case FSConnectStateWorking: {
+            FSLog(@"22.4.1 FSConnectStateWorking");
+        }
+            
+        default:
+            break;
+    }
+//    FSLog(@"22.3.29 设备连接成功：%d", state);
+}
+
+- (void)device:(BleDevice *)device didDisconnectedWithMode:(FSDisconnectType)mode {
+    FSLog(@"22.3.29 设备已断开连接%d", mode);
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"蓝牙断连" message:FSFM(@"%d", mode) preferredStyle:UIAlertControllerStyleAlert];
+
+    [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+//        PLog(@"点击原生弹框的确定按钮");
+//        commitBlock();
+    }]];
+    [self presentViewController:alertController animated:YES completion:^{}];
+    
+}
+
+- (void)deviceError:(FSBaseDevice *)device {
+    FSLog(@"22.3.29 设备故障%@", device.errorCode);
+}
+
+- (void)deviceDidUpdateState:(FSDeviceState)newState fromState:(FSDeviceState)oldState {
+    FSLog(@"22.3.29 设备状态改变  旧状态%d： 新状态:%d", oldState, newState);
+    if (newState == FSDeviceStateTreadmillDisable) {
+        FSLog(@"22.3.29 设备 安全锁脱落");
+    }
+    switch (newState) {
+        case FSDeviceStateTreadmillDisable: {
+            FSLog(@"22.3.29 设备 安全锁脱落");
+        }
+            break;
+        case FSDeviceStateError: {
+            FSLog(@"22.3.29 设备 故障");
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@end
