@@ -49,7 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 目标模式  这个会走setter方法
 @property (nonatomic, assign) long targetMode;
 
-
 /// 待机 0：不待机  1：待机 连接成功，发送不待机指令
 @property (nonatomic, assign) BOOL isStandby;
 

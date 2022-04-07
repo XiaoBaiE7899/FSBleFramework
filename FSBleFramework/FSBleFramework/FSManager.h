@@ -1,7 +1,6 @@
 
-
 #import "BleManager.h"
-//
+
 @class FSDevice;
 @class FSBaseDevice;
 

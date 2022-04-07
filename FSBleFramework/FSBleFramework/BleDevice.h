@@ -48,15 +48,15 @@ NS_ASSUME_NONNULL_BEGIN
 // 蓝牙写入特征
 @property (nonatomic, strong) CBCharacteristic  * _Nullable bleWriteChar;
 
-@property (nonatomic, assign) FSDeviceState oldStatus;
+@property (nonatomic, assign) FSDeviceState    oldStatus;
 
-@property (nonatomic, assign) FSDeviceState currentStatus;
+@property (nonatomic, assign) FSDeviceState    currentStatus;
 
-@property (nonatomic, strong) BleModule *module;
+@property (nonatomic, strong) BleModule        *module;
 
-@property (nonatomic, assign) BOOL isConnected;
+@property (nonatomic, assign) BOOL             isConnected;
 
-@property (nonatomic, assign) uint reconnect;
+@property (nonatomic, assign) uint             reconnect;
 
 @property (nonatomic, assign) FSDisconnectType disconnectType;
 
@@ -109,11 +109,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)moduleInfoAgterConnented:(CBCharacteristic *)chat;
 
 - (void)commit;
-
-
-
-
-
 
 @end
 

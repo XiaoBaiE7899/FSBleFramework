@@ -190,10 +190,6 @@
         return NO;
     }
     return YES;
-    
-//    return  self.sportType == FSSportTypeSlimming || self.sportType == FSSportTypeAbdominalWheel || self.sportType == FSSportTypeFasciaGun ||
-//    self.sportType == FSSportTypeSkipRope ||
-//    self.sportType == FSSportTypePower ? YES : NO;
 }
 
 - (BleProtocolType)protocolType {

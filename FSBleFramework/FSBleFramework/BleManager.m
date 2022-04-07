@@ -144,7 +144,6 @@ static NSMutableDictionary  *manager = nil;
     BleDevice *device = [self objectForPeripheral:peripheral];
 
     if (device) { // 设备已经扫描到了
-//        FSLog(@"设备已经找到了");
         device.module.advertisementData = advertisementData;
         device.module.rssi = RSSI.intValue;
         [self findNearestDevice];
@@ -153,7 +152,6 @@ static NSMutableDictionary  *manager = nil;
 
     // 设备没有找到
     device = [self discoverModule:module];
-//    FSLog(@"设备第一次被扫描到");
     if (!device) return;  // 没设备直接返回
     device.manager = self;
     BOOL add = YES;
@@ -164,7 +162,6 @@ static NSMutableDictionary  *manager = nil;
     if (add && device) {
         // 添加设备
         [self.devices addObject:device];
-//        FSLog(@"把扫描到的设备回调回去");
         if (self.delegate && [self.delegate respondsToSelector:@selector(manager:didDiscoverDevice:)]) {
             [self.delegate manager:self didDiscoverDevice:device];
             return;
@@ -210,7 +207,6 @@ static NSMutableDictionary  *manager = nil;
 }
 
 #pragma mark 子类需要重写的方法
-// 子类要重写的方法
 - (void)initialize {}
 
 - (void)findNearestDevice {}

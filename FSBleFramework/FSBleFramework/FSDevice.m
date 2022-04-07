@@ -217,12 +217,10 @@ static int afterDelayTime = 3;
     FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
     // 跑步机数据解析
-    Byte *bytes = (Byte *)[cmd.data bytes];
+    Byte *bytes     = (Byte *)[cmd.data bytes];
     Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
-    int m = bytes[1];
-    int s = bytes[2];
-    FSLog(@"主指令：%d  子指令：%d", m, s);
+    FSLog(@"主指令：%d  子指令：%d", mainCmd, subcmd);
     switch (mainCmd) {
         case 0x50: { /*FSMainCmdModel*/
             if (subcmd == 0) { /*FSSubParamCmdTreadmillModel*/
@@ -304,7 +302,7 @@ static int afterDelayTime = 3;
     /*
       这个指令的  设备的配置信息可以拿不到 可以根据返回的数据长度去判断信息是否完整。
      不响应返回    返回5个字节：  02 53 03 53 03
-     没有配置信息  返回7个字节： 02 53 03 16  00 ** 03
+     没有配置信息  返回7个字节：  02 53 03 16  00 ** 03
      有配置信息    返回8个字节：  02 53 03 16 00 90 ** 03
      */
     switch (cmd.data.length) {
@@ -562,8 +560,8 @@ static int afterDelayTime = 3;
 - (void)onFailedSend:(BleCommand *)cmd {
     FSLog(@"%@", NSStringFromSelector(_cmd));
     Byte *databytes = (Byte *)[cmd.data bytes];
-    Byte maincmd = databytes[1];
-    Byte subcmd = databytes[2];
+    Byte maincmd    = databytes[1];
+    Byte subcmd     = databytes[2];
     // 如果是控制开始或结束的控制指令，这条指令重新发
     if (maincmd == 0x53/*FSMainCmdTreadmillControl*/ &&
         (subcmd == 0x09/*FSSubControlCmdTreadmillStart*/ ||
@@ -773,12 +771,12 @@ static int afterDelayTime = 3;
 
 @implementation FSSection
 
-@synthesize currentStatus = _currentStatus;
-@synthesize isRunning = _isRunning;
-@synthesize isPausing = _isPausing;
-@synthesize hasStoped = _hasStoped;
-@synthesize isStarting = _isStarting;
-@synthesize isWillStart = _isWillStart;
+@synthesize currentStatus   = _currentStatus;
+@synthesize isRunning       = _isRunning;
+@synthesize isPausing       = _isPausing;
+@synthesize hasStoped       = _hasStoped;
+@synthesize isStarting      = _isStarting;
+@synthesize isWillStart     = _isWillStart;
 @synthesize getParamSuccess = _getParamSuccess;
 
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
@@ -791,9 +789,7 @@ static int afterDelayTime = 3;
             break;
         case 2: _currentStatus = FSDeviceStateRunning;
             break;
-        case 3: {
-            _currentStatus = FSDeviceStatePaused;
-        }
+        case 3: _currentStatus = FSDeviceStatePaused;
             break;
         case 20:
         case 32: { // 睡眠  有2个，防呆不防傻
@@ -1364,23 +1360,23 @@ static int afterDelayTime = 3;
             }
             
             // 运动时间
-            unsigned int r_time = MAKEWORD(databytes[2], databytes[3]);
+            unsigned int r_time       = MAKEWORD(databytes[2], databytes[3]);
             // 总跳数
-            unsigned int r_totalCnts = MAKEWORD(databytes[4], databytes[5]);
+            unsigned int r_totalCnts  = MAKEWORD(databytes[4], databytes[5]);
             // 速度
-            unsigned int r_speed = MAKEWORD(databytes[6], databytes[7]);
+            unsigned int r_speed      = MAKEWORD(databytes[6], databytes[7]);
             // 跘绳
-            unsigned int r_interrupt = MAKEWORD(databytes[8], databytes[9]);
+            unsigned int r_interrupt  = MAKEWORD(databytes[8], databytes[9]);
             // 连跳
             unsigned int r_continuous = MAKEWORD(databytes[10], databytes[11]);
             // 卡路里
-            unsigned int r_calories = MAKEWORD(databytes[12], databytes[13]);
-            self.exerciseTime = FSFM(@"%d", r_time);
-            self.totalCnts = FSFM(@"%d", r_totalCnts);
-            self.speed = FSFM(@"%d", r_speed);
-            self.interruptCnts = FSFM(@"%d", r_interrupt);
-            self.calory = FSFM(@"%d", r_calories);
-            self.continueCnts = FSFM(@"%d", r_continuous);
+            unsigned int r_calories   = MAKEWORD(databytes[12], databytes[13]);
+            self.exerciseTime         = FSFM(@"%d", r_time);
+            self.totalCnts            = FSFM(@"%d", r_totalCnts);
+            self.speed                = FSFM(@"%d", r_speed);
+            self.interruptCnts        = FSFM(@"%d", r_interrupt);
+            self.calory               = FSFM(@"%d", r_calories);
+            self.continueCnts         = FSFM(@"%d", r_continuous);
             // 当前时间
             NSDate *now = [NSDate date];
             NSInteger passTime = (NSInteger)[now timeIntervalSinceDate:self.startDate];
@@ -1554,7 +1550,7 @@ static int afterDelayTime = 3;
 
 @synthesize currentStatus = _currentStatus;
 //@synthesize isRunning = _isRunning;
-@synthesize hasStoped = _hasStoped;
+@synthesize hasStoped     = _hasStoped;
 
 - (UInt8)identifyCode {
     return 0x90;
@@ -1565,7 +1561,7 @@ static int afterDelayTime = 3;
         // MARK: 甩脂机状态变化只有运动/停止 因此在初始化把当天状态设置为0，不然会弹出设备休眠提示框
         [self setValue:@"0" forKey:@"currentStatus"];
         self.totalCalory = @"0";
-        self.mode = [FSSlimmingMode new];
+        self.mode        = [FSSlimmingMode new];
     }
     return self;
 }

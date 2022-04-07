@@ -20,20 +20,20 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 - (instancetype)init {
     if (self = [super init]) {
 //        FSLog(@"设备参数初始化");
-        self.imperial = NO;
-        self.maxSpeed = @"0";
-        self.minSpeed = @"0";
-        self.maxIncline = @"0";
-        self.minIncline = @"0";
-        self.maxLevel = @"0";
-        self.minLevel = @"0";
-        self.paragraph = @"0";
+        self.imperial       = NO;
+        self.maxSpeed       = @"0";
+        self.minSpeed       = @"0";
+        self.maxIncline     = @"0";
+        self.minIncline     = @"0";
+        self.maxLevel       = @"0";
+        self.minLevel       = @"0";
+        self.paragraph      = @"0";
         self.supportIncline = NO;
-        self.supportLevel = NO;
+        self.supportLevel   = NO;
         self.supportControl = NO;
-        self.supportSpeed = NO;
-        self.supportPause = NO;
-        self.totalDistance = @"0";
+        self.supportSpeed   = NO;
+        self.supportPause   = NO;
+        self.totalDistance  = @"0";
     }
     return self;
 }

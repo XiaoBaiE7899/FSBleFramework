@@ -194,7 +194,6 @@
 
 - (void)onConnected {
     // 回调连接成功
-    FSLog(@"");
 }
 
 - (void)removeFromManager {

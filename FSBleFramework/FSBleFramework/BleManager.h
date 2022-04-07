@@ -12,13 +12,8 @@ extern NSString *_Nonnull const kUpdateFitshoData;
 extern NSString *_Nonnull const kFitshowHasStoped;
 extern NSString *_Nonnull const kCmdUncontrolled;
 
-
-
 @class BleManager;
 
-
-
-// 中心代理
 @protocol FSCentralDelegate <NSObject>
 
 @required

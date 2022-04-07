@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 参数 最大速度、时间
 - (FSParams *)paramModel;
 
-// 点击模式
+// 电机模式
 - (NSArray <FSMotors *>*)motorModels;
 
 @end
@@ -64,44 +64,40 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 心跳包 定时器
 @property (nonatomic, strong) NSTimer       *_Nullable heartbeatTmr;
-
 @property (nonatomic, strong) FSDeviceParam *deviceParam;
 @property (nonatomic, strong) FSDeviceInfo  *deviceInfo;
 @property (nonatomic, assign) BOOL          isStarting;
-
-
 // G
-@property (nonatomic, assign) BOOL isRunning;
-@property (nonatomic, assign) BOOL isPausing;
-@property (nonatomic, assign) BOOL isWillStart;
-@property (nonatomic, assign) BOOL hasStoped;
-@property (nonatomic, assign) BOOL speedObtainSuccess;
-@property (nonatomic, assign) BOOL inclineObtainSuccess;
-@property (nonatomic, assign) BOOL writeUserDataSuccess;
-
+@property (nonatomic, assign) BOOL          isRunning;
+@property (nonatomic, assign) BOOL          isPausing;
+@property (nonatomic, assign) BOOL          isWillStart;
+@property (nonatomic, assign) BOOL          hasStoped;
+@property (nonatomic, assign) BOOL          speedObtainSuccess;
+@property (nonatomic, assign) BOOL          inclineObtainSuccess;
+@property (nonatomic, assign) BOOL          writeUserDataSuccess;
 // datas
-@property (nonatomic,   copy) NSString *speed;
-@property (nonatomic,   copy) NSString *display_speed; // G
-@property (nonatomic,   copy) NSString *incline;
-@property (nonatomic,   copy) NSString *exerciseTime;
-@property (nonatomic,   copy) NSString *heartRate;
-@property (nonatomic,   copy) NSString *errorCode;
-@property (nonatomic,   copy) NSString *weight;
-@property (nonatomic,   copy) NSString *height;
-@property (nonatomic,   copy) NSString *age;
-@property (nonatomic,   copy) NSString *gender;
-@property (nonatomic,   copy) NSString *adjustSpeed;
-@property (nonatomic,   copy) NSString *adjustIncline;
-@property (nonatomic,   copy) NSString *resistance;
-@property (nonatomic,   copy) NSString *frequency;
-@property (nonatomic,   copy) NSString *countdownSeconds;
-@property (nonatomic,   copy) NSString *watt;
-@property (nonatomic,   copy) NSString *distance;  // 米
-@property (nonatomic,   copy) NSString *calory;    //
-@property (nonatomic,   copy) NSString *steps;     // 步数
-@property (nonatomic,   copy) NSString *counts;    // 次数
-@property (nonatomic,   copy) NSString *paragraph; // 段数
-@property (nonatomic,   copy) NSString *uid;       // 运动ID
+@property (nonatomic,   copy) NSString      *speed;
+@property (nonatomic,   copy) NSString      *display_speed; // G
+@property (nonatomic,   copy) NSString      *incline;
+@property (nonatomic,   copy) NSString      *exerciseTime;
+@property (nonatomic,   copy) NSString      *heartRate;
+@property (nonatomic,   copy) NSString      *errorCode;
+@property (nonatomic,   copy) NSString      *weight;
+@property (nonatomic,   copy) NSString      *height;
+@property (nonatomic,   copy) NSString      *age;
+@property (nonatomic,   copy) NSString      *gender;
+@property (nonatomic,   copy) NSString      *adjustSpeed;
+@property (nonatomic,   copy) NSString      *adjustIncline;
+@property (nonatomic,   copy) NSString      *resistance;
+@property (nonatomic,   copy) NSString      *frequency;
+@property (nonatomic,   copy) NSString      *countdownSeconds;
+@property (nonatomic,   copy) NSString      *watt;
+@property (nonatomic,   copy) NSString      *distance;  // 米
+@property (nonatomic,   copy) NSString      *calory;    //
+@property (nonatomic,   copy) NSString      *steps;     // 步数
+@property (nonatomic,   copy) NSString      *counts;    // 次数
+@property (nonatomic,   copy) NSString      *paragraph; // 段数
+@property (nonatomic,   copy) NSString      *uid;       // 运动ID
 
 
 @property (nonatomic, assign) FSDiscontrolType discontrolType; // 失控类型
@@ -125,11 +121,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 // 重启模块
 - (void)fsRestartBleModule;
-
-- (void)minDeviceCnts:(NSInteger)cnt;  // 定次数
-- (void)minDeviceTime:(NSInteger)time; // 定时间
-- (void)minPause;                      // 小件暂停
-- (void)minRestore;                    // 小件重启
+// 定次数
+- (void)minDeviceCnts:(NSInteger)cnt;
+// 定时间
+- (void)minDeviceTime:(NSInteger)time;
+// 小件暂停
+- (void)minPause;
+// 小件重启
+- (void)minRestore;
 
 // 甩脂机---------------------------
 // 甩脂机的程序模式
