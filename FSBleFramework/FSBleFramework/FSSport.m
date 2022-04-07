@@ -11,6 +11,7 @@ static FSSport     *currentSport;
 
 + (instancetype)current {
     if (!currentSport) {
+//        FSLog(@"全局运动类初始化");
         currentSport = [[FSSport alloc] init];
         // MARK: 创建运动的时候，添加监听通知，这里可以做数据处理，运动记录等等
         [[NSNotificationCenter defaultCenter] addObserver:currentSport selector:@selector(updateFitshowData:) name:kUpdateFitshoData object:nil];

@@ -5,6 +5,8 @@
 #import "FSManager.h"
 #import "FSBleTools.h"
 #import "FSSlimmingMode.h"
+#import "NSDictionary+fsExtent.h"
+#import "NSString+fsExtent.h"
 
 NSString * _Nonnull const CHAR_READ_MFRS    = @"2A29"; // 厂家
 NSString * _Nonnull const CHAR_READ_PN      = @"2A24"; // 型号
@@ -71,13 +73,13 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
         return model;
     }
     
-    NSDictionary *dic = [FSBleTools jsonStingToDictionary:self.paramString];
+    NSDictionary *dic = /*[FSBleTools jsonStingToDictionary:self.paramString]*/self.paramString.fsToDictionary();
     model = [FSParams modelWithDictionary:dic];
     return model;
 }
 
 - (NSArray<FSMotors *> *)motorModels {
-    NSArray *arr = [FSBleTools jsonStingToArray:self.motorModeString];
+    NSArray *arr = /*[FSBleTools jsonStingToArray:self.motorModeString]*/self.motorModeString.fsToArray();
     switch (self.type.intValue) {
         case FSSportTypeSlimming: {
             if (arr) {
@@ -347,12 +349,12 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
                     if (code.integerValue == 1) { // 只有这个状态才有数据
                         NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dic];
                         if ([dic objectForKey:@"params"]) {
-                            info[@"paramString"] = [FSBleTools ditionaryToJsonSting:dic[@"params"]];
+                            info[@"paramString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"params"]]*/dic.fstoJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
                         
                         if ([dic objectForKey:@"motorMode"]) {
-                            info[@"motorModeString"] = [FSBleTools ditionaryToJsonSting:dic[@"motorMode"]];
+                            info[@"motorModeString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"motorMode"]]*/dic.fstoJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
                         

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2BAEA16127FEDD3900A2FD88 /* NSDictionary+fsExtent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BAEA15F27FEDD3900A2FD88 /* NSDictionary+fsExtent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2BAEA16227FEDD3900A2FD88 /* NSDictionary+fsExtent.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BAEA16027FEDD3900A2FD88 /* NSDictionary+fsExtent.m */; };
+		2BAEA16527FEE0E400A2FD88 /* NSString+fsExtent.h in Headers */ = {isa = PBXBuildFile; fileRef = 2BAEA16327FEE0E400A2FD88 /* NSString+fsExtent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2BAEA16627FEE0E400A2FD88 /* NSString+fsExtent.m in Sources */ = {isa = PBXBuildFile; fileRef = 2BAEA16427FEE0E400A2FD88 /* NSString+fsExtent.m */; };
 		7B0E63C027EDB6B2004EA703 /* FSBleTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B0E63BE27EDB6B2004EA703 /* FSBleTools.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7B0E63C127EDB6B2004EA703 /* FSBleTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 7B0E63BF27EDB6B2004EA703 /* FSBleTools.m */; };
 		7B24320027D1ECAA00D54544 /* FSBleFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = 7B2431FE27D1ECAA00D54544 /* FSBleFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -34,6 +38,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2BAEA15F27FEDD3900A2FD88 /* NSDictionary+fsExtent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+fsExtent.h"; sourceTree = "<group>"; };
+		2BAEA16027FEDD3900A2FD88 /* NSDictionary+fsExtent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+fsExtent.m"; sourceTree = "<group>"; };
+		2BAEA16327FEE0E400A2FD88 /* NSString+fsExtent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+fsExtent.h"; sourceTree = "<group>"; };
+		2BAEA16427FEE0E400A2FD88 /* NSString+fsExtent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+fsExtent.m"; sourceTree = "<group>"; };
 		7B0E63BE27EDB6B2004EA703 /* FSBleTools.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSBleTools.h; sourceTree = "<group>"; };
 		7B0E63BF27EDB6B2004EA703 /* FSBleTools.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSBleTools.m; sourceTree = "<group>"; };
 		7B2431FB27D1ECAA00D54544 /* FSBleFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FSBleFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +108,10 @@
 				7BCA68BB27E03BC700F9E5CB /* FSSport.m */,
 				7BCA68B527E0352400F9E5CB /* NSData+fsExtent.h */,
 				7BCA68B627E0352400F9E5CB /* NSData+fsExtent.m */,
+				2BAEA15F27FEDD3900A2FD88 /* NSDictionary+fsExtent.h */,
+				2BAEA16027FEDD3900A2FD88 /* NSDictionary+fsExtent.m */,
+				2BAEA16327FEE0E400A2FD88 /* NSString+fsExtent.h */,
+				2BAEA16427FEE0E400A2FD88 /* NSString+fsExtent.m */,
 				7B0E63BE27EDB6B2004EA703 /* FSBleTools.h */,
 				7B0E63BF27EDB6B2004EA703 /* FSBleTools.m */,
 				7B24320827D1EDA600D54544 /* BleManager.h */,
@@ -139,6 +151,8 @@
 				7BEB948C27D6E6C100E3429B /* FSFrameworkEnum.h in Headers */,
 				7BBFF00627E31A280062F167 /* FSSlimmingMode.h in Headers */,
 				7BCA68B727E0352400F9E5CB /* NSData+fsExtent.h in Headers */,
+				2BAEA16527FEE0E400A2FD88 /* NSString+fsExtent.h in Headers */,
+				2BAEA16127FEDD3900A2FD88 /* NSDictionary+fsExtent.h in Headers */,
 				7BD2849727E1BBA40022E65D /* FSBleDeice.h in Headers */,
 				7B24322227D1F94900D54544 /* BleModule.h in Headers */,
 			);
@@ -213,12 +227,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				7BCA68C927E0985800F9E5CB /* FSGenerateCmdData.m in Sources */,
+				2BAEA16227FEDD3900A2FD88 /* NSDictionary+fsExtent.m in Sources */,
 				7BCA68B227E0236E00F9E5CB /* FSDevice.m in Sources */,
 				7B0E63C127EDB6B2004EA703 /* FSBleTools.m in Sources */,
 				7BCA68BD27E03BC700F9E5CB /* FSSport.m in Sources */,
 				7B24321027D1EDF100D54544 /* FSManager.m in Sources */,
 				7B24321D27D1F8D900D54544 /* BleDevice.m in Sources */,
 				7B24320B27D1EDA600D54544 /* BleManager.m in Sources */,
+				2BAEA16627FEE0E400A2FD88 /* NSString+fsExtent.m in Sources */,
 				7B24322327D1F94900D54544 /* BleModule.m in Sources */,
 				7BD2849827E1BBA40022E65D /* FSBleDeice.m in Sources */,
 				7BCA68B827E0352400F9E5CB /* NSData+fsExtent.m in Sources */,
@@ -373,7 +389,11 @@
 				);
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "-ObjC";
+				MARKETING_VERSION = 1.10;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fitshow.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -408,7 +428,11 @@
 				);
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "-ObjC";
+				MARKETING_VERSION = 1.10;
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fitshow.framework;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

@@ -22,6 +22,10 @@
     // Override point for customization after application launch.
 //    NSLog(@"%@", @"0".add(@"1"));
     [FSSport current];
+    FSLog(@"蓝牙SDK版本:%.2f", FSBleFrameworkVersionNumber);
+    // 测试  静态库类目
+    NSData *data = FSGenerateCmdData.treadmillSpeedParam();
+    FSLog(@"测试  静态库类目%@", data.fstoString());
     // 测试缓存数据
     NSDictionary *dic1 = @{
         @"brand" : @"fs",

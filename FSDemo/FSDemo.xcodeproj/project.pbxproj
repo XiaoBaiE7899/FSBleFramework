@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */; };
 		7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B348EB027EAFC3C00030216 /* FSExpand.framework */; };
 		7BB5B3AD261EB2D3007752D9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB5B3AC261EB2D3007752D9 /* AppDelegate.m */; };
 		7BB5B3B6261EB2D3007752D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BB5B3B4261EB2D3007752D9 /* Main.storyboard */; };
@@ -39,8 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSBleFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B348EB027EAFC3C00030216 /* FSExpand.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FSExpand.framework; sourceTree = "<group>"; };
-		7BAACEE927609E8800CD2B6B /* FSFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BB5B3A8261EB2D3007752D9 /* FSDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BB5B3AB261EB2D3007752D9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7BB5B3AC261EB2D3007752D9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -62,7 +63,6 @@
 		7BB5B433261EB585007752D9 /* DisplayDataCtrl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayDataCtrl.m; sourceTree = "<group>"; };
 		7BB5B434261EB585007752D9 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		7BB5B435261EB585007752D9 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		7BE3752D262986DD00BC00DB /* FSExpand.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSExpand.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */,
 				7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -155,8 +156,7 @@
 		7BE3752C262986DD00BC00DB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7BAACEE927609E8800CD2B6B /* FSFramework.framework */,
-				7BE3752D262986DD00BC00DB /* FSExpand.framework */,
+				2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

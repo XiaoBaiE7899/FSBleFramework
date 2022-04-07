@@ -90,6 +90,7 @@ typedef NS_ENUM(NSInteger, FSDiscontrolType) {
     FSDiscontrolTypeStop,          // 停止
 };
 
+// 以下是甩脂机的指令
 typedef NS_ENUM(NSInteger, FSDeviceErrorCode) {
     /* 甩脂机故障  过流报警 */
     SlimmingOvercurrentAlarm,

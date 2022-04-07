@@ -2,6 +2,9 @@
 #import <Foundation/Foundation.h>
 #import "FSManager.h"
 #import "NSData+fsExtent.h"
+#import "NSDictionary+fsExtent.h"
+#import "NSString+fsExtent.h"
+
 
 #import "FSFrameworkEnum.h"
 #import "FSGenerateCmdData.h"
