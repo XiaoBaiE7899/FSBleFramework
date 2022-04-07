@@ -1,9 +1,4 @@
-//
-//  NSString+fsExtent.m
-//  FSBleFramework
-//
-//  Created by 林文圻 on 2022/4/7.
-//
+
 
 #import "NSString+fsExtent.h"
 #import "BleManager.h"

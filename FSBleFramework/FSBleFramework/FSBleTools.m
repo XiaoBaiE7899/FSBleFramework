@@ -3,57 +3,9 @@
 #import "BleManager.h"
 #import "FSBleDeice.h"
 #import "BleModule.h"
+#import "NSString+fsExtent.h"
 
 @implementation FSBleTools
-
-//+ (NSString*)ditionaryToJsonSting:(NSDictionary *)dic {
-//    NSAssert(dic,@"数据不能为空!");
-//    NSError *parseError = nil;
-//    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:&parseError];
-//    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-//}
-
-//+ (NSDictionary *)jsonStingToDictionary:(NSString *)string {
-//    if (string == nil) {
-//        return nil;
-//    }
-//    NSData *jsonData = [string dataUsingEncoding:NSUTF8StringEncoding];
-//    NSError *err;
-//    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
-//    if(err)
-//    {
-//        NSLog(@"json解析失败：%@",err);
-//        return nil;
-//    }
-//    return dic;
-//}
-
-//+ (NSArray *)jsonStingToArray:(NSString *)string {
-//    if (!self) return nil;
-//    id tmp = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingAllowFragments | NSJSONReadingMutableLeaves | NSJSONReadingMutableContainers error:nil];
-//    if ([tmp isKindOfClass:[NSArray class]]) {
-//
-//        return tmp;
-//
-//    } else if([tmp isKindOfClass:[NSString class]]
-//              || [tmp isKindOfClass:[NSDictionary class]]) {
-//
-//        return [NSArray arrayWithObject:tmp];
-//    }
-//
-//    return nil;
-//}
-
-
-
-//+ (NSString *)dataToString:(NSData *)data {
-//    NSString *s = @"";
-//    Byte *buf = (Byte *)data.bytes;
-//    for (uint i = 0; i < data.length; i++) {
-//        s = [s stringByAppendingFormat:@"%02X ", buf[i]];
-//    }
-//    return s;
-//}
 
 + (void)createDeviceInfoPlistFileWith:(NSArray *)array {
     // 数据安全过滤
@@ -85,7 +37,7 @@
 
 + (FSDeviceInfo *)readDeviceInfoFromPlistFile:(FSBaseDevice *)device {
     // 先判断文件上是否存在，如果文件存在，在去便利，如果文件
-    NSString *path = [self deviceInfoFilePath];
+    NSString *path = [NSString deviceInfoFilePath];
     if (kFSIsEmptyString(path)) {
         FSLog(@"设备信息的plist文件不存在，直接返回");
         return nil;
@@ -107,13 +59,6 @@
         }
     }
     return nil;
-}
-
-// 设备信息
-+ (NSString *)deviceInfoFilePath {
-    NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    NSString *filePath = [docPath stringByAppendingPathComponent:FITSHOW_DEVICEINFO];
-    return filePath;
 }
 
 @end

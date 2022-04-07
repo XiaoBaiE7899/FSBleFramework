@@ -334,11 +334,6 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     request.HTTPBody = paramData;
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        
-//        FSLog(@"%@", response);
-//        FSLog(@"ddddd");
-        
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             // 回调数据
             if (data) {
@@ -349,12 +344,12 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
                     if (code.integerValue == 1) { // 只有这个状态才有数据
                         NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dic];
                         if ([dic objectForKey:@"params"]) {
-                            info[@"paramString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"params"]]*/dic.fstoJsonString();
+                            info[@"paramString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"params"]]*/dic.fsToJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
                         
                         if ([dic objectForKey:@"motorMode"]) {
-                            info[@"motorModeString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"motorMode"]]*/dic.fstoJsonString();
+                            info[@"motorModeString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"motorMode"]]*/dic.fsToJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
                         
