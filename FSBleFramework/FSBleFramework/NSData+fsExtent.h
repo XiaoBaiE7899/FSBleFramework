@@ -5,7 +5,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSData (fsExtent)
 
-- (NSString *(^)(void))fstoString;
+- (NSString *(^)(void))fsToString;
 
 @end
 

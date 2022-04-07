@@ -3,7 +3,7 @@
 
 @implementation NSData (fsExtent)
 
-- (NSString *(^)(void))fstoString {
+- (NSString *(^)(void))fsToString {
     return ^ NSString * {
         NSString *s = @"";
         Byte *buf = (Byte *)self.bytes;

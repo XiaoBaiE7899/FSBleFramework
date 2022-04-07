@@ -220,7 +220,7 @@
             // 跑步机  写入用户信息，  不需要重发
             if (self.module.isFitshow &&
                 self.module.isTreadmillProtocol &&
-                [/*[FSBleTools dataToString:cmd.data]*/cmd.data.fstoString() hasPrefix:@"02 53 00"]
+                [/*[FSBleTools dataToString:cmd.data]*/cmd.data.fsToString() hasPrefix:@"02 53 00"]
                 /*[cmd.data.fstoString() hasPrefix:@"02 53 00"]*/) {
                 // MARK: AB 测试黑色跑步机，连接成功一直滴滴响，因为是控制指令，设备接收控制指令会滴滴响，刚好这条发送失败，一直重发，要求改成只要写入一次，不敢成功还是失败。
                 [self commit];
@@ -230,7 +230,7 @@
         } else {
             self.resending = NO;
 //            FSLog(@"发送(%@): %@", _module.name, cmd.data.fstoString());
-            FSLog(@"发送(%@): %@", _module.name, /*[FSBleTools dataToString:cmd.data]*/cmd.data.fstoString());
+            FSLog(@"发送(%@): %@", _module.name, /*[FSBleTools dataToString:cmd.data]*/cmd.data.fsToString());
 
         }
 
@@ -314,11 +314,11 @@
     }
 
 //    FSLog(@"接收(%@): %@", peripheral.name, characteristic.value.fstoString());
-    FSLog(@"接收(%@): %@", _module.name, /*[FSBleTools dataToString:characteristic.value]*/characteristic.value.fstoString());
+    FSLog(@"接收(%@): %@", _module.name, /*[FSBleTools dataToString:characteristic.value]*/characteristic.value.fsToString());
     _receiveCmd.chrt = characteristic;
     _receiveCmd.data = characteristic.value;
     // MARK: 20220111  健腹轮  上报的数据可能为空
-    if (kFSIsEmptyString(/*[FSBleTools dataToString:characteristic.value]*/characteristic.value.fstoString())) {
+    if (kFSIsEmptyString(/*[FSBleTools dataToString:characteristic.value]*/characteristic.value.fsToString())) {
         return;
     }
 

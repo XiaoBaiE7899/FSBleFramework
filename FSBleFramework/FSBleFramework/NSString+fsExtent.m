@@ -5,10 +5,6 @@
 
 @implementation NSString (fsExtent)
 
-//- (NSDictionary *(^)(void))fsToDictionary {
-//
-//}
-
 + (NSString *)deviceInfoFilePath {
     NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     NSString *filePath = [docPath stringByAppendingPathComponent:FITSHOW_DEVICEINFO];
