@@ -1,6 +1,8 @@
 
 #import "BleModule.h"
 #import "FSFrameworkEnum.h"
+#import "BleManager.h"
+
 
 @implementation BleCommand
 
@@ -58,10 +60,11 @@
         _isFitshow = NO;
         return;
     }
-    
-//    if ([self.name isEqualToString:@"FS-12345"]) {
-//        FSLog(@"测试设备");
-//    }
+    // 没有FFF0: FitShow-2DF91E
+    // 包含FFF0与1826  
+    if ([self.name isEqualToString:@"FitShow-386EE3"]) {
+        FSLog(@"测试设备");
+    }
 
     Byte *adBytes = (Byte *)self.manufacturerData.bytes;
 
@@ -86,9 +89,11 @@
     }
 
     // 华为的  跳绳  广播包 是7位
-    if (_manufacturerData.length == 7) {
-        [self hw_ropeAdvertisement:adBytes];
-    }
+//    if (_manufacturerData.length == 7) {
+//        [self hw_ropeAdvertisement:adBytes];
+//    }
+    // 华为的  7D02  开头  && FFF0
+    [self hw_testAdType:adBytes];
 }
 
 //- (void)setRssi:(int)rssi {
@@ -145,6 +150,33 @@
         _serial      = @"0";
 //        FSLog(@"AD_HW：设备类型：%d, 设备id:%@, 厂商码%@, 机型码：%@, 序列号：%@",_sportType, _deviceID, _factory, _machineCode, _serial);
     }
+}
+
+// 测试华为广播包
+- (void)hw_testAdType:(Byte *)data {
+    uint8_t HUAWEI[] = {0x7D, 0x02};
+    if (MAKEWORD(HUAWEI[0], HUAWEI[1]) == MAKEWORD(data[0], data[1]) &&
+        [self includeFitshowUUid]) {
+        _fsNewAd     = YES;
+        _isFitshow   = YES;
+        // MARK: 22.4.8  设备类型先写死跑步机
+        _sportType   = FSSportTypeTreadmill;
+        _factory     = @"0";
+        _machineCode = @"0";;
+        _deviceID    = @"0";
+        _serial      = @"0";
+    }
+}
+
+- (BOOL)includeFitshowUUid {
+    BOOL rst = NO;
+    for (CBUUID *obj in self.discover) {
+        if ([obj.UUIDString isEqualToString:FITSHOW_UUID]) {
+            FSLog(@"包含运动秀的UUID  %@", obj.UUIDString);
+            return YES;
+        }
+    }
+    return rst;
 }
 
 // FTMS 广播包

@@ -86,6 +86,8 @@
 
 - (BleDevice *)discoverModule:(BleModule *)module {
     BleDevice *device = nil;
+    // MARK:  22.4.8  如果不是运动秀的摸先过滤掉
+    if (!module.isFitshow) return device;
     NSData *data = module.manufacturerData;
     if (data.length >= /*8 MARK: 20211027 跳绳、健腹轮的广播是7个字节*/ 7 ) {
         device = [self newDevice:module];
