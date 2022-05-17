@@ -42,4 +42,48 @@
     };
 }
 
+/// 乘
+- (NSString *(^)(NSString *))fsMul {
+    if (kFSIsEmptyString(self)) {
+        return ^NSString *(NSString *value) {
+            return @"0.00";
+        };
+    }
+    NSDecimalNumber *num1 = [NSDecimalNumber decimalNumberWithString:self];
+    return ^NSString *(NSString *value) {
+        if (kFSIsEmptyString(value)) {
+            return @"0.00";
+        }
+        NSDecimalNumber *num2 = [NSDecimalNumber decimalNumberWithString:value];
+        NSDecimalNumber *resultNum = [num1 decimalNumberByMultiplyingBy:num2];
+        return [resultNum stringValue];
+    };
+}
+
+/// 除
+- (NSString *(^)(NSString *))fsDiv {
+    if (kFSIsEmptyString(self)) {
+        return ^NSString *(NSString *value) {
+            return @"0.00";
+        };
+    }
+    NSDecimalNumber *num1 = [NSDecimalNumber decimalNumberWithString:self];
+    return ^NSString *(NSString *value) {
+        if (kFSIsEmptyString(value)) {
+            return @"0.00";
+        }
+        if ([value isEqualToString:@"0"]) {
+            return @"0.00";
+        }
+        
+        if ([value isEqualToString:@"0"]) {
+            return @"0.00";
+        }
+        
+        NSDecimalNumber *num2 = [NSDecimalNumber decimalNumberWithString:value];
+        NSDecimalNumber *resultNum = [num1 decimalNumberByDividingBy:num2];
+        return [resultNum stringValue];
+    };
+}
+
 @end

@@ -93,11 +93,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,   copy) NSString      *countdownSeconds;
 @property (nonatomic,   copy) NSString      *watt;
 @property (nonatomic,   copy) NSString      *distance;  // 米
+@property (nonatomic,   copy) NSString      *displayDistance; // 千米 或 英里
 @property (nonatomic,   copy) NSString      *calory;    //
 @property (nonatomic,   copy) NSString      *steps;     // 步数
 @property (nonatomic,   copy) NSString      *counts;    // 次数
 @property (nonatomic,   copy) NSString      *paragraph; // 段数
 @property (nonatomic,   copy) NSString      *uid;       // 运动ID
+
+@property (nonatomic,   copy) NSString      *targetSpeed;   // 目标速度
+@property (nonatomic,   copy) NSString      *targetIncline; // 目标坡度
+@property (nonatomic,   copy) NSString      *targetLevel;   // 目标阻力
 
 
 @property (nonatomic, assign) FSDiscontrolType discontrolType; // 失控类型

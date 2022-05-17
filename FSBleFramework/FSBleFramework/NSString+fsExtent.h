@@ -12,6 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray *(^)(void))fsToArray;
 
+- (NSString *(^)(NSString *))fsMul; // *
+
+- (NSString *(^)(NSString *))fsDiv; // /
+
 @end
 
 NS_ASSUME_NONNULL_END

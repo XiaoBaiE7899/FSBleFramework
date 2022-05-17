@@ -7,6 +7,7 @@
 #import "FSSlimmingMode.h"
 #import "NSDictionary+fsExtent.h"
 #import "NSString+fsExtent.h"
+#import "FSSport.h"
 
 NSString * _Nonnull const CHAR_READ_MFRS    = @"2A29"; // 厂家
 NSString * _Nonnull const CHAR_READ_PN      = @"2A24"; // 型号
@@ -14,6 +15,7 @@ NSString * _Nonnull const CHAR_READ_HV      = @"2A27"; // 硬件版本
 NSString * _Nonnull const CHAR_READ_SV      = @"2A28"; // 软件版本
 NSString * _Nonnull const CHAR_NOTIFY_UUID  = @"FFF1"; // 通知通道
 NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
+
 
 @implementation FSDeviceParam
 
@@ -117,7 +119,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 
 - (BOOL)moduleInfoAgterConnented:(CBCharacteristic *)chat {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     NSArray     *arr       = @[CHAR_READ_MFRS, CHAR_READ_PN, CHAR_READ_HV, CHAR_READ_SV];
     NSData      *data      = chat.value;
     NSUInteger  len        =  data.length;
@@ -141,7 +143,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (BOOL)onService {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     CBUUID  *server = UUID(FITSHOW_UUID);
     CBUUID  *send   = UUID(CHAR_WRITE_UUID);
     CBUUID  *recv   = UUID(CHAR_NOTIFY_UUID);
@@ -173,7 +175,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (void)onDisconnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
@@ -185,7 +187,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 
 - (void)dataReset {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     self.isStarting       = NO;
     self.isRunning        = NO;
     self.isPausing        = NO;
@@ -217,11 +219,11 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (void)updateState:(NSTimer *__nullable)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)updateDeviceParams {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)sendData:(NSData *)data {
@@ -315,17 +317,18 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     
     // @"https://api.fitshow.com/api/device/getdeviceinfo/"
     
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
     NSDictionary *dic = @{
         @"factory" : self.module.factory,
         @"model" : self.module.machineCode,
         @"type" : type
     };
-    FSLog(@"请求参数 %@", dic);
+    FSLog(@"请求地址%@ 参数 %@  ", fs_sport.hostUrl, dic);
+    //
     
-    NSString *urlString = @"https://api.fitshow.com/api/device/getdeviceinfo/";
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+//    NSString *urlString = @"https://api.fitshow.com/api/device/getdeviceinfo/";
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:fs_sport.hostUrl]];
     request.HTTPMethod = @"POST";
     request.timeoutInterval = 30;
     // 设备组请求头
@@ -335,6 +338,10 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self.module.name isEqualToString:@"FS-123456"]) {
+                FSLog(@"获取数据 类型%d  厂商%@  机型%@", self.module.sportType, self.module.factory, self.module.model);
+                
+            }
             // 回调数据
             if (data) {
                 NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -342,13 +349,13 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
                 if([dic objectForKey:@"code"]) {
                     NSNumber *code = dic[@"code"];
                     if (code.integerValue == 1) { // 只有这个状态才有数据
-                        NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dic];
-                        if ([dic objectForKey:@"params"]) {
+                        NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dic[@"data"]];
+                        if ([info objectForKey:@"params"]) {
                             info[@"paramString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"params"]]*/dic.fsToJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
                         
-                        if ([dic objectForKey:@"motorMode"]) {
+                        if ([info objectForKey:@"motorMode"]) {
                             info[@"motorModeString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"motorMode"]]*/dic.fsToJsonString();
                             [FSBleTools createDeviceInfoPlistFileWith:@[info]];
                         }
@@ -380,6 +387,10 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
         return [NSString stringWithFormat:@"%.1f", self.speed.intValue / 100.0];
     }
     return self.speed;
+}
+
+- (NSString *)displayDistance {
+    return [NSString stringWithFormat:@"%.1f", self.distance.intValue / 1000.0];
 }
 
 @end

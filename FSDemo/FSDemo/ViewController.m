@@ -10,6 +10,10 @@
 #import "DisplayDataCtrl.h"
 #import <FSBleFramework/FSBleFramework.h>
 
+//#import <AddressBook/AddressBook.h>
+//#import <Contacts/Contacts.h>
+#import "XBContactLib.h"
+
 
 
 @interface ViewController () <FSCentralDelegate, BleDeviceDelegate>
@@ -38,6 +42,14 @@
     self.fsManager = [FSManager managerWithDelegate:self];
     // 监听设备完全停止
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fsdeviceDidStop:) name:kFitshowHasStoped object:nil];
+//    [self zx];
+    [XBContactLib requestAuthorizationAddressBook];
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [XBContactLib addressBooks:^(CNAuthorizationStatus status, NSArray * _Nonnull datas) {
+        FSLog(@"5.13  数据回调完成了");
+    }];
 }
 
 - (void)fsdeviceDidStop:(NSNotification *)sender {
@@ -114,7 +126,8 @@
 - (IBAction)controlSpeed:(UIButton *)sender {
     if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
         FSLog(@"控制跑步机速度");
-        [self.fsDevice targetSpeed:50 incline:self.fsDevice.incline.intValue];
+//        [self.fsDevice targetSpeed:50 incline:self.fsDevice.incline.intValue];
+        self.fsDevice.targetSpeed = @"50";
     }
 }
 
@@ -262,6 +275,41 @@
         default:
             break;
     }
+}
+
+- (void)zx {
+    NSArray*keysToFetch =@[CNContactGivenNameKey,CNContactFamilyNameKey,CNContactPhoneNumbersKey];
+    
+    CNContactFetchRequest*fetchRequest = [[CNContactFetchRequest alloc]initWithKeysToFetch:keysToFetch];
+    CNContactStore *contactStore = [[CNContactStore alloc]init];
+    [contactStore enumerateContactsWithFetchRequest:fetchRequest error:nil usingBlock:^(CNContact*_Nonnull contact,BOOL*_Nonnull stop) {
+        NSLog(@"-------------------------------------------------------");
+        
+        NSString*givenName = contact.givenName;
+        
+        NSString*familyName = contact.familyName;
+        
+        NSLog(@"givenName=%@, familyName=%@", givenName, familyName);
+        
+        NSArray*phoneNumbers = contact.phoneNumbers;
+        
+        for(CNLabeledValue*labelValue in phoneNumbers) {
+            NSString*label = labelValue.label;
+            
+            CNPhoneNumber *phoneNumber = labelValue.value;
+            
+            //    NSDictionary*contact =@{@"phone":phoneNumber.stringValue,@"user":FORMAT(@"%@%@",familyName,givenName)};
+            //
+            //    [contactArr addObject:contact];
+            //
+                NSLog(@"label=%@, phone=%@", label, phoneNumber.stringValue);
+            FSLog(@"");
+            
+        }
+        
+        //*stop = YES;// 停止循环，相当于break；
+        
+    }];
 }
 
 

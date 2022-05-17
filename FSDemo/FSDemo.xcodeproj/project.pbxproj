@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B569ADA282DEB7400483F6C /* XBContactLib.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B569AD9282DEB7400483F6C /* XBContactLib.m */; };
 		2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */; };
 		7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B348EB027EAFC3C00030216 /* FSExpand.framework */; };
 		7BB5B3AD261EB2D3007752D9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB5B3AC261EB2D3007752D9 /* AppDelegate.m */; };
@@ -40,6 +41,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2B569AD8282DEB7400483F6C /* XBContactLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XBContactLib.h; sourceTree = "<group>"; };
+		2B569AD9282DEB7400483F6C /* XBContactLib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XBContactLib.m; sourceTree = "<group>"; };
 		2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSBleFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B348EB027EAFC3C00030216 /* FSExpand.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FSExpand.framework; sourceTree = "<group>"; };
 		7BB5B3A8261EB2D3007752D9 /* FSDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,6 +134,8 @@
 				7BB5B3B9261EB2D6007752D9 /* LaunchScreen.storyboard */,
 				7BB5B3BC261EB2D6007752D9 /* Info.plist */,
 				7BB5B3BD261EB2D6007752D9 /* main.m */,
+				2B569AD8282DEB7400483F6C /* XBContactLib.h */,
+				2B569AD9282DEB7400483F6C /* XBContactLib.m */,
 			);
 			path = FSDemo;
 			sourceTree = "<group>";
@@ -295,6 +300,7 @@
 				7BB5B437261EB585007752D9 /* DisplayDataCtrl.m in Sources */,
 				7BB5B3AD261EB2D3007752D9 /* AppDelegate.m in Sources */,
 				7BB5B3BE261EB2D6007752D9 /* main.m in Sources */,
+				2B569ADA282DEB7400483F6C /* XBContactLib.m in Sources */,
 				7BB5B438261EB585007752D9 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

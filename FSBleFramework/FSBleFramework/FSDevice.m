@@ -4,6 +4,7 @@
 #import "FSManager.h"
 #import "FSGenerateCmdData.h"
 #import "FSSlimmingMode.h"
+#import "NSString+fsExtent.h"
 
 static int afterDelayTime = 3;
 
@@ -32,10 +33,13 @@ static int afterDelayTime = 3;
 @synthesize isStarting      = _isStarting;
 @synthesize isWillStart     = _isWillStart;
 @synthesize getParamSuccess = _getParamSuccess;
+@synthesize targetSpeed     = _targetSpeed;
+@synthesize targetIncline   = _targetIncline;
+@synthesize targetLevel     = _targetLevel;
 
 
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     // 跑步机状态
     switch (currentStatus) {
@@ -114,7 +118,7 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)hasStoped {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 停止中-----正常状态
     if (self.oldStatus == FSDeviceStateTreadmillStopping &&
         self.currentStatus == FSDeviceStateNormal) {
@@ -152,7 +156,7 @@ static int afterDelayTime = 3;
      3. 跑客（白色跑步机），从app恢复的状态一直为10.
      !!!: 210830 周一早上与AB讨论决定，如果出现 状态为3，速度为0，时间大于0 才是暂停，否则为运行中
      */
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStatePaused) {
         return YES;
     }
@@ -168,7 +172,7 @@ static int afterDelayTime = 3;
 
 - (BOOL)isRunning {
     // !!!: 210828 乔阳工厂  跑步机 启动， 状态为3， 速度为0， 根据之前的判断，这个状态是暂停，如果乔阳的数据都是这样，应该单独处理
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStateRunning /*&&
         self.speed.integerValue != 0*/) {
             return YES;
@@ -178,12 +182,12 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isStarting {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateStarting;
 }
 
 - (BOOL)isWillStart {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus != FSDeviceStateStarting &&
         self.currentStatus == FSDeviceStateStarting) {
         return YES;
@@ -192,11 +196,31 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)getParamSuccess {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.speedObtainSuccess && self.inclineObtainSuccess) {
         return YES;
     }
     return NO;
+}
+
+- (void)setTargetLevel:(NSString *)targetLevel {
+    FSLog(@"目标阻力");
+    _targetLevel = targetLevel;
+}
+
+- (void)setTargetSpeed:(NSString *)targetSpeed {
+    FSLog(@"目标速度");
+    _targetSpeed = targetSpeed;
+    // 当前坡度
+    int cur_inl = self.incline.intValue;
+    [self targetSpeed:targetSpeed.intValue incline:cur_inl];
+}
+
+- (void)setTargetIncline:(NSString *)targetIncline {
+    FSLog(@"目标坡度");
+    // 当前速度
+    int cur_spd = self.speed.intValue;
+    [self targetSpeed:cur_spd incline:targetIncline.intValue];
 }
 
 - (NSMutableArray *)speedArr {
@@ -214,13 +238,13 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)onUpdateData:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
     // 跑步机数据解析
     Byte *bytes     = (Byte *)[cmd.data bytes];
     Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
-    FSLog(@"主指令：%d  子指令：%d", mainCmd, subcmd);
+//    FSLog(@"主指令：%d  子指令：%d", mainCmd, subcmd);
     switch (mainCmd) {
         case 0x50: { /*FSMainCmdModel*/
             if (subcmd == 0) { /*FSSubParamCmdTreadmillModel*/
@@ -352,7 +376,7 @@ static int afterDelayTime = 3;
     // !!!: 22.4.1 回调蓝牙正常工作  写在setter方法中
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
     // 收到状态上报  回调蓝牙正常
-    FSLog(@"%@ new:%d  old:%d", NSStringFromSelector(_cmd), self.currentStatus, self.oldStatus);
+//    FSLog(@"%@ new:%d  old:%d", NSStringFromSelector(_cmd), self.currentStatus, self.oldStatus);
     if (self.oldStatus != self.currentStatus &&
         self.currentStatus != FSDeviceStateDefault &&
         self.deviceDelegate &&
@@ -425,7 +449,7 @@ static int afterDelayTime = 3;
 
             self.exerciseTime = FSFM(@"%d", _time);
             self.distance     = FSFM(@"%d", _distance);
-            self.speed        = FSFM(@"%.1f", _speed / 10.0);
+            self.speed        = FSFM(@"%d", _speed);
             self.calory       = FSFM(@"%d", _calory);
             self.steps        = FSFM(@"%d", _steps);
             self.heartRate    = FSFM(@"%d", _heartrate);
@@ -449,7 +473,7 @@ static int afterDelayTime = 3;
 
             self.exerciseTime = FSFM(@"%d", _time);
             self.distance     = FSFM(@"%d", _distance);
-            self.speed        = FSFM(@"%.1f", _speed / 10.0);
+            self.speed        = FSFM(@"%d", _speed);
             self.calory       = FSFM(@"%d", _calory);
             self.steps        = FSFM(@"%d", _steps);
             self.heartRate    = FSFM(@"%d", _heartrate);
@@ -525,7 +549,7 @@ static int afterDelayTime = 3;
 #pragma mark 重写父类的方法
 - (void)dataReset {
     [super dataReset];
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     self.originalIncline = 0;
     [self.inclineArr removeAllObjects];
     self.originalSpeed = 0;
@@ -537,7 +561,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)onConnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 数据重置
     [self dataReset];
     /*
@@ -558,7 +582,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)onFailedSend:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     Byte *databytes = (Byte *)[cmd.data bytes];
     Byte maincmd    = databytes[1];
     Byte subcmd     = databytes[2];
@@ -572,7 +596,7 @@ static int afterDelayTime = 3;
 
 // 控制 ----------
 - (BOOL)start {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 不是正常状态 不能启动
     if (self.currentStatus != FSDeviceStateNormal) return NO;
     [self sendData:FSGenerateCmdData.treadmillStart()];
@@ -584,7 +608,7 @@ static int afterDelayTime = 3;
      停止之前先保存一次即时速度，2秒以后，
      判断设备是否的速度是下降，如果设备的速度有下降就表示能控制
      */
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     self.originalSpeed = self.speed.intValue;
     /* MARK: 添加通过指令停止设备的标识*/
     self.stopWithCmd = YES;
@@ -594,7 +618,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)targetSpeed:(int)targetSpeed incline:(int)targetIncline {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     /*
      同时控制速度、坡度
      1 如果不是跑步机 因为速度不能控制，速度、坡度等于目标速度、目标坡度 直接返回
@@ -604,7 +628,7 @@ static int afterDelayTime = 3;
      4 速度、坡度都是可以控制，发送指令
      */
     // 当前速度、坡度等于目标速度、坡度 直接返回
-    if (self.speed.intValue * 10 == targetSpeed &&
+    if (self.speed.intValue == targetSpeed &&
         self.incline.intValue == targetIncline) {
         return;
     }
@@ -716,7 +740,7 @@ static int afterDelayTime = 3;
 
 #pragma mark 心跳包
 - (void)updateState:(NSTimer *__nullable)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.commands.count < 3) {
         // MARK: 210617  增加判断设备状态
         if (self.currentStatus != FSDeviceStateDefault &&
@@ -731,7 +755,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)updateDeviceParams {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.treadmillSpeedParam()];
     // MARK: 延迟1秒获取设备坡度信息，
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -741,7 +765,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)treadmillReadyTimeOut {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
@@ -778,9 +802,12 @@ static int afterDelayTime = 3;
 @synthesize isStarting      = _isStarting;
 @synthesize isWillStart     = _isWillStart;
 @synthesize getParamSuccess = _getParamSuccess;
+@synthesize targetSpeed     = _targetSpeed;
+@synthesize targetIncline   = _targetIncline;
+@synthesize targetLevel     = _targetLevel;
 
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 车表机状态
     switch (currentStatus) {
         case 0:_currentStatus  = FSDeviceStateNormal;
@@ -834,7 +861,7 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isPausing {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStatePaused) {
         return YES;
     }
@@ -842,7 +869,7 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isRunning {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStateRunning) {
         return YES;
     }
@@ -851,12 +878,12 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isStarting {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateStarting;
 }
 
 - (BOOL)isWillStart {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus != FSDeviceStateStarting &&
         self.currentStatus == FSDeviceStateStarting ) {
         return YES;
@@ -865,11 +892,32 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)getParamSuccess {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.speedObtainSuccess && self.inclineObtainSuccess) {
         return YES;
     }
     return NO;
+}
+
+- (void)setTargetLevel:(NSString *)targetLevel {
+//    FSLog(@"目标阻力");
+    // 当前坡度
+    int cur_inl = self.incline.intValue;
+    [self setTargetLevl:targetLevel.intValue incline:cur_inl];
+    
+}
+
+- (void)setTargetSpeed:(NSString *)targetSpeed {
+//    FSLog(@"目标速度");
+    _targetSpeed = targetSpeed;
+}
+
+- (void)setTargetIncline:(NSString *)targetIncline {
+//    FSLog(@"目标坡度");
+    // 当前阻力
+    int cur_lvl = self.resistance.intValue;
+    [self setTargetLevl:cur_lvl incline:targetIncline.intValue];
+//    _targetSpeed = _targetSpeed;
 }
 
 - (NSMutableArray *)resistanceArr {
@@ -887,7 +935,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)sectionReadyTimeOut {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
@@ -902,13 +950,13 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)onUpdateData:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
     // 跑步机数据解析
     Byte *bytes = (Byte *)[cmd.data bytes];
     Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
-    FSLog(@"车表22.3.31 主指令：%d 子指令： %d", mainCmd, subcmd);
+//    FSLog(@"车表22.3.31 主指令：%d 子指令： %d", mainCmd, subcmd);
 
     switch (mainCmd) {
             /* FSMainCmdSectionParam */
@@ -1006,14 +1054,14 @@ static int afterDelayTime = 3;
 }
 
 - (void)sectionParams:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     Byte *bytes = (Byte *)[cmd.data bytes];
 //    Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
     /* FSSubParamCmd_Speed_Param */
     if (subcmd == 0x02) { // 参数信息
-        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
+//        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
         // 获取阻力、坡度、配置、段数
         int maxResistance    = bytes[3];
         int maxIncline       = bytes[4];
@@ -1048,7 +1096,7 @@ static int afterDelayTime = 3;
     Byte *bytes = (Byte *)[cmd.data bytes];
 //    Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 新旧状态赋值
     self.oldStatus     = self.currentStatus;
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
@@ -1078,7 +1126,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)sectionStateDataParsing:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     Byte *bytes = (Byte *)[cmd.data bytes];
 //    Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
@@ -1142,7 +1190,7 @@ static int afterDelayTime = 3;
 #pragma mark 重写父类的方法
 - (void)dataReset {
     [super dataReset];
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     self.originalIncline = 0;
     [self.inclineArr removeAllObjects];
     self.originalResistance = 0;
@@ -1154,7 +1202,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)onConnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 数据重置
     [self dataReset];
     
@@ -1169,7 +1217,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)updateState:(NSTimer *)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // FIXME:22.3.30  车表心跳的逻辑还是缺失的，这个得改
     if (self.commands.count < 3) {
         if (self.currentStatus != FSDeviceStateDefault) {
@@ -1190,17 +1238,17 @@ static int afterDelayTime = 3;
 }
 
 - (void)updateDeviceParams {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.sectionParamInfo()];
 }
 
 - (void)onFailedSend:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
 }
 
 - (BOOL)start {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 车表正常待机  睡眠都可以启动
     if (self.currentStatus == FSDeviceStateNormal ||
         self.currentStatus == FSDeviceStateSectionSleep) {
@@ -1217,7 +1265,7 @@ static int afterDelayTime = 3;
 
 - (void)stop {
     /* MARK: 添加通过指令停止设备的标识*/
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 //    self.stopWithCmd = YES;
     [self sendData:FSGenerateCmdData.sectionStop()];
 }
@@ -1282,7 +1330,7 @@ static int afterDelayTime = 3;
 
 #pragma mark 跳绳重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     switch (currentStatus) {
         case 0: {
@@ -1306,12 +1354,12 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isRunning {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateRunning ? YES : NO;
 }
 
 - (BOOL)hasStoped {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus == FSDeviceStateRunning &&
         self.currentStatus == FSDeviceStateNormal) {
         FSLog(@"添加最后一次绊绳");
@@ -1321,12 +1369,12 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isPausing {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return NO;
 }
 
 -(BOOL)onUpdateData:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     NSData *data = cmd.data;
     Byte *databytes = (Byte *)[data bytes];
     Byte dataType = databytes[0];    // 数据类型
@@ -1443,7 +1491,7 @@ static int afterDelayTime = 3;
 
 #pragma mark 重写父类的方法
 - (void)dataReset {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     self.interruptCnts    = @"0";
     self.continueCnts     = @"0";
     self.continueTimes    = @"0";
@@ -1457,7 +1505,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)onConnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 数据重置
     [self dataReset];
 
@@ -1470,7 +1518,7 @@ static int afterDelayTime = 3;
 }
 
 -(void)updateState:(NSTimer *)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 如果指令队列没有指令，就一直获取电量
     if (self.commands.count == 0) {
         [self sendData:FSGenerateCmdData.ropeHeartbeat()];
@@ -1478,16 +1526,16 @@ static int afterDelayTime = 3;
 }
 
 - (void)readyTimeOut {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)onFailedSend:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
 }
 
 - (BOOL)start {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.ropeStarFreeMode()];
     self.startDate = [NSDate date];
     return YES;
@@ -1495,25 +1543,25 @@ static int afterDelayTime = 3;
 
 - (void)stop {
     [self sendData:FSGenerateCmdData.ropeStop()];
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceCnts:(NSInteger)cnt {
 
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceTime:(NSInteger)time {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minPause {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.ropePause()];
 }
 
 - (void)minRestore {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.ropeRestore()];
 }
 
@@ -1586,25 +1634,25 @@ static int afterDelayTime = 3;
 }
 
 - (void)wakeUp {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.slimmingWakeUps()];
 }
 
 - (void)slimmingStartParagram {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 //    [self sendData:FSGenerateCmdData.slimmingMode()];
     [self sendData:FSGenerateCmdData.slimmingNewMode(self.lastCmd.data, self.mode)];
     self.isFirstStop = YES;
 }
 
 - (void)slimmingTargetSpeed:(int)speed {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // FIXME: 这个数据需要做过滤 最大速速不能超过配置的速度
     [self sendData:FSGenerateCmdData.slimmingSpeed(speed, self.lastCmd.data)];
 }
 
 - (void)slimmingTargetTime:(int)time {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // FIXME: 这个数据需要做过滤 最大速速不能超过配置的速度
     [self sendData:FSGenerateCmdData.slimmingTime(time, self.lastCmd.data)];
 }
@@ -1615,13 +1663,13 @@ static int afterDelayTime = 3;
 }
 
 - (void)slimmingSwitchMode {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.slimmingNewMode(self.lastCmd.data, self.mode)];
 }
 
 #pragma mark 重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (currentStatus == 1) {
         _currentStatus = FSDeviceStateRunning;
     }
@@ -1640,7 +1688,7 @@ static int afterDelayTime = 3;
 //}
 
 - (BOOL)hasStoped {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus == FSDeviceStateRunning && self.currentStatus == FSDeviceStateNormal) {
         // 设备已经停止
         if (self.switchMode) {
@@ -1652,7 +1700,7 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)onUpdateData:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     Byte *bytes = (Byte *)[cmd.data bytes];
     // 校验码
     Byte check = bytes[0];
@@ -1757,14 +1805,14 @@ static int afterDelayTime = 3;
 
 #pragma mark 重写父类的方法
 - (void)dataReset {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [super dataReset];
     // 删除指令，这个方法应该在父类调用，子类不需要写
     [self clearSend];
 }
 
 - (void)onConnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 刚刚连上的到时候，切换模式设为为NO
     self.switchMode = NO;
     // 连接成功先唤醒设备
@@ -1780,7 +1828,7 @@ static int afterDelayTime = 3;
 
 - (void)commit {
     // FIXME: xb  这个方法是否需要重写 应该好好考虑
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.switchMode) {
         // 判断甩脂机是否在运行
         if (self.isRunning) { // 是切换模式，并且甩脂机还在运行
@@ -1800,7 +1848,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)sendCommand:(BleCommand *)command {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (command) {
         self.lastCmd = command;
     }
@@ -1808,46 +1856,46 @@ static int afterDelayTime = 3;
 }
 
 -(void)updateState:(NSTimer *)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.commands.count == 0) { // 指令队列没有指令，发送送最后一条指令，
         [self sendCommand:self.lastCmd];
     }
 }
 
 - (void)readyTimeOut {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)onFailedSend:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
 }
 
 - (BOOL)start {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [self sendData:FSGenerateCmdData.slimmingStart(self.targetMode, self.lastCmd.data)];
     self.isFirstStop = YES;
     return YES;
 }
 
 - (void)stop {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceCnts:(NSInteger)cnt {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceTime:(NSInteger)time {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minPause {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minRestore {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 @end
@@ -1862,7 +1910,7 @@ static int afterDelayTime = 3;
 
 #pragma mark 重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     _currentStatus = currentStatus;
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {
@@ -1873,18 +1921,18 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isRunning {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return NO;
 }
 
 - (BOOL)hasStoped {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     return NO;
 }
 
 - (BOOL)onUpdateData:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {
         self.connectState = FSConnectStateWorking;
@@ -1895,14 +1943,14 @@ static int afterDelayTime = 3;
 
 #pragma mark 重写父类的方法
 - (void)dataReset {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     [super dataReset];
     // 删除指令，这个方法应该在父类调用，子类不需要写
     [self clearSend];
 }
 
 - (void)onConnected {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 数据重置
     [self dataReset];
 
@@ -1915,41 +1963,41 @@ static int afterDelayTime = 3;
 }
 
 -(void)updateState:(NSTimer *)sender {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)readyTimeOut {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)onFailedSend:(BleCommand *)cmd {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
 }
 
 - (BOOL)start {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return YES;
 }
 
 - (void)stop {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceCnts:(NSInteger)cnt {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minDeviceTime:(NSInteger)time {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minPause {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)minRestore {
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 
