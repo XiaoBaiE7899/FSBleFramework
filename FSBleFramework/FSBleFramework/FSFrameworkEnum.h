@@ -5,7 +5,7 @@
 #if (DEBUG == 1)
 #define FSLog(string, ...) NSLog(@"FSFramework %@ 🔥 <%d>🔥 %@", [[NSString stringWithUTF8String:__FILE__] lastPathComponent], __LINE__, [NSString stringWithFormat:(string), ##__VA_ARGS__])
 #else
-#define PLog(string, ...)
+#define FSLog(string, ...)
 #endif
 
 #define kFSIsEmptyString(str)  ([str isKindOfClass:[NSNull class]] || str == nil || [str length] < 1 || [str isEqualToString:@"<null>"] || [str isEqualToString:@"(null)"] ? YES : NO )
