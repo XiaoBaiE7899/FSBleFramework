@@ -258,7 +258,7 @@
 }
 
 - (void)deviceDidUpdateState:(FSDeviceState)newState fromState:(FSDeviceState)oldState {
-    FSLog(@"22.3.29 设备状态改变  旧状态%d： 新状态:%d", oldState, newState);
+    FSLog(@"22.6.2 设备状态改变  旧状态%d： 新状态:%d", oldState, newState);
     if (newState == FSDeviceStateTreadmillDisable) {
         FSLog(@"22.3.29 设备 安全锁脱落");
     }

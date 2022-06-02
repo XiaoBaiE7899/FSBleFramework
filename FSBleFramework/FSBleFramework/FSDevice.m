@@ -1097,16 +1097,24 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)sectionStateFilter:(BleCommand *)cmd {
-    Byte *bytes = (Byte *)[cmd.data bytes];
+//    Byte *bytes = (Byte *)[cmd.data bytes];
 //    Byte mainCmd    = bytes[1];
-    Byte subcmd     = bytes[2];
+//    Byte subcmd     = bytes[2];
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 新旧状态赋值
-    self.oldStatus     = self.currentStatus;
-    self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
+//    self.oldStatus     = self.currentStatus;
+//    self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
+//    FSLog(@"状态回调");
+//    FSLog(@"22.6.2 模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+//    if (self.oldStatus != self.currentStatus &&
+//        self.deviceDelegate &&
+//        [self.deviceDelegate respondsToSelector:@selector(deviceDidUpdateState:fromState:)]) {
+//        [self.deviceDelegate deviceDidUpdateState:self.currentStatus fromState:self.oldStatus];
+//    }
     
     if (self.hasStoped) {
         [self disconnect];
+        FSLog(@"22.6.2设备停止了");
         [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
     }
 
@@ -1137,9 +1145,9 @@ static int afterDelayTime = 3;
     // 新旧状态赋值
     self.oldStatus     = self.currentStatus;
     self.currentStatus = subcmd;
+    FSLog(@"22.6.2 模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // 车表状态改变，通过代理回调出去
     if (self.oldStatus != self.currentStatus &&
-        self.currentStatus != FSDeviceStateDefault &&
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(deviceDidUpdateState:fromState:)]) {
         [self.deviceDelegate deviceDidUpdateState:self.currentStatus fromState:self.oldStatus];
