@@ -376,9 +376,9 @@ static int afterDelayTime = 3;
     // !!!: 22.4.1 回调蓝牙正常工作  写在setter方法中
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
     // 收到状态上报  回调蓝牙正常
-//    FSLog(@"%@ new:%d  old:%d", NSStringFromSelector(_cmd), self.currentStatus, self.oldStatus);
+    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     if (self.oldStatus != self.currentStatus &&
-        self.currentStatus != FSDeviceStateDefault &&
+        /*self.currentStatus != FSDeviceStateDefault &&*/
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(deviceDidUpdateState:fromState:)]) {
         [self.deviceDelegate deviceDidUpdateState:self.currentStatus fromState:self.oldStatus];
@@ -450,7 +450,10 @@ static int afterDelayTime = 3;
             self.exerciseTime = FSFM(@"%d", _time);
             self.distance     = FSFM(@"%d", _distance);
             self.speed        = FSFM(@"%d", _speed);
-            self.calory       = FSFM(@"%d", _calory);
+            // 卡路里需要除以10
+//            self.calory       = FSFM(@"%d", _calory);
+            NSString *cal     = FSFM(@"%d", _calory);
+            self.calory       = cal.fsDiv(@"10");
             self.steps        = FSFM(@"%d", _steps);
             self.heartRate    = FSFM(@"%d", _heartrate);
             self.paragraph    = FSFM(@"%d", _paragraph);
@@ -977,10 +980,11 @@ static int afterDelayTime = 3;
         case 0x43: { // 车表数据
             if (subcmd == 0x01) {
                 // 获取运动数据
-                uint runtime = MAKEWORD(bytes[3], bytes[4]); // 时间
-                uint distance = MAKEWORD(bytes[5], bytes[6]); // 距离
-                uint calory   = MAKEWORD(bytes[7], bytes[8]); // 卡路里
-                uint counts = MAKEWORD(bytes[9], bytes[10]); // 次数
+                uint runtime  = MAKEWORD(bytes[3], bytes[4]);  // 时间
+                uint distance = MAKEWORD(bytes[5], bytes[6]);  // 距离
+                uint calory   = MAKEWORD(bytes[7], bytes[8]);  // 卡路里
+                NSString *calStr = FSFM(@"%d", calory);
+                uint counts   = MAKEWORD(bytes[9], bytes[10]); // 次数
                 // 距离做特殊处理
                 // !!!: 距离赋值的地方
                 if (bytes[6] & 0x80) { // 判断是不是以10米为单位的
@@ -995,7 +999,7 @@ static int afterDelayTime = 3;
                 }
                 self.counts = FSFM(@"%d", counts);
                 self.exerciseTime = FSFM(@"%d", runtime);
-                self.calory = FSFM(@"%d", calory);
+                self.calory = calStr.fsDiv(@"10").decimalPlace(1);
                 FSLog(@"车表22.3.31  数据43： 时间%@  距离%@  卡路里%@  次数%@", self.exerciseTime, self.distance, self.calory, self.counts);
             } else if (subcmd == 0x02) { // 这条指令没发送，不需要做解析
                 // 获取用户信息
@@ -1156,13 +1160,14 @@ static int afterDelayTime = 3;
         case 2:   // 运行中
         case 3: { // 暂停
             uint spd         = MAKEWORD(bytes[3], bytes[4]);
+            NSString *spdStr = FSFM(@"%d", spd);
             uint resistance  = bytes[5];
             uint frequency   = MAKEWORD(bytes[6], bytes[7]);
             uint heartRate   = bytes[8];
             uint watt        = MAKEWORD(bytes[9], bytes[10]);
             uint slope       = bytes[11];
             uint duanshu     = bytes[12];
-            self.speed       = FSFM(@"%d", spd);
+            self.speed       = spdStr.fsDiv(@"100").decimalPlace(1);
             self.resistance  = FSFM(@"%d", resistance);
             self.frequency   = FSFM(@"%d", frequency);
             self.heartRate   = FSFM(@"%d", heartRate);

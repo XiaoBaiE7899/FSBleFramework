@@ -39,7 +39,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // 初始化  中心管理器
-    self.fsManager = [FSManager managerWithDelegate:self];
+//    self.fsManager = [FSManager managerWithDelegate:self];
     // 监听设备完全停止
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fsdeviceDidStop:) name:kFitshowHasStoped object:nil];
 //    [self zx];
@@ -310,6 +310,14 @@
         //*stop = YES;// 停止循环，相当于break；
         
     }];
+}
+
+- (BleManager *)fsManager {
+    if (!_fsManager) {
+        _fsManager = [FSManager managerWithDelegate:self];
+        FSLog(@"22.6.2 中心地址%p", _fsManager);
+    }
+    return _fsManager;
 }
 
 

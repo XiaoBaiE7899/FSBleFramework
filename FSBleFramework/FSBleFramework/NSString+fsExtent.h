@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *(^)(NSString *))fsDiv; // /
 
+// 保留多少位小数
+- (NSString *(^)(NSInteger))decimalPlace;
+
 @end
 
 NS_ASSUME_NONNULL_END

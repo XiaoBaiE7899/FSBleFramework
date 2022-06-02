@@ -40,12 +40,13 @@ static NSMutableDictionary  *manager = nil;
         ble = [[[self class] alloc] initWithDelegate:delegate];
         manager[NSStringFromClass([self class])] = ble;
     } else if (ble.CentralState == FSCentralStatePoweredOff) {
-        ble.delegate = delegate;
+//        ble.delegate = delegate;
         ble.centralManager  = [[CBCentralManager alloc] initWithDelegate:ble queue:nil];
     } else if (!ble.isScaning) {
-        ble.delegate = delegate;
+//        ble.delegate = delegate;
         [ble centralManagerDidUpdateState:ble.centralManager];
     }
+    ble.delegate = delegate;
     return ble;
 }
 
