@@ -117,7 +117,7 @@ typedef NS_ENUM(NSInteger, FSSubControlCmd) {
     FSSubControlCmdReady                 = 0x01,
     /*
      跑步机：控制速度、坡度（用户手动操作）
-     车表：开始继续
+     车表：开始
      */
     FSSubControlCmd_SpeedIncline_Start   = 0x02,
     /*
@@ -301,7 +301,7 @@ typedef NS_ENUM(NSInteger, FSSubParamCmd) {
 // 获取设备参数 阻力B  坡度B  配置B  段数B
 + (NSData *(^)(void))sectionParamInfo {
     return ^NSData *(){
-        uint8_t cmd[] = {BLE_CMD_START, FSMainCmdSectionParam, FSSubControlCmd_Incline_SrAndI, 0x40, BLE_CMD_END};
+        uint8_t cmd[] = {BLE_CMD_START, FSMainCmdSectionParam, FSSubParamCmd_Speed_Param, 0x40, BLE_CMD_END};
         return self.prepareSendData(cmd, sizeof(cmd));
     };
 }

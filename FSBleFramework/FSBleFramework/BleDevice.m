@@ -22,6 +22,7 @@
         _accidentalReconnect        = NO;
         _disconnectType             = FSDisconnectTypeNone;
         _connectState               = FSConnectStateDisconnected;
+        FSLog(@"指令队列初始化");
         _commands                   = [NSMutableArray new];
         _receiveCmd                 = [BleCommand new];
         _getParamSuccess            = NO;
@@ -78,7 +79,11 @@
 
 - (void)sendCommand:(BleCommand *_Nullable)command {
     if (command) {
+        FSLog(@"指令队列   添加指令");
         [self.commands addObject:command];
+//        for (BleCommand *cmd in self.commands) {
+//            FSLog(@"指令: %@", cmd.data.fsToString());
+//        }
         if (!self.resending) {
             [self onSendData];
         }
@@ -112,6 +117,7 @@
             // 回调无响应断开
             if (self.deviceDelegate &&
                 [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+                FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
             }
         }
@@ -120,12 +126,14 @@
 }
 
 - (void)clearSend {
+    FSLog(@"指令队列   移除所有指令");
     [self.commands removeAllObjects];
     if (self.resending) self.resending = NO;
 }
 
 - (void)commit {
     _cntError = 0;
+    FSLog(@"指令队列   移除第一条指令");
     if (self.commands.count) [self.commands removeObjectAtIndex:0];
     if (self.commands.count) {
         [self onSendData];
@@ -182,6 +190,7 @@
 - (void)deviceInfoData {}
 
 - (void)onDisconnected {
+    FSLog(@"指令队列   所有指令");
     [self.commands removeAllObjects];
     self.connectState = FSConnectStateDisconnected;
 }
@@ -212,6 +221,10 @@
         return;
     }
     BleCommand *cmd = _commands.firstObject;
+    if (_commands.count) {
+        FSLog(@"第一条指令：%@", cmd.data.fsToString());
+    }
+    
     if (_commands.count && ++_cntError <= cmd.sendCnt) { // 发送指令  错误次数没超过
         // 重发
         if (_cntError > 1) {
@@ -246,6 +259,7 @@
             [_module.peripheral writeValue:cmd.data forCharacteristic:cmd.chrt type:CBCharacteristicWriteWithResponse];
         }
         [_sendCmdTimer invalidate];
+        FSLog(@"停止定时器 sendCmdTimer");
         _sendCmdTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
         [[NSRunLoop currentRunLoop] addTimer:_sendCmdTimer forMode:NSRunLoopCommonModes];
     } else if (_commands.count) {
@@ -256,6 +270,7 @@
         [self onFailedSend:cmd];
         if (_cntFail == 3) {
             if (self.deviceDelegate && [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+                FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeAbnormal");
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
                 [self removeFromManager];
             }
@@ -388,15 +403,20 @@
 //    }
     if (self.disconnectType == FSDisconnectTypeNone) {
         if ([self onService]) {
+            // 清楚指令指令队列
+            [self clearSend];
+            [self.deviceDelegate device:self didConnectedWithState:FSConnectStateConnected];
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connectTimeout) object:nil];
+            self.connectState = FSConnectStateConnected;
             [self onConnected];
+            
             if (self.deviceDelegate &&
                 [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
                 if (!self.accidentalReconnect) {
                     [self onConnected];
-                    [self.deviceDelegate device:self didConnectedWithState:FSConnectStateDisconnected];
                 }
             }
+            
         } else {
             // 22.3.29 这句不需要
 //            self.disconnectType = FSDisconnectTypeService;
@@ -409,9 +429,10 @@
     }
 
     if (self.disconnectType != FSDisconnectTypeNone) {
-//        FSLog(@"connect ERROR: %@  code: %d", self.module.name, self.disconnectType);
+        FSLog(@"connect ERROR: %@  code: %d", self.module.name, self.disconnectType);
         if (self.deviceDelegate &&
             [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+            FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeAbnormal，disconnectType=%d", self.disconnectType);
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
             [self removeFromManager];
             // 重新搜索
@@ -443,6 +464,7 @@
 }
 
 - (void)reconnectAction {
+    self.disconnectType = FSDisconnectTypeNone;
     [self performSelector:@selector(connectTimeout) withObject:nil afterDelay:3];
     [_manager.centralManager cancelPeripheralConnection:self.module.peripheral];
     [_manager.centralManager connectPeripheral:self.module.peripheral options:nil];

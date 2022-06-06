@@ -64,7 +64,15 @@ static int afterDelayTime = 3;
              2. 体博会参展的设备，设备状态一直都是3，点击app上的恢复，也是3，速度为0.
              3. 跑客（白色跑步机），从app恢复的状态一直为10.
              */
-            _currentStatus = self.speed.intValue == 0 ? FSDeviceStatePaused : FSDeviceStateRunning;
+            FSLog(@"22.6.2  设置设备的状态为：暂停");
+            if (self.exerciseTime.intValue > 3 &&
+                self.speed.intValue == 0) {
+                _currentStatus = FSDeviceStatePaused;
+            } else {
+                _currentStatus = FSDeviceStateRunning;
+                
+            }
+//            _currentStatus = self.speed.intValue == 0 ? FSDeviceStatePaused : FSDeviceStateRunning;
         }
             break;
         case 4: {
@@ -157,17 +165,27 @@ static int afterDelayTime = 3;
      !!!: 210830 周一早上与AB讨论决定，如果出现 状态为3，速度为0，时间大于0 才是暂停，否则为运行中
      */
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
+    BOOL rst = NO;
+    
+    FSLog(@"状态:%d 速度:%@ 时间:%@", self.currentStatus, self.speed, self.exerciseTime);
+    
     if (self.currentStatus == FSDeviceStatePaused) {
-        return YES;
+        rst = YES;
+//        return YES;
     }
 
     if (self.currentStatus == FSDeviceStateRunning &&
         self.speed.intValue == 0 &&
         self.exerciseTime.intValue > 3) {
-        return YES;
+//        return YES;
+        rst = YES;
     }
+    
+    FSLog(@"是否为暂停 %d 状态:%d 速度:%@ 时间:%@",rst, self.currentStatus, self.speed, self.exerciseTime);
+    
+    
 
-    return NO;
+    return rst;
 }
 
 - (BOOL)isRunning {
@@ -770,13 +788,16 @@ static int afterDelayTime = 3;
 - (void)treadmillReadyTimeOut {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
+    FSLog(@"指令队列   移除所有指令");
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
+    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
     self.heartbeatTmr = nil;
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
         [self removeFromManager];
     }
@@ -940,6 +961,7 @@ static int afterDelayTime = 3;
 - (void)sectionReadyTimeOut {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
+    FSLog(@"指令队列   移除所有指令");
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
@@ -947,6 +969,7 @@ static int afterDelayTime = 3;
     self.heartbeatTmr = nil;
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
     [self disconnect];
@@ -1065,7 +1088,7 @@ static int afterDelayTime = 3;
     Byte subcmd     = bytes[2];
     /* FSSubParamCmd_Speed_Param */
     if (subcmd == 0x02) { // 参数信息
-//        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
+        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
         // 获取阻力、坡度、配置、段数
         int maxResistance    = bytes[3];
         int maxIncline       = bytes[4];
@@ -1168,14 +1191,14 @@ static int afterDelayTime = 3;
         case 2:   // 运行中
         case 3: { // 暂停
             uint spd         = MAKEWORD(bytes[3], bytes[4]);
-            NSString *spdStr = FSFM(@"%d", spd);
+//            NSString *spdStr = FSFM(@"%d", spd);
             uint resistance  = bytes[5];
             uint frequency   = MAKEWORD(bytes[6], bytes[7]);
             uint heartRate   = bytes[8];
             uint watt        = MAKEWORD(bytes[9], bytes[10]);
             uint slope       = bytes[11];
             uint duanshu     = bytes[12];
-            self.speed       = spdStr.fsDiv(@"100").decimalPlace(1);
+            self.speed       = FSFM(@"%d", spd);
             self.resistance  = FSFM(@"%d", resistance);
             self.frequency   = FSFM(@"%d", frequency);
             self.heartRate   = FSFM(@"%d", heartRate);
@@ -1211,14 +1234,14 @@ static int afterDelayTime = 3;
     // MARK:210701 开始肯定不是指令开始&停止
     self.stopWithCmd = NO;
 //    fs_sport.codeCtrlModel.isStartWithCmd = NO;
-    [self clearSend];
+    
 }
 
 - (void)onConnected {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    [self clearSend];
     // 数据重置
     [self dataReset];
-    
     // 获取状态指令
 
     // 判断是不是准备超时
@@ -1273,6 +1296,7 @@ static int afterDelayTime = 3;
     [self sendData:FSGenerateCmdData.sectionReady()];
     [self sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
     [self sendData:FSGenerateCmdData.sectionStart()];
+    FSLog(@"%@  start", NSStringFromClass([self class]));
     return YES;
 }
 
@@ -1740,6 +1764,7 @@ static int afterDelayTime = 3;
         [self.heartbeatTmr invalidate];
         self.heartbeatTmr = nil;
         [self stopSportTimer];
+        FSLog(@"指令队列   移除所有指令");
         [self.commands removeAllObjects];
         [self disconnect];
         // FIXME: 22.3.31 如果是停止发送通知

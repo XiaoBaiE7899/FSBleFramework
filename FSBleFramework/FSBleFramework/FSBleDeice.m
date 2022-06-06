@@ -176,6 +176,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 - (void)onDisconnected {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
+    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
@@ -228,6 +229,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 - (void)sendData:(NSData *)data {
     BleCommand *cmd = [BleCommand make:self.bleWriteChar data:data];
+    
     [self sendCommand:cmd];
 }
 
@@ -380,17 +382,20 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 #pragma mark setter && getter
 - (NSString *)display_speed {
     if (self.module.isTreadmillProtocol) { // 跑步机的速度要除以10
-        return [NSString stringWithFormat:@"%.1f", self.speed.intValue / 10.0];
+//        return [NSString stringWithFormat:@"%.1f", self.speed.intValue / 10.0];
+        return self.speed.fsDiv(@"10").decimalPlace(1);
     }
     
     if (self.module.isSectionProtocol) { // 车表的速度除以100
-        return [NSString stringWithFormat:@"%.1f", self.speed.intValue / 100.0];
+        return self.speed.fsDiv(@"100").decimalPlace(1);
+//        return [NSString stringWithFormat:@"%.1f", self.speed.intValue / 100.0];
     }
     return self.speed;
 }
 
 - (NSString *)displayDistance {
-    return [NSString stringWithFormat:@"%.1f", self.distance.intValue / 1000.0];
+    return self.distance.fsDiv(@"1000").decimalPlace(1);
+//    return [NSString stringWithFormat:@"%.1f", self.distance.intValue / 1000.0];
 }
 
 @end

@@ -186,6 +186,7 @@ static NSMutableDictionary  *manager = nil;
     if (device.reconnect == 3 &&
         device.deviceDelegate &&
         [device.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+        FSLog(@"33.6.2 代理回调断链 FSDisconnectTypeWithoutResponse");
         [device.deviceDelegate device:device didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
 

@@ -30,7 +30,7 @@
 
 @property (nonatomic, strong) BleManager *fsManager;
 
-@property (nonatomic, strong) FSBaseDevice *fsDevice;;
+//@property (nonatomic, strong) FSBaseDevice *fsDevice;
 
 @end
 
@@ -44,12 +44,14 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fsdeviceDidStop:) name:kFitshowHasStoped object:nil];
 //    [self zx];
     [XBContactLib requestAuthorizationAddressBook];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateFitshowData:) name:kUpdateFitshoData object:nil];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    [XBContactLib addressBooks:^(CNAuthorizationStatus status, NSArray * _Nonnull datas) {
-        FSLog(@"5.13  数据回调完成了");
-    }];
+//    [XBContactLib addressBooks:^(CNAuthorizationStatus status, NSArray * _Nonnull datas) {
+//        FSLog(@"5.13  数据回调完成了");
+//    }];
+    [fs_sport.fsDevice connent:self];
 }
 
 - (void)fsdeviceDidStop:(NSNotification *)sender {
@@ -59,11 +61,16 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kFitshowHasStoped object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kUpdateFitshoData object:nil];
 }
 
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+}
+
+- (void)updateFitshowData:(NSNotification *)notify {
+    FSLog(@"暂停测试%d", fs_sport.fsDevice.isPausing);
 }
 
 #pragma mark  按钮点击事件
@@ -74,7 +81,6 @@
     } else {
         FSLog(@"不可以扫描");
     }
-
 }
 
 - (IBAction)stopScan:(UIButton *)sender {
@@ -101,9 +107,9 @@
 
 - (IBAction)contentDevice:(UIButton *)sender {
     [self.fsManager stopScan];
-    if (self.fsDevice) {
+    if (fs_sport.fsDevice) {
         FSLog(@"连接最近的设备");
-        [self.fsDevice connent:self];
+        [fs_sport.fsDevice connent:self];
     }
 }
 
@@ -111,7 +117,7 @@
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
-    if ([self.fsDevice start]) {
+    if ([fs_sport.fsDevice start]) {
         FSLog(@"运动秀的设备可以启动");
     } else {
         FSLog(@"运动秀的设备不能启动");
@@ -120,28 +126,29 @@
 
 - (IBAction)stopDevice:(UIButton *)sender {
     FSLog(@"设备通过指令停止");
-    [self.fsDevice stop];
+//    [self.fsDevice stop];
+    [fs_sport.fsDevice stop];
 }
 
 - (IBAction)controlSpeed:(UIButton *)sender {
-    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+    if (fs_sport.fsDevice.module.sportType == FSSportTypeTreadmill) {
         FSLog(@"控制跑步机速度");
 //        [self.fsDevice targetSpeed:50 incline:self.fsDevice.incline.intValue];
-        self.fsDevice.targetSpeed = @"50";
+        fs_sport.fsDevice.targetSpeed = @"50";
     }
 }
 
 - (IBAction)controlSpeedAndIncline:(UIButton *)sender {
-    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+    if (fs_sport.fsDevice.module.sportType == FSSportTypeTreadmill) {
         FSLog(@"控制跑步机速度与坡度");
-        [self.fsDevice targetSpeed:50 incline:5];
+        [fs_sport.fsDevice targetSpeed:50 incline:5];
     }
 }
 
 - (IBAction)controlIncline:(UIButton *)sender {
-    if (self.fsDevice.module.sportType == FSSportTypeTreadmill) {
+    if (fs_sport.fsDevice.module.sportType == FSSportTypeTreadmill) {
         FSLog(@"控制跑步机  坡度");
-        [self.fsDevice targetSpeed:self.fsDevice.speed.intValue * 10 incline:5];
+        [fs_sport.fsDevice targetSpeed:fs_sport.fsDevice.speed.intValue * 10 incline:5];
     }
 }
 
@@ -167,10 +174,10 @@
     if (!_scanedCtl) {
         _scanedCtl = (ScanedDevicesCtrl *)[self storyboardWithName:@"Main" storyboardID:NSStringFromClass([ScanedDevicesCtrl class])];
 //        __weak typeof(self) weakSelf = self;
-        weakObj(self);
+//        weakObj(self);
         _scanedCtl.selectDevice = ^(FSBaseDevice * _Nonnull device) {
             FSLog(@"选中的设备%@", device.module.name);
-            weakself.fsDevice = device;
+            fs_sport.fsDevice = device;
 //            [device connent:weakself];
         };
     }
@@ -205,11 +212,15 @@
 
 - (void)manager:(BleManager *)manager didDiscoverDevice:(BleDevice *)device {
     FSLog(@"^^^^22.3.24...设备已经找到%@", device.module.name);
-    if ([device isKindOfClass:[FSBaseDevice class]]) {
-        FSLog(@"是运动秀的设备**");
-        FSLog(@"最近的设备是%@", device.module.name);
-    } else {
-        FSLog(@"不是运动秀的设备*****");
+//    if ([device isKindOfClass:[FSBaseDevice class]]) {
+//        FSLog(@"是运动秀的设备**");
+//        FSLog(@"最近的设备是%@", device.module.name);
+//    } else {
+//        FSLog(@"不是运动秀的设备*****");
+//    }
+    if ([device.module.name isEqualToString:@"K850D-B-428"]) {
+        FSLog(@"22.6.2  调试设备");
+        fs_sport.fsDevice = (FSBaseDevice *)device;
     }
 }
 
@@ -233,6 +244,11 @@
             break;
         case FSConnectStateWorking: {
             FSLog(@"22.4.1 FSConnectStateWorking");
+            if ([fs_sport.fsDevice start]) {
+                FSLog(@"运动秀的设备可以启动");
+            } else {
+                FSLog(@"运动秀的设备不能启动");
+            }
         }
             
         default:
