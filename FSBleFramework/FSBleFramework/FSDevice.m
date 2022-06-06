@@ -1015,10 +1015,12 @@ static int afterDelayTime = 3;
                 } else {
                     distance = MAKEWORD(bytes[5], bytes[6]);
                 }
+                self.distance = FSFM(@"%d", distance);
                 // MARK: 210713 针对金亚太程序烧入错误做适配
                 if (self.module.deviceID.integerValue == 544344117) {
 //                    [device setValue:device.distance.div(mileToKm) forKey:sportDistance];
-                    self.distance = [NSString stringWithFormat:@"%.0f", distance / 1.60934];
+//                    self.distance = [NSString stringWithFormat:@"%.0f", distance / 1.60934];
+                    self.distance = self.distance.fsDiv(@"1.60934");
                 }
                 self.counts = FSFM(@"%d", counts);
                 self.exerciseTime = FSFM(@"%d", runtime);

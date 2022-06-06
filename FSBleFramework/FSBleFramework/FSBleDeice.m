@@ -168,6 +168,8 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     }
 
     if (self.bleNotifyChar && self.bleWriteChar) {
+        // 22.6.6 添加 全局运动类的设备赋值
+        fs_sport.fsDevice = self;
         return YES;
     }
 

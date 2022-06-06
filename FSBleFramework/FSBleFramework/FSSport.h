@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic,   copy) NSString     *hostUrl;
 
-@property (nonatomic, strong) FSBaseDevice *fsDevice;
+@property (nonatomic, strong) FSBaseDevice *_Nullable fsDevice;
 
 // 初始化方法
 + (instancetype)currentWithHostURL:(NSString *)url;
