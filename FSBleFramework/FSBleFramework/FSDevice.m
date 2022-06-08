@@ -495,7 +495,9 @@ static int afterDelayTime = 3;
             self.exerciseTime = FSFM(@"%d", _time);
             self.distance     = FSFM(@"%d", _distance);
             self.speed        = FSFM(@"%d", _speed);
-            self.calory       = FSFM(@"%d", _calory);
+            NSString *cal     = FSFM(@"%d", _calory);
+            self.calory       = cal.fsDiv(@"10");
+//            self.calory       = FSFM(@"%d", _calory);
             self.steps        = FSFM(@"%d", _steps);
             self.heartRate    = FSFM(@"%d", _heartrate);
             self.paragraph    = FSFM(@"%d", _paragraph);
@@ -924,7 +926,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetLevel:(NSString *)targetLevel {
-//    FSLog(@"目标阻力");
+    FSLog(@"目标阻力 %@", targetLevel);
     // 当前坡度
     int cur_inl = self.incline.intValue;
     [self setTargetLevl:targetLevel.intValue incline:cur_inl];
@@ -1107,7 +1109,7 @@ static int afterDelayTime = 3;
             maxIncline    = (256 - maxIncline)   * -1;
         }
         self.deviceParam.maxLevel = FSFM(@"%d", maxResistance);
-        self.deviceParam.maxLevel = FSFM(@"%d", maxIncline);
+        self.deviceParam.maxIncline = FSFM(@"%d", maxIncline);
         // MARK: 20210419 金亚太  因为模块烧入错误，这里做兼容，类型是车，测试模块名字FS-1B39B3， deviceid:544344117  厂商码：114 机型码：2101. 如果获取配置信息是公制单位，应该变成英制单位，逻辑：1 配置信息上报的单位是公制单位，2 deviceid==544344117
         if (self.module.deviceID.integerValue == 544344117 && !unit) {
             self.deviceParam.imperial = 1;
@@ -1307,6 +1309,53 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
 //    self.stopWithCmd = YES;
     [self sendData:FSGenerateCmdData.sectionStop()];
+}
+
+- (void)setTargetLevl:(int)t_level incline:(int)t_incline {
+//    FSLog(@"发送车表控制指令");
+    /*
+     同时控制阻力、坡度
+     1 直接返回
+       不是车表协议，
+       阻力&坡度都不能控制，
+       阻力、坡度等于目标阻力、目标坡度
+       阻力不可控，坡度等于目标坡度
+       坡度不可空，阻力等于目标阻力
+     2 过滤速度、坡度的上下限
+     3 跑步机的速度可以控制，坡度不一定可以控制
+       3.1 如果跑步的坡度不可控制，速度等于目标速度，直接返回， 否则发送执行后返回
+     4 速度、坡度都是可以控制，发送指令
+     */
+    if (!self.module.isSectionProtocol) return;
+    
+    if (!self.deviceParam.supportLevel &&
+        !self.deviceParam.supportIncline) return;
+    
+    if (self.resistance.intValue == t_level &&
+        self.incline.intValue == t_incline) return;
+    
+    if (!self.deviceParam.supportLevel &&
+        self.incline.intValue == t_incline) return;
+    
+    if (!self.deviceParam.supportIncline &&
+        self.resistance.intValue == t_level) return;
+
+    int targetLevel = 0;
+    int targetIncline = 0;
+    FSLog(@"最大阻力 %@", self.deviceParam.maxLevel);
+    targetLevel = [self paramRangeOfMax:self.deviceParam.maxLevel.intValue min:self.deviceParam.minLevel.intValue compare:t_level];
+    targetIncline = [self paramRangeOfMax:self.deviceParam.maxIncline.intValue min:0 compare:t_incline];
+    FSLog(@"发送车表控制指令  阻力%d  坡度:%d", targetLevel, targetIncline);
+    [self sendData:FSGenerateCmdData.sectionControlParam(targetLevel, targetIncline)];
+    
+//    if (self.deviceParam.supportLevel) {
+//        [self performSelector:@selector(levelIsControllable) withObject:nil afterDelay:afterDelayTime];
+//        return;
+//    }
+
+//    if (self.deviceParam.supportIncline) {
+//        [self performSelector:@selector(inclineIsControllable) withObject:nil afterDelay:afterDelayTime];
+//    }
 }
 
 // 失控处理

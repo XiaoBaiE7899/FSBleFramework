@@ -155,6 +155,11 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (IBAction)controlLevel:(UIButton *)sender {
+    if (fs_sport.fsDevice.module.isSectionProtocol &&
+        fs_sport.fsDevice.isRunning) {
+        FSLog(@"控制阻力");
+        fs_sport.fsDevice.targetLevel = @"6";
+    }
 }
 
 - (IBAction)restore:(UIButton *)sender {

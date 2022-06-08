@@ -172,7 +172,7 @@
     BOOL rst = NO;
     for (CBUUID *obj in self.discover) {
         if ([obj.UUIDString isEqualToString:FITSHOW_UUID]) {
-            FSLog(@"包含运动秀的UUID  %@", obj.UUIDString);
+//            FSLog(@"包含运动秀的UUID  %@", obj.UUIDString);
             return YES;
         }
     }
