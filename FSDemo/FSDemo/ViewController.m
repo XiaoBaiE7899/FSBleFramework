@@ -14,6 +14,8 @@
 //#import <Contacts/Contacts.h>
 #import "XBContactLib.h"
 
+static NSString *dev_device = @"FS-12345";
+
 
 
 @interface ViewController () <FSCentralDelegate, BleDeviceDelegate>
@@ -218,8 +220,8 @@
 //    } else {
 //        FSLog(@"不是运动秀的设备*****");
 //    }
-    if ([device.module.name isEqualToString:@"K850D-B-428"]) {
-        FSLog(@"22.6.2  调试设备");
+    if ([device.module.name isEqualToString:dev_device]) {
+        FSLog(@"22.6.8 调试设备");
         fs_sport.fsDevice = (FSBaseDevice *)device;
     }
 }

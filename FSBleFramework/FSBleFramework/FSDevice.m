@@ -290,7 +290,7 @@ static int afterDelayTime = 3;
         }
             break;
         case 0x51: { /* FSMainCmdTreadmillStatus */
-            FSLog(@"跑步机 上报  心跳 信息");
+//            FSLog(@"跑步机 上报  心跳 信息");
             // 这个独立一个方法处理
             [self updateDeviceStatusAndData:cmd];
         }
@@ -478,11 +478,11 @@ static int afterDelayTime = 3;
 //            self.incline = FSFM(@"%d", _incline);
             // 坡度是有符号的  // MARK: 210430  坡度有-1 MD
             self.incline      = FSFM(@"%d", _incline > 127 ? (256 - _incline) * -1 : _incline);
-            FSLog(@"treadmill数据: 时间%@  距离%@  速度%@  卡路里%@  步数%@ 心率%@ 坡度%@", self.exerciseTime, self.distance, self.speed, self.calory, self.steps, self.heartRate, self.incline);
+            FSLog(@"跑步机上报数据 03: 时间%@  距离%@  速度%@  卡路里%@  步数%@ 心率%@ 坡度%@", self.exerciseTime, self.distance, self.speed, self.calory, self.steps, self.heartRate, self.incline);
         }
             break;
             // FSDeviceStateTreadmillStopping 减速度停止中
-        case 4: {
+        case 4: { // 黑色跑步机 结束的有问题，距离会为0，统计的要增加判断
             int _speed        = bytes[3];
             int _incline      = bytes[4];
             int _time         = MAKEWORD(bytes[5], bytes[6]);
@@ -501,7 +501,7 @@ static int afterDelayTime = 3;
             self.paragraph    = FSFM(@"%d", _paragraph);
             // 坡度是有符号的  // MARK: 210430  坡度有-1 MD
             self.incline      = FSFM(@"%d", _incline > 127 ? (256 - _incline) * -1 : _incline);
-            FSLog(@"treadmill数据: 时间%@  距离%@  速度%@  卡路里%@  步数%@ 心率%@ 坡度%@", self.exerciseTime, self.distance, self.speed, self.calory, self.steps, self.heartRate, self.incline);
+            FSLog(@"跑步机上报数据 04: 时间%@  距离%@  速度%@  卡路里%@  步数%@ 心率%@ 坡度%@", self.exerciseTime, self.distance, self.speed, self.calory, self.steps, self.heartRate, self.incline);
         }
             break;
             // FSDeviceStateError 设备故障
@@ -1025,7 +1025,7 @@ static int afterDelayTime = 3;
                 self.counts = FSFM(@"%d", counts);
                 self.exerciseTime = FSFM(@"%d", runtime);
                 self.calory = calStr.fsDiv(@"10").decimalPlace(1);
-                FSLog(@"车表22.3.31  数据43： 时间%@  距离%@  卡路里%@  次数%@", self.exerciseTime, self.distance, self.calory, self.counts);
+                FSLog(@"车表数据数据上报43： 时间%@  距离%@  卡路里%@  次数%@", self.exerciseTime, self.distance, self.calory, self.counts);
             } else if (subcmd == 0x02) { // 这条指令没发送，不需要做解析
                 // 获取用户信息
             
@@ -1207,7 +1207,7 @@ static int afterDelayTime = 3;
             self.watt        = FSFM(@"%d", watt);
             self.incline     = FSFM(@"%d", slope);
             self.paragraph   = FSFM(@"%d", duanshu);
-            FSLog(@"车表22.3.31  数据42： 速度%@  阻力%@  频率%@  心率%@ 功率%@  坡度%@  段数%@", self.speed, self.resistance, self.frequency, self.heartRate, self.watt, self.incline, self.paragraph);
+            FSLog(@"车表数据数据上报42： 速度%@  阻力%@  频率%@  心率%@ 功率%@  坡度%@  段数%@", self.speed, self.resistance, self.frequency, self.heartRate, self.watt, self.incline, self.paragraph);
         }
             break;
         case 20:

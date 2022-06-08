@@ -76,7 +76,7 @@
     self.incline.text = device.incline;
     self.level.text = device.resistance;
     self.time.text = device.exerciseTime;
-    self.distance.text = device.distance;
+    self.distance.text = device.displayDistance;
     self.calory.text = device.calory;
     self.steps.text = device.steps;
     self.counts.text = device.counts;
@@ -97,7 +97,7 @@
     self.isPaused.text = device.isPausing ? @"是" : @"否";
     self.isStoped.text = device.hasStoped ? @"是" : @"否";
     self.supportControl.text = device.deviceParam.supportControl ? @"是" : @"否";
-}
+} 
 
 // 设备停止
 - (void)deviceStoped:(NSNotification *)notify {

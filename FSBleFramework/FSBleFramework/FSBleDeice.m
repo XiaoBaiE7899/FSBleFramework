@@ -396,7 +396,8 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (NSString *)displayDistance {
-    return self.distance.fsDiv(@"1000").decimalPlace(1);
+    // 22.6.8  距离保留2位小数
+    return self.distance.fsDiv(@"1000").decimalPlace(2);
 //    return [NSString stringWithFormat:@"%.1f", self.distance.intValue / 1000.0];
 }
 
