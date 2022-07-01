@@ -9,6 +9,7 @@
 #import "ScanedDevicesCtrl.h"
 #import "DisplayDataCtrl.h"
 #import <FSBleFramework/FSBleFramework.h>
+#import "HealthAppManager.h"
 
 //#import <AddressBook/AddressBook.h>
 //#import <Contacts/Contacts.h>
@@ -22,17 +23,17 @@ static NSString *dev_device = @"FS-12345";
 
 
 // 设备的默认图片
-@property (weak, nonatomic) IBOutlet UIImageView *deviceImg;
+@property (weak,   nonatomic) IBOutlet UIImageView *deviceImg;
 // 模块名称
-@property (weak, nonatomic) IBOutlet UILabel *moduleName;
+@property (weak,   nonatomic) IBOutlet UILabel     *moduleName;
 // 已扫描到的设备
-@property (nonatomic, strong) ScanedDevicesCtrl *scanedCtl;
+@property (nonatomic, strong) ScanedDevicesCtrl    *scanedCtl;
 // 展示数据的控制器
-@property (nonatomic, strong) DisplayDataCtrl   *datasCtrl;
+@property (nonatomic, strong) DisplayDataCtrl      *datasCtrl;
 
-@property (nonatomic, strong) BleManager *fsManager;
+@property (nonatomic, strong) BleManager           *fsManager;
 
-//@property (nonatomic, strong) FSBaseDevice *fsDevice;
+@property (nonatomic, strong) HealthAppManager     *healthManager;
 
 @end
 
@@ -47,6 +48,10 @@ static NSString *dev_device = @"FS-12345";
 //    [self zx];
     [XBContactLib requestAuthorizationAddressBook];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateFitshowData:) name:kUpdateFitshoData object:nil];
+    self.healthManager = [HealthAppManager shareInstance];
+    
+    // 设备失控制
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(withoutControl:) name:kCmdUncontrolled object:nil];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -64,6 +69,7 @@ static NSString *dev_device = @"FS-12345";
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kFitshowHasStoped object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kUpdateFitshoData object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kCmdUncontrolled object:nil];
 }
 
 
@@ -75,7 +81,41 @@ static NSString *dev_device = @"FS-12345";
     FSLog(@"暂停测试%d", fs_sport.fsDevice.isPausing);
 }
 
+- (void)withoutControl:(NSNotification *)notify {
+    FSLog(@"22.7.1  设备失去控制了");
+}
+
 #pragma mark  按钮点击事件
+
+- (IBAction)openSettings:(UIButton *)sender {
+    FSLog(@"跳转到设置");
+//    NSURL *url = [NSURL URLWithString:UIApplicationOpenSettingsURLString];
+//    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    // 判断是否授权
+//    HKQuantityType *stepCount = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+//    HKAuthorizationStatus status = [self.healthManager.healthStore authorizationStatusForType:stepCount];
+//    FSLog(@"22.6.22 是否授权%d", status);
+    // 这个跳转才是对的
+    
+    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:@"x-apple-health://app/"] options:@{} completionHandler:^(BOOL success) {
+                    }];
+    
+}
+
+- (IBAction)visitHealth:(UIButton *)sender {
+    FSLog(@"访问健康");
+    [self.healthManager authorizeHealthKit:^(BOOL success, NSError * _Nonnull error) {
+
+    }];
+    
+    // 测试
+//    [HealthAppManager weekBegin];
+//    NSDate *d1 = [HealthAppManager dayBegin];
+//    NSDate *d2 = [HealthAppManager weekBegin];
+//    NSDate *d3 = [HealthAppManager monthBegin];
+//    FSLog(@"今天 %f, 周: %f  月:%f", d1.timeIntervalSince1970, d2.timeIntervalSince1970, d3.timeIntervalSince1970);
+    
+}
 
 - (IBAction)blescanDevice:(UIButton *)sender {
     if ([self.fsManager startScan]) {

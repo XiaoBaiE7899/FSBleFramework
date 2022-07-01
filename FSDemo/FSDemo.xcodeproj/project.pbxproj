@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B23C3772862F7970093F104 /* HealthAppManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B23C3762862F7970093F104 /* HealthAppManager.m */; };
+		2B23C37A286300040093F104 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B23C379286300040093F104 /* HealthKit.framework */; };
 		2B569ADA282DEB7400483F6C /* XBContactLib.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B569AD9282DEB7400483F6C /* XBContactLib.m */; };
 		2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */; };
 		7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B348EB027EAFC3C00030216 /* FSExpand.framework */; };
@@ -41,6 +43,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2B23C3752862F7970093F104 /* HealthAppManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HealthAppManager.h; sourceTree = "<group>"; };
+		2B23C3762862F7970093F104 /* HealthAppManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HealthAppManager.m; sourceTree = "<group>"; };
+		2B23C378286300040093F104 /* FSDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FSDemo.entitlements; sourceTree = "<group>"; };
+		2B23C379286300040093F104 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		2B569AD8282DEB7400483F6C /* XBContactLib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XBContactLib.h; sourceTree = "<group>"; };
 		2B569AD9282DEB7400483F6C /* XBContactLib.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = XBContactLib.m; sourceTree = "<group>"; };
 		2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FSBleFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2B23C37A286300040093F104 /* HealthKit.framework in Frameworks */,
 				2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */,
 				7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */,
 			);
@@ -119,6 +126,7 @@
 		7BB5B3AA261EB2D3007752D9 /* FSDemo */ = {
 			isa = PBXGroup;
 			children = (
+				2B23C378286300040093F104 /* FSDemo.entitlements */,
 				7B348EB027EAFC3C00030216 /* FSExpand.framework */,
 				7BB5B428261EB567007752D9 /* FSDeiveceDefImg.bundle */,
 				7BB5B3AB261EB2D3007752D9 /* AppDelegate.h */,
@@ -129,6 +137,8 @@
 				7BB5B432261EB585007752D9 /* ScanedDevicesCtrl.m */,
 				7BB5B435261EB585007752D9 /* ViewController.h */,
 				7BB5B434261EB585007752D9 /* ViewController.m */,
+				2B23C3752862F7970093F104 /* HealthAppManager.h */,
+				2B23C3762862F7970093F104 /* HealthAppManager.m */,
 				7BB5B3B4261EB2D3007752D9 /* Main.storyboard */,
 				7BB5B3B7261EB2D6007752D9 /* Assets.xcassets */,
 				7BB5B3B9261EB2D6007752D9 /* LaunchScreen.storyboard */,
@@ -161,6 +171,7 @@
 		7BE3752C262986DD00BC00DB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2B23C379286300040093F104 /* HealthKit.framework */,
 				2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */,
 			);
 			name = Frameworks;
@@ -300,6 +311,7 @@
 				7BB5B437261EB585007752D9 /* DisplayDataCtrl.m in Sources */,
 				7BB5B3AD261EB2D3007752D9 /* AppDelegate.m in Sources */,
 				7BB5B3BE261EB2D6007752D9 /* main.m in Sources */,
+				2B23C3772862F7970093F104 /* HealthAppManager.m in Sources */,
 				2B569ADA282DEB7400483F6C /* XBContactLib.m in Sources */,
 				7BB5B438261EB585007752D9 /* ViewController.m in Sources */,
 			);
@@ -482,6 +494,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CODE_SIGN_ENTITLEMENTS = FSDemo/FSDemo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F6USD8625R;
@@ -512,6 +525,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
+				CODE_SIGN_ENTITLEMENTS = FSDemo/FSDemo.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F6USD8625R;

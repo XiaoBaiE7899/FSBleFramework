@@ -1348,37 +1348,37 @@ static int afterDelayTime = 3;
     FSLog(@"发送车表控制指令  阻力%d  坡度:%d", targetLevel, targetIncline);
     [self sendData:FSGenerateCmdData.sectionControlParam(targetLevel, targetIncline)];
     
-//    if (self.deviceParam.supportLevel) {
-//        [self performSelector:@selector(levelIsControllable) withObject:nil afterDelay:afterDelayTime];
-//        return;
-//    }
+    if (self.deviceParam.supportLevel) {
+        [self performSelector:@selector(levelIsControllable) withObject:nil afterDelay:afterDelayTime];
+        return;
+    }
 
-//    if (self.deviceParam.supportIncline) {
-//        [self performSelector:@selector(inclineIsControllable) withObject:nil afterDelay:afterDelayTime];
-//    }
+    if (self.deviceParam.supportIncline) {
+        [self performSelector:@selector(inclineIsControllable) withObject:nil afterDelay:afterDelayTime];
+    }
 }
 
 // 失控处理
-//- (void)speedIsControllable {
-//    if (self.speedArr.count == 0) { // 失控
-//        self.discontrolType = FSDiscontrolTypeSpeed;
-//        [[NSNotificationCenter defaultCenter] postNotificationName:kCmdUncontrolled object:self];
-//    }
-//}
+- (void)levelIsControllable {
+    if (self.resistanceArr.count == 0) { // 阻力失控
+        self.discontrolType = FSDiscontrolTypeResistance;
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCmdUncontrolled object:self];
+    }
+}
 
 // 坡度是否可以控制
-//- (void)inclineIsControllable {
-//    if (self.inclineArr.count == 0) { // 失控
-//        self.discontrolType = FSDiscontrolTypeIncline;
-//        [[NSNotificationCenter defaultCenter] postNotificationName:kCmdUncontrolled object:self];
-//    }
-//}
+- (void)inclineIsControllable {
+    if (self.inclineArr.count == 0) { // 失控
+        self.discontrolType = FSDiscontrolTypeIncline;
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCmdUncontrolled object:self];
+    }
+}
 
-//- (void)cancelDelayControllable {
-//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(canStopEnable) object:nil];
-//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(inclineIsControllable) object:nil];
-//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(speedIsControllable) object:nil];
-//}
+- (void)cancelDelayControllable {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(canStopEnable) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(inclineIsControllable) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(levelIsControllable) object:nil];
+}
 
 
 
