@@ -401,6 +401,14 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 //    return [NSString stringWithFormat:@"%.1f", self.distance.intValue / 1000.0];
 }
 
+- (NSString *)calculateDist {
+    if (self.deviceParam.imperial) { // 英制单位
+        return self.distance.fsMul(@"1.60934").decimalPlace(0);
+    }
+    // 公制单位
+    return self.distance;
+}
+
 @end
 
 

@@ -32,6 +32,8 @@
 
 - (void)connent:(id<BleDeviceDelegate>)delegate {
     FSLog(@"外设调用连接");
+    // 已经开始连接，就停止扫描
+    [self.manager stopScan];
     // FIXME: 甩脂机需要重写设置
     if (self.module.sportType == FSSportTypeSlimming) {
         // MARK: 甩脂机需要从后台获取电机模式才能连接，不然连接无效，速度无法调整

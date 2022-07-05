@@ -43,6 +43,10 @@ static int afterDelayTime = 3;
     
     // 跑步机状态
     switch (currentStatus) {
+        case -1: {
+            _currentStatus = FSDeviceStateDefault;
+        }
+            break;
         case 0: {
             _currentStatus  = FSDeviceStateNormal;
         }
@@ -391,10 +395,12 @@ static int afterDelayTime = 3;
     Byte *bytes        = (Byte *)[cmd.data bytes];
     Byte subcmd        = bytes[2];
     self.oldStatus     = self.currentStatus;
+    FSLog(@"22.7.5模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // !!!: 22.4.1 回调蓝牙正常工作  写在setter方法中
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
-    // 收到状态上报  回调蓝牙正常
     FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    // 收到状态上报  回调蓝牙正常
+    
     if (self.oldStatus != self.currentStatus &&
         /*self.currentStatus != FSDeviceStateDefault &&*/
         self.deviceDelegate &&
@@ -836,13 +842,24 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 车表机状态
     switch (currentStatus) {
-        case 0:_currentStatus  = FSDeviceStateNormal;
+        case -1:{
+            _currentStatus = FSDeviceStateDefault;
+        }
+        case 0: {
+            _currentStatus  = FSDeviceStateNormal;
+        }
             break;
-        case 1: _currentStatus = FSDeviceStateStarting;
+        case 1: {
+            _currentStatus = FSDeviceStateStarting;
+        }
             break;
-        case 2: _currentStatus = FSDeviceStateRunning;
+        case 2: {
+            _currentStatus = FSDeviceStateRunning;
+        }
             break;
-        case 3: _currentStatus = FSDeviceStatePaused;
+        case 3: {
+            _currentStatus = FSDeviceStatePaused;
+        }
             break;
         case 20:
         case 32: { // 睡眠  有2个，防呆不防傻
@@ -1368,7 +1385,7 @@ static int afterDelayTime = 3;
 
 // 坡度是否可以控制
 - (void)inclineIsControllable {
-    if (self.inclineArr.count == 0) { // 失控
+    if (self.inclineArr.count == 0) { // 坡度失控
         self.discontrolType = FSDiscontrolTypeIncline;
         [[NSNotificationCenter defaultCenter] postNotificationName:kCmdUncontrolled object:self];
     }
@@ -1421,6 +1438,10 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     switch (currentStatus) {
+        case -1: {
+            _currentStatus = FSDeviceStateDefault;
+        }
+            break;
         case 0: {
             _currentStatus = FSDeviceStateNormal;
         }
@@ -1758,15 +1779,38 @@ static int afterDelayTime = 3;
 #pragma mark 重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
-    if (currentStatus == 1) {
-        _currentStatus = FSDeviceStateRunning;
+    // 22.7.5  重构方法
+    switch (currentStatus) {
+        case -1: {
+            _currentStatus = FSDeviceStateDefault;
+        }
+            
+            break;
+        case 1: {
+            _currentStatus = FSDeviceStateRunning;
+        }
+            break;
+            
+        default: {
+            _currentStatus = currentStatus;
+            // 回调蓝牙正在工作中
+            if (self.connectState != FSConnectStateWorking) {
+                self.connectState = FSConnectStateWorking;
+                [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
+            }
+        }
+            break;
     }
-    _currentStatus = currentStatus;
-    // 回调蓝牙正在工作中
-    if (self.connectState != FSConnectStateWorking) {
-        self.connectState = FSConnectStateWorking;
-        [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
-    }
+    
+//    if (currentStatus == 1) {
+//        _currentStatus = FSDeviceStateRunning;
+//    }
+//    _currentStatus = currentStatus;
+//    // 回调蓝牙正在工作中
+//    if (self.connectState != FSConnectStateWorking) {
+//        self.connectState = FSConnectStateWorking;
+//        [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
+//    }
     
 }
 
@@ -2000,6 +2044,7 @@ static int afterDelayTime = 3;
 #pragma mark 重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
+    // FIXME: 22.7.5 XB  力量训练这个方法需要重构，因为设备还没有出货，暂时不做处理
     _currentStatus = currentStatus;
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {

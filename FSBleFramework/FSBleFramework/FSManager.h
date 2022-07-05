@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 查找已绑定的设备
 - (FSBaseDevice *)didbindedDevice:(NSString *)localName;
 
+
 @end
 
 NS_ASSUME_NONNULL_END

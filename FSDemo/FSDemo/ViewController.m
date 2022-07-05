@@ -151,6 +151,7 @@ static NSString *dev_device = @"FS-12345";
     [self.fsManager stopScan];
     if (fs_sport.fsDevice) {
         FSLog(@"连接最近的设备");
+        FSLog(@"22.7.5 :: %d", fs_sport.fsDevice.currentStatus);
         [fs_sport.fsDevice connent:self];
     }
 }
@@ -258,7 +259,7 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (void)manager:(BleManager *)manager didDiscoverDevice:(BleDevice *)device {
-    FSLog(@"^^^^22.3.24...设备已经找到%@", device.module.name);
+    FSLog(@"^^^^22.7.5...设备已经找到%@  状态%d", device.module.name, device.currentStatus);
 //    if ([device isKindOfClass:[FSBaseDevice class]]) {
 //        FSLog(@"是运动秀的设备**");
 //        FSLog(@"最近的设备是%@", device.module.name);

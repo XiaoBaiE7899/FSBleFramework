@@ -92,8 +92,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,   copy) NSString      *frequency;
 @property (nonatomic,   copy) NSString      *countdownSeconds;
 @property (nonatomic,   copy) NSString      *watt;
-@property (nonatomic,   copy) NSString      *distance;  // 米
+@property (nonatomic,   copy) NSString      *distance;  // 设备上报的数据
 @property (nonatomic,   copy) NSString      *displayDistance; // 千米 或 英里
+@property (nonatomic,   copy) NSString      *calculateDist;   // 计算距离，内部同步转换成米计算
 @property (nonatomic,   copy) NSString      *calory;    //
 @property (nonatomic,   copy) NSString      *steps;     // 步数
 @property (nonatomic,   copy) NSString      *counts;    // 次数
