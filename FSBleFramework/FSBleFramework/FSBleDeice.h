@@ -105,6 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,   copy) NSString      *targetIncline; // 目标坡度
 @property (nonatomic,   copy) NSString      *targetLevel;   // 目标阻力
 
+@property (nonatomic, assign) BOOL           stopWithCmd; // 是否通过指令停止 22.7.5 添加
 
 @property (nonatomic, assign) FSDiscontrolType discontrolType; // 失控类型
 

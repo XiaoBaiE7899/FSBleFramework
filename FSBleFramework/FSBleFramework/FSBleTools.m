@@ -39,7 +39,7 @@
     // 先判断文件上是否存在，如果文件存在，在去便利，如果文件
     NSString *path = [NSString deviceInfoFilePath];
     if (kFSIsEmptyString(path)) {
-        FSLog(@"设备信息的plist文件不存在，直接返回");
+        // MARK: 设备信息的plist文件不存在，直接返回
         return nil;
     }
     // 能走到这里，说明文件已经存在，直接读取就可以

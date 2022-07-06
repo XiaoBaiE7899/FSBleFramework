@@ -21,7 +21,6 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 - (instancetype)init {
     if (self = [super init]) {
-//        FSLog(@"设备参数初始化");
         self.imperial       = NO;
         self.maxSpeed       = @"0";
         self.minSpeed       = @"0";
@@ -66,7 +65,6 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-//    FSLog(@"没定义的key");
 }
 
 - (FSParams *)paramModel {
@@ -178,7 +176,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 
 - (void)onDisconnected {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
-    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
+//    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
@@ -222,11 +220,9 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (void)updateState:(NSTimer *__nullable)sender {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)updateDeviceParams {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
 }
 
 - (void)sendData:(NSData *)data {
@@ -328,7 +324,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
         @"model" : self.module.machineCode,
         @"type" : type
     };
-    FSLog(@"请求地址%@ 参数 %@  ", fs_sport.hostUrl, dic);
+//    FSLog(@"请求地址%@ 参数 %@  ", fs_sport.hostUrl, dic);
     //
     
 //    NSString *urlString = @"https://api.fitshow.com/api/device/getdeviceinfo/";
@@ -342,10 +338,10 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([self.module.name isEqualToString:@"FS-123456"]) {
-                FSLog(@"获取数据 类型%d  厂商%@  机型%@", self.module.sportType, self.module.factory, self.module.model);
+//            if ([self.module.name isEqualToString:@"FS-123456"]) {
+//                FSLog(@"获取数据 类型%d  厂商%@  机型%@", self.module.sportType, self.module.factory, self.module.model);
                 
-            }
+//            }
             // 回调数据
             if (data) {
                 NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -369,7 +365,7 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
             }
             
             if (error) {
-                FSLog(@"获取设备信息失败，%@", error);
+//                FSLog(@"获取设备信息失败，%@", error);
             }
             
         });

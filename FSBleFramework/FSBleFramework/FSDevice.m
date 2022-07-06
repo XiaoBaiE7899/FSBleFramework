@@ -20,7 +20,7 @@ static int afterDelayTime = 3;
 @property (nonatomic, strong) NSMutableArray *inclineArr;
 
 // 指令停止
-@property (nonatomic, assign) BOOL           stopWithCmd;
+//@property (nonatomic, assign) BOOL           stopWithCmd;
 
 @end
 
@@ -68,7 +68,7 @@ static int afterDelayTime = 3;
              2. 体博会参展的设备，设备状态一直都是3，点击app上的恢复，也是3，速度为0.
              3. 跑客（白色跑步机），从app恢复的状态一直为10.
              */
-            FSLog(@"22.6.2  设置设备的状态为：暂停");
+//            FSLog(@"22.6.2  设置设备的状态为：暂停");
             if (self.exerciseTime.intValue > 3 &&
                 self.speed.intValue == 0) {
                 _currentStatus = FSDeviceStatePaused;
@@ -171,7 +171,7 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     BOOL rst = NO;
     
-    FSLog(@"状态:%d 速度:%@ 时间:%@", self.currentStatus, self.speed, self.exerciseTime);
+//    FSLog(@"状态:%d 速度:%@ 时间:%@", self.currentStatus, self.speed, self.exerciseTime);
     
     if (self.currentStatus == FSDeviceStatePaused) {
         rst = YES;
@@ -185,7 +185,16 @@ static int afterDelayTime = 3;
         rst = YES;
     }
     
-    FSLog(@"是否为暂停 %d 状态:%d 速度:%@ 时间:%@",rst, self.currentStatus, self.speed, self.exerciseTime);
+    // 22.7.5 如果是通过指令停止的，永远都不会进入暂停状态
+//    if (self.stopWithCmd) {
+//        rst = NO;
+//    }
+//    FSLog(@"是否为暂停 %d 状态:%d 速度:%@ 时间:%@",rst, self.currentStatus, self.speed, self.exerciseTime);
+//    if (rst && self.stopWithCmd) {
+//        FSLog(@"22.7.5 跑步机  第二次发送停止指令");
+//        [self stop];
+//        return NO;
+//    }
     
     
 
@@ -226,12 +235,12 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetLevel:(NSString *)targetLevel {
-    FSLog(@"目标阻力");
+//    FSLog(@"目标阻力");
     _targetLevel = targetLevel;
 }
 
 - (void)setTargetSpeed:(NSString *)targetSpeed {
-    FSLog(@"目标速度");
+//    FSLog(@"目标速度");
     _targetSpeed = targetSpeed;
     // 当前坡度
     int cur_inl = self.incline.intValue;
@@ -239,7 +248,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetIncline:(NSString *)targetIncline {
-    FSLog(@"目标坡度");
+//    FSLog(@"目标坡度");
     // 当前速度
     int cur_spd = self.speed.intValue;
     [self targetSpeed:cur_spd incline:targetIncline.intValue];
@@ -276,7 +285,7 @@ static int afterDelayTime = 3;
                 self.module.model        = FSFM(@"%d", models);
             } else if (subcmd == 2) { /* FSSubParamCmd_Speed_Param */
                 // 02 速度信息
-                FSLog(@"22.3.29跑步机 上报  速度 信息");
+//                FSLog(@"22.3.29跑步机 上报  速度 信息");
                 unsigned int maxSpeed         = bytes[3];
                 unsigned int minSpeed         = bytes[4];
                 unsigned int control          = maxSpeed - minSpeed;
@@ -285,7 +294,7 @@ static int afterDelayTime = 3;
                 self.deviceParam.supportSpeed = control > 0 ? YES : NO;
                 self.speedObtainSuccess = YES;
             } else if (subcmd == 3) { /* FSSubParamCmd_Incline_Total */
-                FSLog(@"22.3.29跑步机 上报  坡度 信息");
+//                FSLog(@"22.3.29跑步机 上报  坡度 信息");
                 [self inclineConfigInfo:cmd];
             } else if (subcmd == 4) { /* FSSubParamCmd_Total_Date */
 //                unsigned int total_Distance = FSBleDataProcess.readUInt(databytes + 3);
@@ -395,10 +404,21 @@ static int afterDelayTime = 3;
     Byte *bytes        = (Byte *)[cmd.data bytes];
     Byte subcmd        = bytes[2];
     self.oldStatus     = self.currentStatus;
-    FSLog(@"22.7.5模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    
     // !!!: 22.4.1 回调蓝牙正常工作  写在setter方法中
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
-    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    // 如果设备处于暂停暂停，并且是通过指令停止的，在发一次停止指令
+    if (self.currentStatus == FSDeviceStatePaused && self.stopWithCmd) {
+        FSLog(@"跑步机   发送第二次停止指令");
+        [self stop];
+        
+//        if (self.stopWithCmd) { // 通过指令停止的
+//
+//        }
+        
+    }
+//    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // 收到状态上报  回调蓝牙正常
     
     if (self.oldStatus != self.currentStatus &&
@@ -678,7 +698,7 @@ static int afterDelayTime = 3;
 
         [self cancelDelayControllable];
         // 发送指令，坡度为0
-        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, 0);
+//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, 0);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, 0)];
         [self performSelector:@selector(speedIsControllable) withObject:nil afterDelay:afterDelayTime]; // 2
         return;
@@ -701,7 +721,7 @@ static int afterDelayTime = 3;
         }
 
         [self cancelDelayControllable];
-        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
+//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, targetIncline)];
         [self performSelector:@selector(inclineIsControllable) withObject:nil afterDelay:afterDelayTime];
         return;
@@ -713,7 +733,7 @@ static int afterDelayTime = 3;
         }
 
         [self cancelDelayControllable];
-        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
+//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, targetIncline)];
 
         [self performSelector:@selector(speedIsControllable) withObject:nil afterDelay:afterDelayTime];
@@ -726,7 +746,7 @@ static int afterDelayTime = 3;
 
     // 速度坡度都不相等
     [self cancelDelayControllable];
-    FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
+//    FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
     [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, targetIncline)];
     [self performSelector:@selector(speedIsControllable) withObject:nil afterDelay:afterDelayTime];
 }
@@ -796,16 +816,16 @@ static int afterDelayTime = 3;
 - (void)treadmillReadyTimeOut {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
-    FSLog(@"指令队列   移除所有指令");
+//    FSLog(@"指令队列   移除所有指令");
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
-    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
+//    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
     self.heartbeatTmr = nil;
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
+//        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
         [self removeFromManager];
     }
@@ -821,7 +841,7 @@ static int afterDelayTime = 3;
 @property (nonatomic, strong) NSMutableArray *resistanceArr;
 @property (nonatomic, assign) int originalIncline; // 原阻力  失控判断
 @property (nonatomic, strong) NSMutableArray *inclineArr;
-@property (nonatomic, assign) BOOL stopWithCmd;  // 指令停止
+//@property (nonatomic, assign) BOOL stopWithCmd;  // 指令停止
 
 @end
 
@@ -891,7 +911,7 @@ static int afterDelayTime = 3;
 
 - (BOOL)hasStoped {
     // TODO: XB 210507 其实这个只要判断设备  从其他状态变为  正常待机状态就是停止了
-    FSLog(@"%@", NSStringFromSelector(_cmd));
+//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus == FSDeviceStateRunning &&
         self.currentStatus == FSDeviceStateNormal) {
         return YES;
@@ -905,10 +925,16 @@ static int afterDelayTime = 3;
 
 - (BOOL)isPausing {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
+    BOOL rst = NO;
     if (self.currentStatus == FSDeviceStatePaused) {
-        return YES;
+        rst = YES;
     }
-    return NO;
+    // 22.7.5  如果是指令停止，重新发送停止指令
+    if (self.stopWithCmd) {
+//        [self stop];
+        rst = NO;
+    }
+    return rst;
 }
 
 - (BOOL)isRunning {
@@ -943,7 +969,7 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetLevel:(NSString *)targetLevel {
-    FSLog(@"目标阻力 %@", targetLevel);
+//    FSLog(@"目标阻力 %@", targetLevel);
     // 当前坡度
     int cur_inl = self.incline.intValue;
     [self setTargetLevl:targetLevel.intValue incline:cur_inl];
@@ -980,7 +1006,7 @@ static int afterDelayTime = 3;
 - (void)sectionReadyTimeOut {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
-    FSLog(@"指令队列   移除所有指令");
+//    FSLog(@"指令队列   移除所有指令");
     [self.commands removeAllObjects];
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
@@ -988,7 +1014,7 @@ static int afterDelayTime = 3;
     self.heartbeatTmr = nil;
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
+//        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
     [self disconnect];
@@ -1044,7 +1070,7 @@ static int afterDelayTime = 3;
                 self.counts = FSFM(@"%d", counts);
                 self.exerciseTime = FSFM(@"%d", runtime);
                 self.calory = calStr.fsDiv(@"10").decimalPlace(1);
-                FSLog(@"车表数据数据上报43： 时间%@  距离%@  卡路里%@  次数%@", self.exerciseTime, self.distance, self.calory, self.counts);
+                FSLog(@"车表数据上报43： 时间%@  距离%@  卡路里%@  次数%@", self.exerciseTime, self.distance, self.calory, self.counts);
             } else if (subcmd == 0x02) { // 这条指令没发送，不需要做解析
                 // 获取用户信息
             
@@ -1057,7 +1083,7 @@ static int afterDelayTime = 3;
             break;
         case 0x44: {
             if (subcmd == 0x0A) { // 设置写入用户数据成功
-                FSLog(@"车表22.3.31 写入用户数据成功");
+//                FSLog(@"车表22.3.31 写入用户数据成功");
                 self.writeUserDataSuccess = YES;
             }
             
@@ -1109,7 +1135,7 @@ static int afterDelayTime = 3;
     Byte subcmd     = bytes[2];
     /* FSSubParamCmd_Speed_Param */
     if (subcmd == 0x02) { // 参数信息
-        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
+//        FSLog(@"车表22.3.31 获取 阻力、坡度、配置、段数  还有公英制暂停等信息");
         // 获取阻力、坡度、配置、段数
         int maxResistance    = bytes[3];
         int maxIncline       = bytes[4];
@@ -1158,7 +1184,7 @@ static int afterDelayTime = 3;
     
     if (self.hasStoped) {
         [self disconnect];
-        FSLog(@"22.6.2设备停止了");
+//        FSLog(@"22.6.2设备停止了");
         [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
     }
 
@@ -1189,7 +1215,11 @@ static int afterDelayTime = 3;
     // 新旧状态赋值
     self.oldStatus     = self.currentStatus;
     self.currentStatus = subcmd;
-    FSLog(@"22.6.2 模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    if (subcmd == 3 && self.stopWithCmd) {
+        // 22.7.5  如果设备处于暂停状态并且是通过指令停止的，再发一次停止指令
+        [self stop];
+    }
+    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // 车表状态改变，通过代理回调出去
     if (self.oldStatus != self.currentStatus &&
         self.deviceDelegate &&
@@ -1226,7 +1256,7 @@ static int afterDelayTime = 3;
             self.watt        = FSFM(@"%d", watt);
             self.incline     = FSFM(@"%d", slope);
             self.paragraph   = FSFM(@"%d", duanshu);
-            FSLog(@"车表数据数据上报42： 速度%@  阻力%@  频率%@  心率%@ 功率%@  坡度%@  段数%@", self.speed, self.resistance, self.frequency, self.heartRate, self.watt, self.incline, self.paragraph);
+            FSLog(@"车表数据上报42::: 速度%@  阻力%@  频率%@  心率%@ 功率%@  坡度%@  段数%@", self.speed, self.resistance, self.frequency, self.heartRate, self.watt, self.incline, self.paragraph);
         }
             break;
         case 20:
@@ -1317,14 +1347,14 @@ static int afterDelayTime = 3;
     [self sendData:FSGenerateCmdData.sectionReady()];
     [self sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
     [self sendData:FSGenerateCmdData.sectionStart()];
-    FSLog(@"%@  start", NSStringFromClass([self class]));
+//    FSLog(@"%@  start", NSStringFromClass([self class]));
     return YES;
 }
 
 - (void)stop {
     /* MARK: 添加通过指令停止设备的标识*/
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
-//    self.stopWithCmd = YES;
+    self.stopWithCmd = YES;
     [self sendData:FSGenerateCmdData.sectionStop()];
 }
 
@@ -1359,10 +1389,10 @@ static int afterDelayTime = 3;
 
     int targetLevel = 0;
     int targetIncline = 0;
-    FSLog(@"最大阻力 %@", self.deviceParam.maxLevel);
+//    FSLog(@"最大阻力 %@", self.deviceParam.maxLevel);
     targetLevel = [self paramRangeOfMax:self.deviceParam.maxLevel.intValue min:self.deviceParam.minLevel.intValue compare:t_level];
     targetIncline = [self paramRangeOfMax:self.deviceParam.maxIncline.intValue min:0 compare:t_incline];
-    FSLog(@"发送车表控制指令  阻力%d  坡度:%d", targetLevel, targetIncline);
+//    FSLog(@"发送车表控制指令  阻力%d  坡度:%d", targetLevel, targetIncline);
     [self sendData:FSGenerateCmdData.sectionControlParam(targetLevel, targetIncline)];
     
     if (self.deviceParam.supportLevel) {
@@ -1471,7 +1501,7 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus == FSDeviceStateRunning &&
         self.currentStatus == FSDeviceStateNormal) {
-        FSLog(@"添加最后一次绊绳");
+//        FSLog(@"添加最后一次绊绳");
         return YES;
     }
     return NO;
@@ -1859,7 +1889,7 @@ static int afterDelayTime = 3;
         [self.heartbeatTmr invalidate];
         self.heartbeatTmr = nil;
         [self stopSportTimer];
-        FSLog(@"指令队列   移除所有指令");
+//        FSLog(@"指令队列   移除所有指令");
         [self.commands removeAllObjects];
         [self disconnect];
         // FIXME: 22.3.31 如果是停止发送通知

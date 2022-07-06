@@ -62,9 +62,9 @@
     }
     // 没有FFF0: FitShow-2DF91E
     // 包含FFF0与1826  
-    if ([self.name isEqualToString:@"FitShow-386EE3"]) {
-        FSLog(@"测试设备");
-    }
+//    if ([self.name isEqualToString:@"FitShow-386EE3"]) {
+//        FSLog(@"测试设备");
+//    }
 
     Byte *adBytes = (Byte *)self.manufacturerData.bytes;
 

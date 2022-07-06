@@ -174,19 +174,20 @@ static NSMutableDictionary  *manager = nil;
 //    FSLog(@"蓝牙中心连接成功%@", peripheral.name);
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (device) {
-        FSLog(@"蓝牙中心连接成功%@", device.module.name);
+        // MARK: 蓝牙中心连接成功
+//        FSLog(@"蓝牙中心连接成功%@", device.module.name);
         [peripheral discoverServices:nil];
     }
 }
 
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
-    FSLog(@"蓝牙中心断开连接");
+    // MARK: 蓝牙中心断开连接
+//    FSLog(@"蓝牙中心断开连接");
     BleDevice *device = [self objectForPeripheral:peripheral];
     if (!device) return;
     if (device.reconnect == 3 &&
         device.deviceDelegate &&
         [device.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-        FSLog(@"33.6.2 代理回调断链 FSDisconnectTypeWithoutResponse");
         [device.deviceDelegate device:device didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
 
