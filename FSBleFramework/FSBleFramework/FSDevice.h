@@ -8,37 +8,47 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// 跑步机
 @interface FSTreadmill : FSBaseDevice
 
 @end
 
-
+// 车表
 @interface FSSection : FSBaseDevice
 
 @end
 
 
+// 跳绳
 @interface FSRope : FSBaseDevice
 
 // 绊绳次数
 @property (nonatomic, copy) NSString *interruptCnts;
+
 // 连跳数
 @property (nonatomic, copy) NSString *continueCnts;
+
 // 连跳时间
 @property (nonatomic, copy) NSString *continueTimes;
+
 // 最大连跳数
 @property (nonatomic, copy) NSString *maxContinueCnts;
+
 // 最大连跳时间
 @property (nonatomic, copy) NSString *maxContinueTimes;
+
 // 总数量
 @property (nonatomic, copy) NSString *totalCnts;
+
 // 平均频率
 @property (nonatomic, copy) NSString *avg_cntFreq;
+
 // 电量
 @property (nonatomic, copy) NSString *battery;
 
 @end
 
+// 甩脂机
 @interface FSSlimming : FSBaseDevice
 
 @property (nonatomic, assign) UInt8 identifyCode; // G 0x90
@@ -80,6 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+// 力量测试  设备还未完成全部测试，  FIXME:XB 有待完善
 @interface FSPower : FSBaseDevice
 
 @end

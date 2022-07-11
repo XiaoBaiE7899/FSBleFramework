@@ -19,8 +19,6 @@ static int afterDelayTime = 3;
 @property (nonatomic, assign) int            originalIncline;
 @property (nonatomic, strong) NSMutableArray *inclineArr;
 
-// 指令停止
-//@property (nonatomic, assign) BOOL           stopWithCmd;
 
 @end
 
@@ -39,9 +37,6 @@ static int afterDelayTime = 3;
 
 
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
-    
-    // 跑步机状态
     switch (currentStatus) {
         case -1: {
             _currentStatus = FSDeviceStateDefault;
@@ -68,7 +63,6 @@ static int afterDelayTime = 3;
              2. 体博会参展的设备，设备状态一直都是3，点击app上的恢复，也是3，速度为0.
              3. 跑客（白色跑步机），从app恢复的状态一直为10.
              */
-//            FSLog(@"22.6.2  设置设备的状态为：暂停");
             if (self.exerciseTime.intValue > 3 &&
                 self.speed.intValue == 0) {
                 _currentStatus = FSDeviceStatePaused;
@@ -76,7 +70,6 @@ static int afterDelayTime = 3;
                 _currentStatus = FSDeviceStateRunning;
                 
             }
-//            _currentStatus = self.speed.intValue == 0 ? FSDeviceStatePaused : FSDeviceStateRunning;
         }
             break;
         case 4: {
@@ -130,7 +123,6 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)hasStoped {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 停止中-----正常状态
     if (self.oldStatus == FSDeviceStateTreadmillStopping &&
         self.currentStatus == FSDeviceStateNormal) {
@@ -168,14 +160,10 @@ static int afterDelayTime = 3;
      3. 跑客（白色跑步机），从app恢复的状态一直为10.
      !!!: 210830 周一早上与AB讨论决定，如果出现 状态为3，速度为0，时间大于0 才是暂停，否则为运行中
      */
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     BOOL rst = NO;
-    
-//    FSLog(@"状态:%d 速度:%@ 时间:%@", self.currentStatus, self.speed, self.exerciseTime);
     
     if (self.currentStatus == FSDeviceStatePaused) {
         rst = YES;
-//        return YES;
     }
 
     if (self.currentStatus == FSDeviceStateRunning &&
@@ -184,26 +172,12 @@ static int afterDelayTime = 3;
 //        return YES;
         rst = YES;
     }
-    
-    // 22.7.5 如果是通过指令停止的，永远都不会进入暂停状态
-//    if (self.stopWithCmd) {
-//        rst = NO;
-//    }
-//    FSLog(@"是否为暂停 %d 状态:%d 速度:%@ 时间:%@",rst, self.currentStatus, self.speed, self.exerciseTime);
-//    if (rst && self.stopWithCmd) {
-//        FSLog(@"22.7.5 跑步机  第二次发送停止指令");
-//        [self stop];
-//        return NO;
-//    }
-    
-    
 
     return rst;
 }
 
 - (BOOL)isRunning {
     // !!!: 210828 乔阳工厂  跑步机 启动， 状态为3， 速度为0， 根据之前的判断，这个状态是暂停，如果乔阳的数据都是这样，应该单独处理
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStateRunning /*&&
         self.speed.integerValue != 0*/) {
             return YES;
@@ -213,12 +187,10 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isStarting {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateStarting;
 }
 
 - (BOOL)isWillStart {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus != FSDeviceStateStarting &&
         self.currentStatus == FSDeviceStateStarting) {
         return YES;
@@ -227,7 +199,6 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)getParamSuccess {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.speedObtainSuccess && self.inclineObtainSuccess) {
         return YES;
     }
@@ -235,7 +206,6 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetLevel:(NSString *)targetLevel {
-//    FSLog(@"目标阻力");
     _targetLevel = targetLevel;
 }
 
@@ -271,11 +241,9 @@ static int afterDelayTime = 3;
 - (BOOL)onUpdateData:(BleCommand *)cmd {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(treadmillReadyTimeOut) object:nil];
-    // 跑步机数据解析
     Byte *bytes     = (Byte *)[cmd.data bytes];
     Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
-//    FSLog(@"主指令：%d  子指令：%d", mainCmd, subcmd);
     switch (mainCmd) {
         case 0x50: { /*FSMainCmdModel*/
             if (subcmd == 0) { /*FSSubParamCmdTreadmillModel*/
@@ -410,13 +378,7 @@ static int afterDelayTime = 3;
     self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
     // 如果设备处于暂停暂停，并且是通过指令停止的，在发一次停止指令
     if (self.currentStatus == FSDeviceStatePaused && self.stopWithCmd) {
-        FSLog(@"跑步机   发送第二次停止指令");
         [self stop];
-        
-//        if (self.stopWithCmd) { // 通过指令停止的
-//
-//        }
-        
     }
 //    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // 收到状态上报  回调蓝牙正常
@@ -698,7 +660,6 @@ static int afterDelayTime = 3;
 
         [self cancelDelayControllable];
         // 发送指令，坡度为0
-//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, 0);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, 0)];
         [self performSelector:@selector(speedIsControllable) withObject:nil afterDelay:afterDelayTime]; // 2
         return;
@@ -721,7 +682,6 @@ static int afterDelayTime = 3;
         }
 
         [self cancelDelayControllable];
-//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, targetIncline)];
         [self performSelector:@selector(inclineIsControllable) withObject:nil afterDelay:afterDelayTime];
         return;
@@ -733,7 +693,6 @@ static int afterDelayTime = 3;
         }
 
         [self cancelDelayControllable];
-//        FSLog(@"22.4.1 发送指令  目标速度%d  目标坡度%d", targetSpeed, targetIncline);
         [self sendData:FSGenerateCmdData.treadmillControlSpeedAndIncline(targetSpeed, targetIncline)];
 
         [self performSelector:@selector(speedIsControllable) withObject:nil afterDelay:afterDelayTime];
@@ -924,7 +883,6 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isPausing {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     BOOL rst = NO;
     if (self.currentStatus == FSDeviceStatePaused) {
         rst = YES;
@@ -938,7 +896,6 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isRunning {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.currentStatus == FSDeviceStateRunning) {
         return YES;
     }
@@ -947,12 +904,10 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isStarting {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateStarting;
 }
 
 - (BOOL)isWillStart {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus != FSDeviceStateStarting &&
         self.currentStatus == FSDeviceStateStarting ) {
         return YES;
@@ -961,7 +916,6 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)getParamSuccess {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.speedObtainSuccess && self.inclineObtainSuccess) {
         return YES;
     }
@@ -969,7 +923,6 @@ static int afterDelayTime = 3;
 }
 
 - (void)setTargetLevel:(NSString *)targetLevel {
-//    FSLog(@"目标阻力 %@", targetLevel);
     // 当前坡度
     int cur_inl = self.incline.intValue;
     [self setTargetLevl:targetLevel.intValue incline:cur_inl];
@@ -1023,7 +976,6 @@ static int afterDelayTime = 3;
 - (BOOL)onUpdateData:(BleCommand *)cmd {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
-    // 跑步机数据解析
     Byte *bytes = (Byte *)[cmd.data bytes];
     Byte mainCmd    = bytes[1];
     Byte subcmd     = bytes[2];
@@ -1465,7 +1417,6 @@ static int afterDelayTime = 3;
 
 #pragma mark 跳绳重写父类属性的setter && getter 方法
 - (void)setCurrentStatus:(FSDeviceState)currentStatus {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     
     switch (currentStatus) {
         case -1: {
@@ -1493,12 +1444,10 @@ static int afterDelayTime = 3;
 }
 
 - (BOOL)isRunning {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     return self.currentStatus == FSDeviceStateRunning ? YES : NO;
 }
 
 - (BOOL)hasStoped {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.oldStatus == FSDeviceStateRunning &&
         self.currentStatus == FSDeviceStateNormal) {
 //        FSLog(@"添加最后一次绊绳");
@@ -1644,7 +1593,6 @@ static int afterDelayTime = 3;
 }
 
 - (void)onConnected {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 数据重置
     [self dataReset];
 

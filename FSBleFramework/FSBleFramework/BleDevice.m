@@ -22,7 +22,6 @@
         _accidentalReconnect        = NO;
         _disconnectType             = FSDisconnectTypeNone;
         _connectState               = FSConnectStateDisconnected;
-//        FSLog(@"指令队列初始化");
         _commands                   = [NSMutableArray new];
         _receiveCmd                 = [BleCommand new];
         _getParamSuccess            = NO;
@@ -31,18 +30,12 @@
 }
 
 - (void)connent:(id<BleDeviceDelegate>)delegate {
-//    FSLog(@"调用连接");
     // 已经开始连接，就停止扫描
     [self.manager stopScan];
     // FIXME: 甩脂机需要重写设置
     if (self.module.sportType == FSSportTypeSlimming) {
         // MARK: 甩脂机需要从后台获取电机模式才能连接，不然连接无效，速度无法调整
         return;
-        // 数据库是否有数据
-//        FSDeviceInfo *info = [self deviceInfoFromLocalDataBase];
-//        if (!info || kIsEmptyStr(info.paramString)) {
-//            return;
-//        }
     }
 
     if (!_manager && !delegate) return;
@@ -81,11 +74,7 @@
 
 - (void)sendCommand:(BleCommand *_Nullable)command {
     if (command) {
-//        FSLog(@"指令队列   添加指令");
         [self.commands addObject:command];
-//        for (BleCommand *cmd in self.commands) {
-//            FSLog(@"指令: %@", cmd.data.fsToString());
-//        }
         if (!self.resending) {
             [self onSendData];
         }
@@ -106,7 +95,6 @@
     }
 
     if (self.connectState != FSConnectStateDisconnected) {
-//        [self setValue:@(mode) forKeyPath:@"disconnectType"];
         self.disconnectType = mode;
         if (_manager) {
             [_manager.centralManager cancelPeripheralConnection:_module.peripheral];
@@ -115,11 +103,9 @@
         }
 
         if (mode == FSDisconnectTypeWithoutResponse) {
-//            SPBLOCK_EXEC(self.withoutResponse);
             // 回调无响应断开
             if (self.deviceDelegate &&
                 [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-//                FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
             }
         }
@@ -192,7 +178,6 @@
 - (void)deviceInfoData {}
 
 - (void)onDisconnected {
-//    FSLog(@"指令队列   所有指令");
     [self.commands removeAllObjects];
     self.connectState = FSConnectStateDisconnected;
 }
@@ -418,8 +403,6 @@
             }
             
         } else {
-            // 22.3.29 这句不需要
-//            self.disconnectType = FSDisconnectTypeService;
             if (self.deviceDelegate &&[self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeService];
                 [self removeFromManager];
@@ -429,10 +412,8 @@
     }
 
     if (self.disconnectType != FSDisconnectTypeNone) {
-//        FSLog(@"connect ERROR: %@  code: %d", self.module.name, self.disconnectType);
         if (self.deviceDelegate &&
             [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-//            FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeAbnormal，disconnectType=%d", self.disconnectType);
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
             [self removeFromManager];
             // 重新搜索

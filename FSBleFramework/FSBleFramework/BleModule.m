@@ -110,7 +110,6 @@
     _machineCode = [NSString stringWithFormat:@"%u", device & 0xffff];
     uint serialNum = MAKEDWORD(data[4], data[5], data[6], data[7]);
     _serial = [NSString stringWithFormat:@"%u", serialNum];
-//    FSLog(@"AD旧：设备类型：%d, 设备id:%@, 厂商码%@, 机型码：%@, 序列号：%@",_sportType, _deviceID, _factory, _machineCode, _serial);
 }
 
 // 新的广播包解析
@@ -133,7 +132,6 @@
         _machineCode     = [NSString stringWithFormat:@"%d", machine_Code];//SF(@"%d", machine_Code);
         _deviceID        = @"0";
         _serial          = @"0";
-//        FSLog(@"AD旧：设备类型：%d, 设备id:%@, 厂商码%@, 机型码：%@, 序列号：%@",_sportType, _deviceID, _factory, _machineCode, _serial);
         return;
     }
 }
@@ -148,7 +146,6 @@
         _machineCode = @"0";;
         _deviceID    = @"0";
         _serial      = @"0";
-//        FSLog(@"AD_HW：设备类型：%d, 设备id:%@, 厂商码%@, 机型码：%@, 序列号：%@",_sportType, _deviceID, _factory, _machineCode, _serial);
     }
 }
 

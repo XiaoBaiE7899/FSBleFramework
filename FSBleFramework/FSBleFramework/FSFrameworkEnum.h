@@ -18,12 +18,28 @@
 #define FSMAKEWORD(a, b)    (uint)((uint)((uint)(b) << 8) | (a))
 #define MAKEDWORD(a,b,c,d)  (uint)(MAKELONG(MAKEWORD(a, b), MAKEWORD(c, d)))
 
+
+// 系统蓝牙的 状态
 typedef NS_ENUM(int, FSCentralState) {
     FSCentralStatePoweredOff,  // 系统蓝牙没开
-    FSCentralStatePoweredOn,   // 蓝牙可以使用
-    FSCentralStateUnsupported, // 设备不支持
+    /*
+     蓝牙可以使用，PS:只有这个状态，蓝牙才可以扫描到设备
+     */
+    FSCentralStatePoweredOn,
+    FSCentralStateUnsupported, // 设备(主要指手机)不支持
 };
 
+/*
+   蓝牙协议，不同协议，指令不同，
+   通过解析广播包数据，得到设备类型，具体如下：
+   设备类型为： 请参考: FSSportType
+     0：BleProtocolTypeTreadmill
+     1、2、3、4、5：BleProtocolTypeSection
+     7、9:BleProtocolTypeSlimming
+     6、8、12：BleProtocolTypeRope
+  特别注意：
+  FSSportTypeArtificial:设备为机械跑步机：使用的是车表协议，
+ */
 typedef NS_ENUM(int, BleProtocolType) {
     BleProtocolTypeUnknow         = -1, // 未知
     BleProtocolTypeTreadmill      = 0,  // 跑步机
@@ -32,47 +48,102 @@ typedef NS_ENUM(int, BleProtocolType) {
     BleProtocolTypeRope           = 3,  // 跳绳、健腹轮、摸高挑
 };
 
+/*
+ 蓝牙连接状态，连接状态发送改变是，会通过代理回调，使用设备的属性：connectState 访问
+ */
 typedef NS_ENUM(int, FSConnectState) {
+    /*
+     蓝牙断链，默认为这个状态
+     */
     FSConnectStateDisconnected,
+    /*
+     正在连接
+     */
     FSConnectStateConnecting,
+    /*
+     重新中
+     */
     FSConnectStateReconnecting,
+    /*
+     蓝牙已连接成功：只有当蓝牙中心连接成功，并且发现对应的服务的UUID,才会回调这个状态
+     即使回调这个状态，也补代表蓝牙通讯正常
+     */
     FSConnectStateConnected,
-    FSConnectStateWorking,     // 数据收发正常才能进入这个状态
+    /*
+     蓝牙连接成功，发送指令有回复，回调这个状态，回调这个状态，表示：蓝牙不仅连接成功，而且通讯正常
+     */
+    FSConnectStateWorking,
 };
 
+/*
+ 蓝牙断链的类型， 会通过回调断链的类型，使用设备的属性：disconnectType访问
+ */
 typedef NS_ENUM(int, FSDisconnectType) {
+    /* 默认状态 */
     FSDisconnectTypeNone,
+    /* 指令没响应，连接9调指令没有回复，回调 */
     FSDisconnectTypeWithoutResponse,
+    /* 连接超时，每次连接2秒，连续连接3次失败，就会超时 */
     FSDisconnectTypeTimeout,
+    /* 程序主动断开连接，这个状态不会回调 */
     FSDisconnectTypeUser,
+    /* 蓝牙中心连接成功，但是没有找打对应服务UUID,回调这个状态 */
     FSDisconnectTypeService,
     FSDisconnectTypeAbnormal,
 };
 
+/*
+ 运动类型，就是设备类型，
+ */
 typedef NS_ENUM(int, FSSportType) {
+    /* 默认设备类型 */
     FSSportTypeFree           = -1,
+    /* 跑步机 */
     FSSportTypeTreadmill      = 0,
+    /* 椭圆机  或者称为：交叉训练机 */
     FSSportTypeEllipse        = 1,
+    /* 健身车 */
     FSSportTypeFitnessCar     = 2,
+    /* 划船器 */
     FSSportTypeRowing         = 3,
+    /* 骑马器 没有见过这个种设备 */
     FSSportTypeRider          = 4,
+    /* 走步机，大部分工厂的走步机的类型是使用 跑步机协议，最大速度一般在6KM/H */
     FSSportTypeWalking        = 5,
+    /* 跳绳 */
     FSSportTypeSkipRope       = 6,
+    /* 筋膜枪 */
     FSSportTypeFasciaGun      = 7,
+    /* 健腹轮 */
     FSSportTypeAbdominalWheel = 8,
+    /* 甩脂机 */
     FSSportTypeSlimming       = 9,
+    /* 机械跑步机 使用的车表协议 */
     FSSportTypeArtificial     = 10,
+    /* 摸高跳，协议已经调通，还未实际设备测试 */
     FSSportTypeTouchHigh      = 12,
+    /* 力量器械，协议已经调通，还未爱实际设备测试 */
     FSSportTypePower          = 13,
 };
 
 
-// 设备状态
+/*
+ 设备状态  SDK  根据实际设备重构了，
+ */
 typedef NS_ENUM(int, FSDeviceState)  {
+    // 默认状态
     FSDeviceStateDefault = -1,
+    // 待机  只有当设备处于正常待机状态，才能通过蓝牙指令启动设备
     FSDeviceStateNormal,
+    // 启动倒计时
     FSDeviceStateStarting,
+    // 设备已经运行，
     FSDeviceStateRunning,
+    /*
+     暂停状态，
+     FS:因为很多厂家没有严格按照协议做，
+     内部对这个这个做了很多兼容，建议新接入的厂家，严格按照协议对接
+     */
     FSDeviceStatePaused,
     FSDeviceStateError,
     FSDeviceStateTreadmillEnd,
@@ -83,6 +154,17 @@ typedef NS_ENUM(int, FSDeviceState)  {
     FSDeviceStateSectionSleep,
 };
 
+/*
+ 设备失控类型  可以通过：discontrolType属性方法获取具体是哪个参数不能控制
+ 由于多种原因，会出现设备启动以后，
+ 指令下发，通过串口工具也可以抓取到数据，但是设备并没有反映，出现这种状态，理解为设备失控，
+ 
+ 具体的控制参数根据设备参数判断，
+ PS: 跑步机：  速度(必须参数)、停止(必须参数)、坡度(可选参数)
+     车表：    停止(必须参数)、坡度(可选参数)、阻力(可选参数)
+ 
+ 当设备下发控制指令以后，2秒后设备没有响应，就判定为失控，这个时候会发送通知：kCmdUncontrolled
+ */
 typedef NS_ENUM(NSInteger, FSDiscontrolType) {
     FSDiscontrolTypeSpeed,         // 速度
     FSDiscontrolTypeIncline,       // 坡度
@@ -109,7 +191,7 @@ typedef NS_ENUM(NSInteger, FSDeviceErrorCode) {
 };
 
 
-// 故障代码
+// 甩脂机 故障代码
 typedef NS_ENUM(NSInteger, SlimmingError) {
     /*  过流报警  */
     SlimmingErrorO1  = 0xA1,

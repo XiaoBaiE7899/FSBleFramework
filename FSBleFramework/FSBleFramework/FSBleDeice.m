@@ -166,7 +166,6 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     }
 
     if (self.bleNotifyChar && self.bleWriteChar) {
-        // 22.6.6 添加 全局运动类的设备赋值
         fs_sport.fsDevice = self;
         return YES;
     }
@@ -175,8 +174,6 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
 }
 
 - (void)onDisconnected {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
-//    FSLog(@"停止定时器 sendCmdTimer, heartbeatTmr");
     [self.sendCmdTimer invalidate];
     self.sendCmdTimer = nil;
     [self.heartbeatTmr invalidate];
@@ -317,15 +314,12 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     
     // @"https://api.fitshow.com/api/device/getdeviceinfo/"
     
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
 
     NSDictionary *dic = @{
         @"factory" : self.module.factory,
         @"model" : self.module.machineCode,
         @"type" : type
     };
-//    FSLog(@"请求地址%@ 参数 %@  ", fs_sport.hostUrl, dic);
-    //
     
 //    NSString *urlString = @"https://api.fitshow.com/api/device/getdeviceinfo/";
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:fs_sport.hostUrl]];
@@ -349,6 +343,10 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
                 if([dic objectForKey:@"code"]) {
                     NSNumber *code = dic[@"code"];
                     if (code.integerValue == 1) { // 只有这个状态才有数据
+                        // !!!:  22.7.8 添加数据安全过滤
+                        if (![dic[@"data"] isKindOfClass:[NSDictionary class]]) {
+                            return;
+                        }
                         NSMutableDictionary *info = [NSMutableDictionary dictionaryWithDictionary:dic[@"data"]];
                         if ([info objectForKey:@"params"]) {
                             info[@"paramString"] = /*[FSBleTools ditionaryToJsonSting:dic[@"params"]]*/dic.fsToJsonString();
