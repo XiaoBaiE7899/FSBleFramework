@@ -60,6 +60,7 @@
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
         if (self.connectState == FSConnectStateWorking) {
+            FSLog(@"FSConnectStateWorking");
             [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
         } else if (self.connectState == FSConnectStateConnected) {
             [self onConnected];
@@ -259,6 +260,7 @@
             if (self.deviceDelegate && [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
 //                FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeAbnormal");
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
+                FSLog(@"22.7.14  意外断链   移除设备");
                 [self removeFromManager];
             }
             // MARK:210423 弹出无响应断开连接
@@ -388,9 +390,11 @@
 //    }
     if (self.disconnectType == FSDisconnectTypeNone) {
         if ([self onService]) {
+            FSLog(@"22.7.12  SDK 找到服务 断链类型%d", self.disconnectType);
             // 清楚指令指令队列
             [self clearSend];
             [self.deviceDelegate device:self didConnectedWithState:FSConnectStateConnected];
+            FSLog(@"22.7.12  SDK 取消执行  连接超时%d", self.disconnectType);
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connectTimeout) object:nil];
             self.connectState = FSConnectStateConnected;
             [self onConnected];
@@ -403,24 +407,28 @@
             }
             
         } else {
+            FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
             if (self.deviceDelegate &&[self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeService];
+                FSLog(@"22.7.14  意外断链   移除设备");
                 [self removeFromManager];
             }
-            
         }
     }
 
     if (self.disconnectType != FSDisconnectTypeNone) {
+        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
         if (self.deviceDelegate &&
             [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
+            FSLog(@"22.7.14  意外断链   移除设备");
             [self removeFromManager];
             // 重新搜索
             self.deviceDelegate = nil;
         }
         [_manager.centralManager cancelPeripheralConnection:_module.peripheral];
     } else if (_commands.count && !self.resending) {
+        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
         [self onSendData];
     }
 
@@ -432,11 +440,19 @@
 
 - (void)connectTimeout {
     self.reconnect++;
+    // 22.7.15  如果是意外断链，不会调超时了
+    FSLog(@"22.7.14  连接超时  如果是意外断链不会回调%d", self.accidentalReconnect);
+    
     if (self.reconnect > 3) {
         if (self.deviceDelegate &&
-            [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+            [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]/* &&
+            !self.accidentalReconnect*/
+            ) {
+            // 回调连接超时
+            FSLog(@"22.7.14  意外断链测试  回调连接超时");
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeTimeout];
             self.deviceDelegate = nil;
+            FSLog(@"22.7.14  意外断链   移除设备");
             [self removeFromManager];
             return;
         }

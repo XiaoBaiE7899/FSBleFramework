@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FSDeviceParam : NSObject
 
-// 单位 0:公里  1: 英里
+// 单位 0:公里  1: 英里  544344117
 @property (nonatomic, assign) BOOL     imperial;
 
 // 最大速度，def:@"0"

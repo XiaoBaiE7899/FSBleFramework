@@ -1,6 +1,8 @@
 
 #import "BleManager.h"
 #import "BleModule.h"
+#import "FSSport.h"
+#import "FSDevice.h"
 
 NSString * _Nonnull const FITSHOW_UUID        = @"FFF0";  // 运动秀扫描的UUID
 NSString * _Nonnull const FTMS_UUID           = @"1826";  // 运动器材的UUID
@@ -75,6 +77,8 @@ static NSMutableDictionary  *manager = nil;
     } else {
         [self.centralManager scanForPeripheralsWithServices:self.scanUUIDs.count ? self.scanUUIDs : nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey:@YES}];
     }
+    // 10秒后停止扫描
+    [self performSelector:@selector(stopScan) withObject:nil afterDelay:10];
     return YES;
 }
 
@@ -184,10 +188,27 @@ static NSMutableDictionary  *manager = nil;
     // MARK: 蓝牙中心断开连接
 //    FSLog(@"蓝牙中心断开连接");
     BleDevice *device = [self objectForPeripheral:peripheral];
-    if (!device) return;
+    
+    if (!device) {
+        FSLog(@"22.7.14  意外断链测试  找不到设备直接返回 全局对象%@  全局对象代理%@", fs_sport.fsDevice, fs_sport.fsDevice.deviceDelegate);
+//        [fs_sport.fsDevice.deviceDelegate]
+        if (fs_sport.fsDevice &&
+            fs_sport.fsDevice.deviceDelegate &&
+            [fs_sport.fsDevice.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+            FSLog(@"22.7.14  意外断链测试 设备没找到，使用全局运动类回调");
+            [fs_sport.fsDevice.deviceDelegate device:fs_sport.fsDevice didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
+            fs_sport.fsDevice.deviceDelegate = nil;
+        }
+        
+        return;
+    }
+    FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  全局对象%@", device.reconnect, device.deviceDelegate, fs_sport.fsDevice);
+    
     if (device.reconnect == 3 &&
         device.deviceDelegate &&
         [device.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+        // 回调断链
+        FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  代理响应方法", device.reconnect, device.deviceDelegate);
         [device.deviceDelegate device:device didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
 
@@ -205,9 +226,47 @@ static NSMutableDictionary  *manager = nil;
     if (device) {
         [device willDisconnect];
     }
-
-
 }
+
+// 处理运动秀断连
+//- (void)fitshowDisconnect {
+//    if (fs_sport.fsDevice.reconnect > 3) {
+//        return;
+//    }
+//    if (!fs_sport.fsDevice) {
+//        FSLog(@"22.7.14  意外断链测试  找不到设备直接返回");
+//        FSLog(@"22.7.14  意外断链测试 管理器 %p  外设的个数%lu 全局设备%p",self, (unsigned long)self.devices.count, fs_sport.fsDevice);
+//        return;
+//    }
+//    FSLog(@"22.7.14  意外断链测试 管理器 %p  外设的个数%lu 全局设备%p",self, (unsigned long)self.devices.count, fs_sport.fsDevice);
+//    FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@", fs_sport.fsDevice.reconnect, fs_sport.fsDevice.deviceDelegate);
+//
+//    if (fs_sport.fsDevice.reconnect == 3 &&
+//        fs_sport.fsDevice.deviceDelegate &&
+//        [fs_sport.fsDevice.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+//        // 回调断链
+//        FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  代理响应方法  是否连接%d", fs_sport.fsDevice.reconnect, fs_sport.fsDevice.deviceDelegate, fs_sport.fsDevice.isConnected);
+//        [fs_sport.fsDevice.deviceDelegate device:fs_sport.fsDevice didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
+//        // 避免多次回调，把代理置空
+//        fs_sport.fsDevice.deviceDelegate = nil;
+//        [fs_sport.fsDevice disconnect];
+//    }
+//
+//    if (fs_sport.fsDevice.connectState == FSConnectStateConnecting ||
+//        fs_sport.fsDevice.connectState == FSConnectStateReconnecting) {
+//        return;
+//    }
+//
+//    if (fs_sport.fsDevice.module.sportType == FSSportTypeSkipRope) {
+//        [fs_sport.fsDevice onDisconnected];
+//        [[NSNotificationCenter defaultCenter] postNotificationName:kFitshowHasStoped object:self];
+//        return;
+//    }
+//
+//    if (fs_sport.fsDevice) {
+//        [fs_sport.fsDevice willDisconnect];
+//    }
+//}
 
 #pragma mark 子类需要重写的方法
 - (void)initialize {}

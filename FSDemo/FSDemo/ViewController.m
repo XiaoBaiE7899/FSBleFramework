@@ -157,6 +157,8 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (IBAction)disconnectAction:(UIButton *)sender {
+    [fs_sport.fsDevice disconnect];
+    
 }
 
 - (IBAction)startDevice:(UIButton *)sender {
@@ -273,7 +275,9 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (void)device:(BleDevice *)device didConnectedWithState:(FSConnectState)state {
+    FSLog(@"22.7.12 回调连接状态%d", state);
     switch (state) {
+            
         case FSConnectStateDisconnected: {
             FSLog(@"22.4.1  FSConnectStateDisconnected");
         }
@@ -287,15 +291,16 @@ static NSString *dev_device = @"FS-12345";
         }
             break;
         case FSConnectStateConnected: {
-            FSLog(@"22.4.1 FSConnectStateConnected");
+//            FSLog(@"22.4.1 FSConnectStateConnected");
+            FSLog(@"22.7.12  SDK 取消执行  连接超时%d", device.disconnectType);
         }
             break;
         case FSConnectStateWorking: {
-            FSLog(@"22.4.1 FSConnectStateWorking");
+            FSLog(@"22.7.12 FSConnectStateWorking");
             if ([fs_sport.fsDevice start]) {
-                FSLog(@"运动秀的设备可以启动");
+                FSLog(@"22.7.12…………运动秀的设备可以启动");
             } else {
-                FSLog(@"运动秀的设备不能启动");
+                FSLog(@"22.7.12…………运动秀的设备不能启动");
             }
         }
             

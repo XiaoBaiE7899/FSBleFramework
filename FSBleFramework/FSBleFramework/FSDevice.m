@@ -40,6 +40,8 @@ static int afterDelayTime = 3;
     switch (currentStatus) {
         case -1: {
             _currentStatus = FSDeviceStateDefault;
+            // 22.7.12  MARK: XB 如果是初始化状态不做回调处理
+            return;
         }
             break;
         case 0: {
@@ -112,12 +114,18 @@ static int afterDelayTime = 3;
      2 车表：  状态指令有返回再执行回调
      3 其他设备： 直接回调就行了
      */
+//
+//    if (_currentStatus == FSDeviceStateDefault) {
+//        return;
+//    }
     if (self.connectState != FSConnectStateWorking &&
         !self.accidentalReconnect &&
         self.getParamSuccess &&
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
+        FSLog(@"22.7.12 回调工作中的状态  %d", _currentStatus);
         self.connectState = FSConnectStateWorking;
+        FSLog(@"FSConnectStateWorking");
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
 }
@@ -609,6 +617,7 @@ static int afterDelayTime = 3;
 - (BOOL)start {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 不是正常状态 不能启动
+    FSLog(@"22.7.12  判断是不是可以启动  当前状态::%d", self.currentStatus);
     if (self.currentStatus != FSDeviceStateNormal) return NO;
     [self sendData:FSGenerateCmdData.treadmillStart()];
     return YES;
@@ -786,6 +795,7 @@ static int afterDelayTime = 3;
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
 //        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
+        FSLog(@"22.7.14  意外断链   移除设备");
         [self removeFromManager];
     }
     [self disconnect];
@@ -823,6 +833,8 @@ static int afterDelayTime = 3;
     switch (currentStatus) {
         case -1:{
             _currentStatus = FSDeviceStateDefault;
+            // 22.7.12  MARK: XB 如果是初始化状态不做回调处理
+            return;
         }
         case 0: {
             _currentStatus  = FSDeviceStateNormal;
@@ -863,6 +875,7 @@ static int afterDelayTime = 3;
         !self.accidentalReconnect &&
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
+        FSLog(@"FSConnectStateWorking");
         self.connectState = FSConnectStateWorking;
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
@@ -1093,6 +1106,7 @@ static int afterDelayTime = 3;
         int maxIncline       = bytes[4];
         /// !!!: FS 最小阻力、单位、是否支持暂停的赋值 协议里面写的时候配置信息
         int unit             = bytes[5] & 0x01;
+        FSLog(@"22.7.14  是否为英制单位%d", unit);
         int pause            = bytes[5] & 0x02;
         int deviceParagraph  = bytes[6];
         /* !!!: 210427 最大坡度  最小坡度  是有符号的整数，第一位是符号位 因此最大的数据就是127*/
@@ -1106,6 +1120,8 @@ static int afterDelayTime = 3;
         self.deviceParam.maxLevel = FSFM(@"%d", maxResistance);
         self.deviceParam.maxIncline = FSFM(@"%d", maxIncline);
         // MARK: 20210419 金亚太  因为模块烧入错误，这里做兼容，类型是车，测试模块名字FS-1B39B3， deviceid:544344117  厂商码：114 机型码：2101. 如果获取配置信息是公制单位，应该变成英制单位，逻辑：1 配置信息上报的单位是公制单位，2 deviceid==544344117
+        // 22.7.14 添加公英制
+        self.deviceParam.imperial = unit;
         if (self.module.deviceID.integerValue == 544344117 && !unit) {
             self.deviceParam.imperial = 1;
         }
@@ -1439,6 +1455,7 @@ static int afterDelayTime = 3;
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {
         self.connectState = FSConnectStateWorking;
+        FSLog(@"FSConnectStateWorking");
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
 }
@@ -1774,6 +1791,7 @@ static int afterDelayTime = 3;
             // 回调蓝牙正在工作中
             if (self.connectState != FSConnectStateWorking) {
                 self.connectState = FSConnectStateWorking;
+                FSLog(@"FSConnectStateWorking");
                 [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
             }
         }
@@ -2026,6 +2044,7 @@ static int afterDelayTime = 3;
     _currentStatus = currentStatus;
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {
+        FSLog(@"FSConnectStateWorking");
         self.connectState = FSConnectStateWorking;
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
@@ -2047,6 +2066,7 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 回调蓝牙正在工作中
     if (self.connectState != FSConnectStateWorking) {
+        FSLog(@"FSConnectStateWorking");
         self.connectState = FSConnectStateWorking;
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }

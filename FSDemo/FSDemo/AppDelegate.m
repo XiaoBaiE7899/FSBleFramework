@@ -26,8 +26,8 @@
     [FSSport currentWithHostURL:@"http://192.168.0.236:8082/api/device/getDeviceInfo/"];
     FSLog(@"蓝牙SDK版本:%.2f", FSBleFrameworkVersionNumber);
     // 测试  静态库类目
-    NSData *data = FSGenerateCmdData.treadmillSpeedParam();
-    FSLog(@"测试  静态库类目%@", data.fsToString());
+//    NSData *data = FSGenerateCmdData.treadmillSpeedParam();
+//    FSLog(@"测试  静态库类目%@", data.fsToString());
     // 测试缓存数据
     NSDictionary *dic1 = @{
         @"brand" : @"fs",

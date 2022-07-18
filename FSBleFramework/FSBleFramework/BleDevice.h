@@ -19,7 +19,7 @@
 - (void)device:(BleDevice *_Nonnull)device didConnectedWithState:(FSConnectState)state;
 
 /*
- 外设断链回调
+ 外设断链回调 device如果为空不会回调
  蓝牙连接过程中，所有非主动断链，都会通过这个方法回调是什么问题断链
  */
 - (void)device:(BleDevice *_Nonnull)device didDisconnectedWithMode:(FSDisconnectType)mode;
@@ -144,7 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 设备已经断连，如果是运动型的模块断链， 停止定时器:1发送指令定时器，2心跳包的定时器
 - (void)onDisconnected;
 
-// 把该设备从管理中删除
+// 把该设备从管理中删除  这个方法不不需要
 - (void)removeFromManager;
 
 /*
