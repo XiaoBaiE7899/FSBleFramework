@@ -83,6 +83,13 @@
 }
 
 - (void)disconnect {
+    // 销毁定时器
+//    FSLog(@"22.8.29  销毁定时器");
+    [self.commands removeAllObjects];
+    [self.sendCmdTimer invalidate];
+    self.sendCmdTimer = nil;
+    [self.heartbeatTmr invalidate];
+    
     self.disconnectType = FSDisconnectTypeUser;
     self.connectState = FSConnectStateDisconnected;
     [self.manager.centralManager cancelPeripheralConnection:self.module.peripheral];
@@ -251,23 +258,25 @@
         _sendCmdTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
         [[NSRunLoop currentRunLoop] addTimer:_sendCmdTimer forMode:NSRunLoopCommonModes];
     } else if (_commands.count) {
-//        [EasyLoadingView hidenLoading];
-        _cntFail++;
-//        FSLog(@"意外断连 联系失败 失败次数%d", _cntFail);
-        // S_CMD
-        [self onFailedSend:cmd];
-        if (_cntFail == 3) {
-            if (self.deviceDelegate && [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-//                FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeAbnormal");
-                [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
-                FSLog(@"22.7.14  意外断链   移除设备");
-                [self removeFromManager];
-            }
-            // MARK:210423 弹出无响应断开连接
-//            SPBLOCK_EXEC(self.withoutResponse);
-        } else {
-            [self commit];
-        }
+        // MARK: XB 休眠不能进入的代码
+//        _cntFail++;
+//        // S_CMD
+//        [self onFailedSend:cmd];
+//        if (_cntFail == 3) {
+//            if (self.deviceDelegate && [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+//                [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
+//                FSLog(@"22.7.14  意外断链   移除设备");
+//                [self removeFromManager];
+//            }
+//        } else {
+//            [self commit];
+//        }
+        // MARK: XB 22.8.28 休眠  可以进入的代码
+//        [_sendCmdTimer invalidate];
+//        _sendCmdTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(onSendData) userInfo:nil repeats:NO];
+//        [[NSRunLoop currentRunLoop] addTimer:_sendCmdTimer forMode:NSRunLoopCommonModes];
+        [self commit];
+        
     }
 
 }
@@ -390,11 +399,11 @@
 //    }
     if (self.disconnectType == FSDisconnectTypeNone) {
         if ([self onService]) {
-            FSLog(@"22.7.12  SDK 找到服务 断链类型%d", self.disconnectType);
+//            FSLog(@"22.7.12  SDK 找到服务 断链类型%d", self.disconnectType);
             // 清楚指令指令队列
             [self clearSend];
             [self.deviceDelegate device:self didConnectedWithState:FSConnectStateConnected];
-            FSLog(@"22.7.12  SDK 取消执行  连接超时%d", self.disconnectType);
+//            FSLog(@"22.7.12  SDK 取消执行  连接超时%d", self.disconnectType);
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connectTimeout) object:nil];
             self.connectState = FSConnectStateConnected;
             [self onConnected];
@@ -407,28 +416,28 @@
             }
             
         } else {
-            FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
+//            FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
             if (self.deviceDelegate &&[self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
                 [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeService];
-                FSLog(@"22.7.14  意外断链   移除设备");
+//                FSLog(@"22.7.14  意外断链   移除设备");
                 [self removeFromManager];
             }
         }
     }
 
     if (self.disconnectType != FSDisconnectTypeNone) {
-        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
+//        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
         if (self.deviceDelegate &&
             [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeAbnormal];
-            FSLog(@"22.7.14  意外断链   移除设备");
+//            FSLog(@"22.7.14  意外断链   移除设备");
             [self removeFromManager];
             // 重新搜索
             self.deviceDelegate = nil;
         }
         [_manager.centralManager cancelPeripheralConnection:_module.peripheral];
     } else if (_commands.count && !self.resending) {
-        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
+//        FSLog(@"22.7.12  SDK 没有找到服务%d", self.disconnectType);
         [self onSendData];
     }
 
@@ -441,7 +450,7 @@
 - (void)connectTimeout {
     self.reconnect++;
     // 22.7.15  如果是意外断链，不会调超时了
-    FSLog(@"22.7.14  连接超时  如果是意外断链不会回调%d", self.accidentalReconnect);
+//    FSLog(@"22.7.14  连接超时  如果是意外断链不会回调%d", self.accidentalReconnect);
     
     if (self.reconnect > 3) {
         if (self.deviceDelegate &&
@@ -449,10 +458,10 @@
             !self.accidentalReconnect*/
             ) {
             // 回调连接超时
-            FSLog(@"22.7.14  意外断链测试  回调连接超时");
+//            FSLog(@"22.7.14  意外断链测试  回调连接超时");
             [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeTimeout];
             self.deviceDelegate = nil;
-            FSLog(@"22.7.14  意外断链   移除设备");
+//            FSLog(@"22.7.14  意外断链   移除设备");
             [self removeFromManager];
             return;
         }

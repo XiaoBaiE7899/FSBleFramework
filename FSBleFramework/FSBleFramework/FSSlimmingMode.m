@@ -41,7 +41,7 @@
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-    NSLog(@"FSParams::没定义的key");
+//    NSLog(@"FSParams::没定义的key");
 }
 
 @end
@@ -61,7 +61,7 @@
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
-    NSLog(@"FSMotors::  没定义的key");
+//    NSLog(@"FSMotors::  没定义的key");
 }
 
 @end

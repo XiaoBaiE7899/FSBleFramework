@@ -121,13 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FSBaseDevice : BleDevice
 
-/*
- 心跳包
- 运动型的模块，连接成功以后，必须启动心跳包，当指令队列没有指令时，会自定加入查询状态指令，
- 跑步机：一条状态指令就行
- 车表： 每次会加入2条指令，一条查询状态，一条获取运动数据的
- */
-@property (nonatomic, strong) NSTimer       *_Nullable heartbeatTmr;
+
 
 // 设备参数
 @property (nonatomic, strong) FSDeviceParam *deviceParam;
@@ -231,7 +225,7 @@ NS_ASSUME_NONNULL_BEGIN
 // 运动ID 模块上报数据 实际没使用
 @property (nonatomic,   copy) NSString      *uid;
 
-// 目标速度  精度0.1, 如:需要包设备的速度调到5KM/H, 把这个属性设置为50
+// 目标速度  精度0.1, 如:需要把设备的速度调到5KM/H, 把这个属性设置为50
 @property (nonatomic,   copy) NSString      *targetSpeed;
 
 // 目标坡度  精度1 如:需要包设备的坡度调到5, 把这个属性设置为5
@@ -244,6 +238,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL           stopWithCmd;
 
 @property (nonatomic, assign) FSDiscontrolType discontrolType; // 失控类型
+
+@property (nonatomic, assign) int subSafeCode; // 安全锁脱落的子数据  def:0
 
 /*
  启动设备:所有运动模块的设备调用此方法，启动设备

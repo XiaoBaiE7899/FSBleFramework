@@ -166,6 +166,7 @@ typedef NS_ENUM(int, FSDeviceState)  {
  当设备下发控制指令以后，2秒后设备没有响应，就判定为失控，这个时候会发送通知：kCmdUncontrolled
  */
 typedef NS_ENUM(NSInteger, FSDiscontrolType) {
+    FSDiscontrolTypeNone,          // 初始化状态
     FSDiscontrolTypeSpeed,         // 速度
     FSDiscontrolTypeIncline,       // 坡度
     FSDiscontrolTypeResistance,    // 阻力

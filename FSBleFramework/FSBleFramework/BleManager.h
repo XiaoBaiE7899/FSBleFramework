@@ -13,6 +13,7 @@ extern NSString *_Nonnull const FTMS_UUID;
 extern NSString *_Nonnull const FITSHOW_DEVICEINFO;
 
 
+
 // 通知-------
 // 蓝牙模块上报数据，完成数据解析后，通过这个通知发出去
 extern NSString *_Nonnull const kUpdateFitshoData;
@@ -20,6 +21,8 @@ extern NSString *_Nonnull const kUpdateFitshoData;
 extern NSString *_Nonnull const kFitshowHasStoped;
 // 已下发控制指令，但是设备无响应，发通知
 extern NSString *_Nonnull const kCmdUncontrolled;
+// 意外断连
+extern NSString *_Nonnull const kBleDisconnect;
 
 @class BleManager;
 

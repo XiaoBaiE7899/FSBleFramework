@@ -108,6 +108,14 @@ NS_ASSUME_NONNULL_BEGIN
 // 发送指令的定时器  发送频率500ms一条
 @property (nonatomic, strong) NSTimer *_Nullable sendCmdTimer;
 
+/*
+ 心跳包
+ 运动型的模块，连接成功以后，必须启动心跳包，当指令队列没有指令时，会自定加入查询状态指令，
+ 跑步机：一条状态指令就行
+ 车表： 每次会加入2条指令，一条查询状态，一条获取运动数据的
+ */
+@property (nonatomic, strong) NSTimer       *_Nullable heartbeatTmr;
+
 // 通过模块信息初始化  设备
 - (instancetype _Nonnull )initWithModule:(BleModule *_Nonnull)module;
 

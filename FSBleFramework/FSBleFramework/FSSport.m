@@ -18,6 +18,14 @@ static FSSport     *currentSport;
 
 + (instancetype)currentWithHostURL:(NSString *)url {
     if (!currentSport) {
+        /*
+         22.11.5 重构车表连接逻辑
+         22.11.14 车表阻力不能控制
+         22.11.21 跑步机安全锁脱落的状态还是为2，因为在新状态的赋值的，把6的状态过滤掉了
+         */
+//        FSLog(@"22.11.5 重构车表连接逻辑");
+//        FSLog(@"22.11.14 车表阻力不能控制");
+//        FSLog(@"22.11.21 修改跑步机安全锁脱落的状态还是为2");
         currentSport = [[FSSport alloc] init];
         // MARK: 创建运动的时候，添加监听通知，这里可以做数据处理，运动记录等等
         [[NSNotificationCenter defaultCenter] addObserver:currentSport selector:@selector(updateFitshowData:) name:kUpdateFitshoData object:nil];

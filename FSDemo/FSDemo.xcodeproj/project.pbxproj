@@ -10,7 +10,7 @@
 		2B23C3772862F7970093F104 /* HealthAppManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B23C3762862F7970093F104 /* HealthAppManager.m */; };
 		2B23C37A286300040093F104 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B23C379286300040093F104 /* HealthKit.framework */; };
 		2B569ADA282DEB7400483F6C /* XBContactLib.m in Sources */ = {isa = PBXBuildFile; fileRef = 2B569AD9282DEB7400483F6C /* XBContactLib.m */; };
-		2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */; };
+		2BC1417628B6051E009A1BAA /* FSBleFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2BAEA15B27FED77400A2FD88 /* FSBleFramework.framework */; };
 		7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B348EB027EAFC3C00030216 /* FSExpand.framework */; };
 		7BB5B3AD261EB2D3007752D9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7BB5B3AC261EB2D3007752D9 /* AppDelegate.m */; };
 		7BB5B3B6261EB2D3007752D9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7BB5B3B4261EB2D3007752D9 /* Main.storyboard */; };
@@ -80,8 +80,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B23C37A286300040093F104 /* HealthKit.framework in Frameworks */,
-				2BAEA15C27FED77400A2FD88 /* FSBleFramework.framework in Frameworks */,
 				7B348EB127EAFC3C00030216 /* FSExpand.framework in Frameworks */,
+				2BC1417628B6051E009A1BAA /* FSBleFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,7 +239,7 @@
 		7BB5B3A0261EB2D3007752D9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1330;
 				TargetAttributes = {
 					7BB5B3A7261EB2D3007752D9 = {
 						CreatedOnToolsVersion = 12.4;
@@ -419,7 +419,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -476,7 +476,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
@@ -498,13 +498,15 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F6USD8625R;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/FSDemo",
+					"$(PROJECT_DIR)",
 				);
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				INFOPLIST_FILE = FSDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_MAP_FILE_PATH = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -529,13 +531,15 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = F6USD8625R;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/FSDemo",
+					"$(PROJECT_DIR)",
 				);
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				INFOPLIST_FILE = FSDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_MAP_FILE_PATH = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

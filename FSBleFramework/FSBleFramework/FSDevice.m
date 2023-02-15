@@ -83,7 +83,13 @@ static int afterDelayTime = 3;
         }
             break;
         case 6: {
-            _currentStatus = FSDeviceStateTreadmillDisable;
+            // MARK: XB 22.8.29  新增对安全锁子数据的判断
+//            _currentStatus = FSDeviceStateTreadmillDisable;
+            if (self.subSafeCode == 2) {
+                _currentStatus = FSDeviceStateSectionSleep;
+            } else {
+                _currentStatus = FSDeviceStateTreadmillDisable;
+            }
         }
             break;
         case 7: {
@@ -123,9 +129,9 @@ static int afterDelayTime = 3;
         self.getParamSuccess &&
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
-        FSLog(@"22.7.12 回调工作中的状态  %d", _currentStatus);
+//        FSLog(@"22.7.12 回调工作中的状态  %d", _currentStatus);
         self.connectState = FSConnectStateWorking;
-        FSLog(@"FSConnectStateWorking");
+//        FSLog(@"跑步机  回调Working");
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
 }
@@ -381,9 +387,13 @@ static int afterDelayTime = 3;
     Byte subcmd        = bytes[2];
     self.oldStatus     = self.currentStatus;
     FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+    // MARK:XB 22.8.29  跑步机的如果是安全锁脱落，先不复制，
+//    if (subcmd != 6) {
+//        self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
+//    }
     
     // !!!: 22.4.1 回调蓝牙正常工作  写在setter方法中
-    self.currentStatus = subcmd; // 测试状态  会不会进入setter方法
+    
     // 如果设备处于暂停暂停，并且是通过指令停止的，在发一次停止指令
     if (self.currentStatus == FSDeviceStatePaused && self.stopWithCmd) {
         [self stop];
@@ -518,11 +528,50 @@ static int afterDelayTime = 3;
             // FSDeviceStateTreadmillDisable 设备禁用
         case 6: {
             // 代理回调
-            if (self.deviceDelegate &&
-                [self.deviceDelegate respondsToSelector:@selector(deviceError:)]) {
+//            if (self.deviceDelegate &&
+//                [self.deviceDelegate respondsToSelector:@selector(deviceError:)]) {
+//                [self.deviceDelegate deviceError:self];
+//            }
+//            [self disconnect];
+            // MARK: XB 22.8.29  新增安全锁脱落的适配
+//            switch (cmd.data.length) {
+//                case 5: {
+//                    FSLog(@"这个不是1.1协议的  安全锁  直接提示安全锁脱落");
+//                    if (self.deviceDelegate &&
+//                        [self.deviceDelegate respondsToSelector:@selector(deviceError:)]) {
+//                        FSLog(@"^^^这个不是1.1协议的  安全锁  直接提示安全锁脱落");
+//                        [self.deviceDelegate deviceError:self];
+//                    }
+////                    [self disconnect];
+//                }
+//                    break;
+//                case 6: { // 1.1 协议， 有安全锁脱落&&休眠
+//                    self.subSafeCode = bytes[4];
+////                    NSString *subCode = SF(@"%d", safeCode);
+//                    if (self.subSafeCode == 1) {
+//                        // 代理回调
+//                        if ([self.deviceDelegate respondsToSelector:@selector(deviceError:)]) {
+//                            [self.deviceDelegate deviceError:self];
+//                        }
+//                        [self disconnect];
+//                    } else if (self.subSafeCode == 2) {
+//                        FSLog(@"22.8.29提示休眠");
+//                    }
+//
+//                }
+//
+//                default:
+//                    break;
+//            }
+            // 新状态赋值
+            self.currentStatus = subcmd;
+            self.subSafeCode = bytes[4];
+            // 代理回调
+            if ([self.deviceDelegate respondsToSelector:@selector(deviceError:)]) {
                 [self.deviceDelegate deviceError:self];
             }
             [self disconnect];
+            
         }
             break;
             // FSDeviceStateTreadmillReady 设备就绪
@@ -617,7 +666,7 @@ static int afterDelayTime = 3;
 - (BOOL)start {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 不是正常状态 不能启动
-    FSLog(@"22.7.12  判断是不是可以启动  当前状态::%d", self.currentStatus);
+//    FSLog(@"22.7.12  判断是不是可以启动  当前状态::%d", self.currentStatus);
     if (self.currentStatus != FSDeviceStateNormal) return NO;
     [self sendData:FSGenerateCmdData.treadmillStart()];
     return YES;
@@ -760,9 +809,13 @@ static int afterDelayTime = 3;
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     if (self.commands.count < 3) {
         // MARK: 210617  增加判断设备状态
-        if (self.currentStatus != FSDeviceStateDefault &&
-            !self.getParamSuccess &&
-            sender) {
+//        if (self.currentStatus != FSDeviceStateDefault &&
+//            !self.getParamSuccess &&
+//            sender) {
+//            [self updateDeviceParams];
+//        }
+        // MARK: XB  22.8.29  如果没有获取设备参数就去获取设备参数
+        if (!self.getParamSuccess && sender) {
             [self updateDeviceParams];
         }
         // 发送状态指令
@@ -795,7 +848,7 @@ static int afterDelayTime = 3;
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
 //        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
-        FSLog(@"22.7.14  意外断链   移除设备");
+//        FSLog(@"22.7.14  意外断链   移除设备");
         [self removeFromManager];
     }
     [self disconnect];
@@ -852,13 +905,13 @@ static int afterDelayTime = 3;
             _currentStatus = FSDeviceStatePaused;
         }
             break;
-        case 20:
-        case 32: { // 睡眠  有2个，防呆不防傻
+        case 20: {
+//        case 32: { // 睡眠  有2个，防呆不防傻 22.11.4 SCZG 车表连接逻辑 只要求做21的判断 坑
             _currentStatus = FSDeviceStateSectionSleep;
         };
             break;
         case 21:
-        case 33: // 故障  防呆不防傻
+//        case 33: // 故障  防呆不防傻 22.11.4 SCZG 车表连接逻辑 只要求做21的判断 坑
             _currentStatus = FSDeviceStateError;
         default:
             break;
@@ -875,7 +928,7 @@ static int afterDelayTime = 3;
         !self.accidentalReconnect &&
         self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didConnectedWithState:)]) {
-        FSLog(@"FSConnectStateWorking");
+//        FSLog(@"车表回调  Working");
         self.connectState = FSConnectStateWorking;
         [self.deviceDelegate device:self didConnectedWithState:FSConnectStateWorking];
     }
@@ -970,20 +1023,27 @@ static int afterDelayTime = 3;
 }
 
 - (void)sectionReadyTimeOut {
-//    FSLog(@"%@", NSStringFromSelector(_cmd));
+    // MARK: XB 休眠不能进入的代码
+//    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
+//    [self.commands removeAllObjects];
+//    [self.sendCmdTimer invalidate];
+//    self.sendCmdTimer = nil;
+//    [self.heartbeatTmr invalidate];
+//    self.heartbeatTmr = nil;
+//    if (self.deviceDelegate &&
+//        [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
+//        [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
+//    }
+//    [self disconnect];
+    
+    // MARK: XB  休眠可以进入 回调连接无响应
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(sectionReadyTimeOut) object:nil];
-//    FSLog(@"指令队列   移除所有指令");
-    [self.commands removeAllObjects];
-    [self.sendCmdTimer invalidate];
-    self.sendCmdTimer = nil;
-    [self.heartbeatTmr invalidate];
-    self.heartbeatTmr = nil;
     if (self.deviceDelegate &&
         [self.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-//        FSLog(@"33.6.6 代理回调断链 FSDisconnectTypeWithoutResponse");
         [self.deviceDelegate device:self didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
-    [self disconnect];
+    // 只有回调状态，SDK不断连，等外部调用断连接的时候才断链
+    
 }
 
 - (BOOL)onUpdateData:(BleCommand *)cmd {
@@ -1106,7 +1166,7 @@ static int afterDelayTime = 3;
         int maxIncline       = bytes[4];
         /// !!!: FS 最小阻力、单位、是否支持暂停的赋值 协议里面写的时候配置信息
         int unit             = bytes[5] & 0x01;
-        FSLog(@"22.7.14  是否为英制单位%d", unit);
+//        FSLog(@"22.7.14  是否为英制单位%d", unit);
         int pause            = bytes[5] & 0x02;
         int deviceParagraph  = bytes[6];
         /* !!!: 210427 最大坡度  最小坡度  是有符号的整数，第一位是符号位 因此最大的数据就是127*/
@@ -1187,7 +1247,7 @@ static int afterDelayTime = 3;
         // 22.7.5  如果设备处于暂停状态并且是通过指令停止的，再发一次停止指令
         [self stop];
     }
-    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
+//    FSLog(@"模块%@  当前状态:%d  旧状态:%d", self.module.name,  self.currentStatus, self.oldStatus);
     // 车表状态改变，通过代理回调出去
     if (self.oldStatus != self.currentStatus &&
         self.deviceDelegate &&
@@ -1274,16 +1334,32 @@ static int afterDelayTime = 3;
 - (void)updateState:(NSTimer *)sender {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // FIXME:22.3.30  车表心跳的逻辑还是缺失的，这个得改
-    if (self.commands.count < 3) {
-        if (self.currentStatus != FSDeviceStateDefault) {
-            if (!self.writeUserDataSuccess) {
-                // 写入用数据
-                [self sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
-            }
 
-            if (!self.getParamSuccess) { // 更新设备参数
-                [self updateDeviceParams];
-            }
+    if (self.commands.count < 3) {
+//        if (self.currentStatus != FSDeviceStateDefault) {
+//            if (!self.writeUserDataSuccess) {
+//                // 写入用数据
+//                [self sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
+//            }
+//
+//            if (!self.getParamSuccess) { // 更新设备参数
+//                [self updateDeviceParams];
+//            }
+//        }
+        
+        if (!self.writeUserDataSuccess) {
+//            FSLog(@"22.8.29  写入用户数据");
+            // 写入用数据
+            [self sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
+        }
+        
+        if (!self.getParamSuccess) { // 更新设备参数
+//            FSLog(@"22.8.29  获取设备参数");
+            [self updateDeviceParams];
+        }
+        
+        if (!self.getParamSuccess) { // 更新设备参数
+            [self updateDeviceParams];
         }
         // 获取状态信息
         [self sendData:FSGenerateCmdData.sectionStatue()];
@@ -1305,8 +1381,12 @@ static int afterDelayTime = 3;
 - (BOOL)start {
 //    FSLog(@"%@", NSStringFromSelector(_cmd));
     // 车表正常待机  睡眠都可以启动
+    // MARK: XB 22.8.28 添加休眠可以进入的代码
     if (self.currentStatus == FSDeviceStateNormal ||
-        self.currentStatus == FSDeviceStateSectionSleep) {
+        self.currentStatus == FSDeviceStateSectionSleep ||
+        self.currentStatus == FSDeviceStateDefault ||
+        /* 22.8.30 旋钮划船器 连接成功是这个状态，应该要允许进入 */
+        self.currentStatus == FSDeviceStateStarting) {
     } else {
         return NO;
     }

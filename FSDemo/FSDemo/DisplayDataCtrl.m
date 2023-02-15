@@ -2,6 +2,8 @@
 #import "DisplayDataCtrl.h"
 #import <FSBleFramework/FSBleFramework.h>
 
+#define weakObject(value) __weak typeof(value) weak##value = value;
+
 
 @interface DisplayDataCtrl ()
 // 是否为英制设备
@@ -52,6 +54,25 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    FSLog(@"当前的蓝牙状态%d", fs_sport.fsDevice.currentStatus);
+    // 不停的发送启动指令
+    [self keepStart];
+    
+}
+
+- (void)keepStart {
+    weakObject(self)
+    if (fs_sport.fsDevice.currentStatus == FSDeviceStateDefault) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [fs_sport.fsDevice start];
+            [weakself keepStart];
+//            [fs_sport.fsDevice sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
+//            [fs_sport.fsDevice sendData:FSGenerateCmdData.sectionStatue()];
+//            [fs_sport.fsDevice sendData:FSGenerateCmdData.sectionReady()];
+//            [fs_sport.fsDevice sendData:FSGenerateCmdData.sectionWriteUserData(0, 70, 170, 25, 00)];
+//            [fs_sport.fsDevice sendData:FSGenerateCmdData.sectionStart()];
+        });
+    }
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {

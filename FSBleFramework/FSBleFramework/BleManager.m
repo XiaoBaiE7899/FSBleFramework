@@ -10,6 +10,8 @@ NSString * _Nonnull const FITSHOW_DEVICEINFO  = @"deviceInfo"; // 设备类别�
 NSString * _Nonnull const kUpdateFitshoData   = @"kUpdateFitshoData";
 NSString * _Nonnull const kFitshowHasStoped   = @"kFitshowHasStoped";
 NSString * _Nonnull const kCmdUncontrolled    = @"kCmdUncontrolled"; // 设备失控
+// 意外断连
+NSString * _Nonnull const kBleDisconnect    = @"kBleDisconnect";
 
 
 static NSMutableDictionary  *manager = nil;
@@ -190,25 +192,26 @@ static NSMutableDictionary  *manager = nil;
     BleDevice *device = [self objectForPeripheral:peripheral];
     
     if (!device) {
-        FSLog(@"22.7.14  意外断链测试  找不到设备直接返回 全局对象%@  全局对象代理%@", fs_sport.fsDevice, fs_sport.fsDevice.deviceDelegate);
+//        FSLog(@"22.7.14  意外断链测试  找不到设备直接返回 全局对象%@  全局对象代理%@", fs_sport.fsDevice, fs_sport.fsDevice.deviceDelegate);
 //        [fs_sport.fsDevice.deviceDelegate]
         if (fs_sport.fsDevice &&
             fs_sport.fsDevice.deviceDelegate &&
             [fs_sport.fsDevice.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
-            FSLog(@"22.7.14  意外断链测试 设备没找到，使用全局运动类回调");
+//            FSLog(@"22.7.14  意外断链测试 设备没找到，使用全局运动类回调");
             [fs_sport.fsDevice.deviceDelegate device:fs_sport.fsDevice didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
             fs_sport.fsDevice.deviceDelegate = nil;
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:kBleDisconnect object:self];
         
         return;
     }
-    FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  全局对象%@", device.reconnect, device.deviceDelegate, fs_sport.fsDevice);
+//    FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  全局对象%@", device.reconnect, device.deviceDelegate, fs_sport.fsDevice);
     
     if (device.reconnect == 3 &&
         device.deviceDelegate &&
         [device.deviceDelegate respondsToSelector:@selector(device:didDisconnectedWithMode:)]) {
         // 回调断链
-        FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  代理响应方法", device.reconnect, device.deviceDelegate);
+//        FSLog(@"22.7.14  意外断链测试  连接次数%d  代理%@  代理响应方法", device.reconnect, device.deviceDelegate);
         [device.deviceDelegate device:device didDisconnectedWithMode:FSDisconnectTypeWithoutResponse];
     }
 

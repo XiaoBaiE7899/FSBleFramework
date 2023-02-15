@@ -109,8 +109,8 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
         self.deviceParam = [FSDeviceParam new];
         // 设备信息初始化
         self.deviceInfo = [FSDeviceInfo new];
-        // 获取设备信息
-        [self pullDeviceInfo];
+        // 获取设备信息 环球项目不需要去获取数据
+        // [self pullDeviceInfo];
     }
     return self;
 }
@@ -214,6 +214,9 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     self.counts           = @"0";
     self.paragraph        = @"0";
     self.uid              = @"0";
+    self.stopWithCmd      = NO;
+    self.discontrolType   = FSDiscontrolTypeNone;
+    self.subSafeCode      = 0;
 }
 
 - (void)updateState:(NSTimer *__nullable)sender {
@@ -303,6 +306,8 @@ NSString * _Nonnull const CHAR_WRITE_UUID   = @"FFF2"; // 写入通道
     NSString *type        = [NSString stringWithFormat:@"%d", self.module.sportType];
 //    NSString *factory     = self.module.factory;
 //    NSString *machineCode =  self.module.machineCode;
+    
+//    FSLog(@"SDK 获取设备信息");
     
     FSDeviceInfo *deviceInfo = [FSBleTools readDeviceInfoFromPlistFile:self];
     

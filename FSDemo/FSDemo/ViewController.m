@@ -15,6 +15,11 @@
 //#import <Contacts/Contacts.h>
 #import "XBContactLib.h"
 
+// ijkPlayer 包
+
+
+
+
 static NSString *dev_device = @"FS-12345";
 
 
@@ -275,32 +280,32 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (void)device:(BleDevice *)device didConnectedWithState:(FSConnectState)state {
-    FSLog(@"22.7.12 回调连接状态%d", state);
+    FSLog(@"22.11.1 回调连接状态%d", state);
     switch (state) {
             
         case FSConnectStateDisconnected: {
-            FSLog(@"22.4.1  FSConnectStateDisconnected");
+            FSLog(@"22.11.1  FSConnectStateDisconnected");
         }
             break;
         case FSConnectStateConnecting: {
-            FSLog(@"22.4.1 FSConnectStateConnecting");
+            FSLog(@"22.11.1 FSConnectStateConnecting");
         }
             break;
         case FSConnectStateReconnecting: {
-            FSLog(@"22.4.1 FSConnectStateReconnecting");
+            FSLog(@"22.11.1 FSConnectStateReconnecting");
         }
             break;
         case FSConnectStateConnected: {
 //            FSLog(@"22.4.1 FSConnectStateConnected");
-            FSLog(@"22.7.12  SDK 取消执行  连接超时%d", device.disconnectType);
+            FSLog(@"22.11.1  SDK 取消执行  连接超时%d", device.disconnectType);
         }
             break;
         case FSConnectStateWorking: {
-            FSLog(@"22.7.12 FSConnectStateWorking");
+            FSLog(@"22.11.1 FSConnectStateWorking");
             if ([fs_sport.fsDevice start]) {
-                FSLog(@"22.7.12…………运动秀的设备可以启动");
+                FSLog(@"22.11.1…………运动秀的设备可以启动");
             } else {
-                FSLog(@"22.7.12…………运动秀的设备不能启动");
+                FSLog(@"22.11.11…………运动秀的设备不能启动");
             }
         }
             
@@ -311,7 +316,7 @@ static NSString *dev_device = @"FS-12345";
 }
 
 - (void)device:(BleDevice *)device didDisconnectedWithMode:(FSDisconnectType)mode {
-    FSLog(@"22.3.29 设备已断开连接%d", mode);
+    FSLog(@"22.8.29 设备已断开连接%d", mode);
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"蓝牙断连" message:FSFM(@"%d", mode) preferredStyle:UIAlertControllerStyleAlert];
 
     [alertController addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
@@ -324,6 +329,17 @@ static NSString *dev_device = @"FS-12345";
 
 - (void)deviceError:(FSBaseDevice *)device {
     FSLog(@"22.3.29 设备故障%@", device.errorCode);
+    if (device.currentStatus == FSDeviceStateTreadmillDisable) {
+        if (device.subSafeCode == 0 || device.subSafeCode == 1) {
+            FSLog(@"22.8.29跑步机禁止启动---安全锁脱落");
+            [device disconnect];
+            
+        }
+        
+        if (device.subSafeCode == 2) {
+            FSLog(@"22.8.29跑步机禁止启动---休眠");
+        }
+    }
 }
 
 - (void)deviceDidUpdateState:(FSDeviceState)newState fromState:(FSDeviceState)oldState {
